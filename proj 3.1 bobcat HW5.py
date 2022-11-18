@@ -58,8 +58,12 @@ for x in idx:
 testmat = np.mat([[1,2],[0,3]])
 testval,testvec = np.linalg.eig(testmat)
 
-ic(realVal)
-ic(realVec)
+print("\n")
+
+print("Eigenvalues of the Bobcat Transition Matrix:")
+print(realVal,"\n")
+print("Example Eigenvectors of the Bobcat Transition Matrix (columns respective to eigenvalue indices):")
+print(realVec,"\n")
 
 """
 TODO:
