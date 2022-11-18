@@ -41,6 +41,7 @@ ic(A)
 eVal,eVec = np.linalg.eig(A)
 
 ic(eVal)
+ic(eVec)
 
 #find real evals and their respective evectors
 realVal = np.array([]) #array of real evals
@@ -63,7 +64,7 @@ print("\n")
 print("Eigenvalues of the Bobcat Transition Matrix:")
 print(realVal,"\n")
 print("Example Eigenvectors of the Bobcat Transition Matrix (columns respective to eigenvalue indices):")
-print(realVec,"\n")
+print(realVec,"\n where column @index 0 is the e-vector for e-val @ index 0, and column @ index 1 is the e-vector for e-val @ index 1")
 
 """
 TODO:
@@ -82,10 +83,12 @@ APPLYING MATRIX OVER 10 YEARS
 
 #make initial probability vector 
 init = np.r_[0,100,50,50,25,10, [0]*10]
-ic(init)
+print("\n Initial Population Vector: \n", init)
 
-ic(A.shape)
-ic(init.shape)
 
-res = np.matmul(A,init)
-ic(res)
+for x in range(1,11):
+    print("\n")
+    print("Probability Vector after ", x, "years: \n")
+    init = np.matmul(A,init)
+    init = np.reshape(init,(16,1))
+    print(init)
