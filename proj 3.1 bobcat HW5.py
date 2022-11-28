@@ -54,7 +54,8 @@ def bestCaseMatrix():
     return m
 
 
-# Displays eigenvalues and eigenvectors of A, also displays dominant eigenvalue and eigenvector
+# Displays eigenvalues and eigenvectors of A, also displays dominant 
+# eigenvalue and eigenvector
 # Parameters: A = Numpy matrix 
 def displayEigen(A):
 
@@ -81,8 +82,10 @@ def displayEigen(A):
 
     print("Real Eigenvalues of the Bobcat Transition Matrix:")
     print(realVal,"\n")
-    print("Example Eigenvectors of the Bobcat Transition Matrix (columns respective to eigenvalue indices):")
-    print(realVec,"\n where column @index 0 is the e-vector for e-val @ index 0, and column @ index 1 is the e-vector for e-val @ index 1")
+    print("Example Eigenvectors of the Bobcat Transition Matrix (columns \
+    respective to eigenvalue indices):")
+    print(realVec,"\n where column @index 0 is the e-vector for e-val @ \
+    index 0, and column @ index 1 is the e-vector for e-val @ index 1")
 
     #sum col where val is biggest
     domEvalidx = realVal.argmax()
@@ -94,7 +97,8 @@ def displayEigen(A):
     for x in range(DIMENSION):
         sum+=realVec[x,domEvalidx]
     sum = np.real(sum)
-    print("\n\nSum of Population Vectors of the Dominant Eigenvalue's Eigenvector: \n",sum)
+    print("\n\nSum of Population Vectors of the Dominant Eigenvalue's\
+   Eigenvector:\n",sum)
 
 
     #make dom eval array and dom eval eigen vector
@@ -102,15 +106,18 @@ def displayEigen(A):
 
     domEvec = np.multiply(domEvec,np.reciprocal(sum))
 
-    print("This is the eigenvector with its values summing to 1 (i.e. proportion vector): \n",domEvec)
+    print("This is the eigenvector with its values summing to \
+    1 (i.e. proportion vector): \n",domEvec)
 
     total = 0
     for x in range(DIMENSION):
         total += domEvec[x,0]
 
-    print("Total of eigenvector values: \n",total,"\n So, we know the values are proportions now")
+    print("Total of eigenvector values: \n",total,"\n So, we know the values are\
+   proportions now")
     for x in range(DIMENSION):
-        print("Bobcat Age Class - ", x+1, " Proportion: ",np.format_float_positional(domEvec[x,0]))
+        print("Bobcat Age Class - ", x+1, " Proportion: ",\
+            np.format_float_positional(domEvec[x,0]))
 
 
 # Simulates 10 years of growth, printing the results as it simulates
@@ -316,15 +323,19 @@ for x in range(100):
 color_palette = sns.color_palette("Paired", n_colors = DIMENSION)
 
 
-#plot initial graph to get the legend, then remove the legend for the rest of the DataFrames
-ax = sns.lineplot(data = hundredSims[0], x = "Years", y = "Population_Count", hue = "Age_Group", legend = True, palette = color_palette)
+#plot initial graph to get the legend, then remove the legend for the rest of the
+# DataFrames
+ax = sns.lineplot(data = hundredSims[0], x = "Years", y = "Population_Count", \
+    hue = "Age_Group", legend = True, palette = color_palette)
 sns.move_legend(ax, "upper right")
 for sim in hundredSims[1:]:
-    ax = sns.lineplot(data = sim, x = "Years", y = "Population_Count", hue = "Age_Group", legend = False, palette = color_palette)
+    ax = sns.lineplot(data = sim, x = "Years", y = "Population_Count", \
+        hue = "Age_Group", legend = False, palette = color_palette)
 
-#TODO: To make line graphs, plot each dataframe individually onto the same figure
+# To make line graphs, plot each dataframe individually onto the same figure
 
-#TODO: To make box plots, you HAVE to filter each dataframe to extract EACH AGE GROUP'S 
+#To make box plots, you HAVE to filter each dataframe to extract EACH 
+#AGE GROUP'S 
 #vals each year into 1 DATAFRAME
 #i.e. Dataframe 1 is Age Group 1, columns labeled "Year 1" Year 2", etc
 # each row will be a new Simulation
@@ -359,13 +370,17 @@ for i in range(8):
     fig,axes= plt.subplots(2,1, figsize=[9,6], dpi = 100, sharey = True, sharex = True)
     for j in range(2):
         # make figure with 4x4 axes for 18 Age Groups (0 is initial->17) 
-        sns.boxplot(data = listOfAgeFilteredSims[idx], ax = axes[j], x = "Years", y = "Population_Count", orient = "v",).set(title = "Age Group "+str(idx+1), ylabel = "Population Count")
+        sns.boxplot(data = listOfAgeFilteredSims[idx], ax = axes[j], x = "Years", \
+            y = "Population_Count", orient = "v",).set(title = "Age Group "+str(idx+1), \
+            ylabel = "Population Count")
         idx+=1
         assert(idx<DIMENSION)
 
 #make age 17 figure
 fig,ax = plt.subplots()
-sns.boxplot(data = listOfAgeFilteredSims[DIMENSION-1], x = "Years", y = "Population_Count", orient = "v").set(title = "Age Group "+str(idx+1), ylabel = "Population Count")
+sns.boxplot(data = listOfAgeFilteredSims[DIMENSION-1], x = "Years", \
+    y = "Population_Count", orient = "v").set(title = "Age Group "+str(idx+1),\
+    ylabel = "Population Count")
 
 
 
