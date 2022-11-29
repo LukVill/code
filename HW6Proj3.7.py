@@ -235,11 +235,32 @@ def findTNodes(transMat, initialCond):
 # insertTNodes
 # Function: inserts TNodes into initial condition matrix (aka,
 # boundary matrix with initial temps) into the None values
-# Parameters: T matrix (for vals of T nodes); initial temp matrix
+# Parameters: T vector (for vals of T nodes); initial temp matrix
 # Returns: a new matrix with boundary temps AND temp nodes
 # (ready for graphing)
-def insertTNodes(Tmat,initialCond):
-    pass
+def insertTNodes(Tvec,initialCond):
+    # For every node encountered, that node is in order, same order
+    # as the Temp node resulting vector
+
+    # Rows of initialCond
+    nrows = initialCond.shape[0]
+    # Columns of initialCond
+    ncols = initialCond.shape[1]
+
+    # Node counter to track which node we are on
+    node_counter = 0
+
+    # For each element in initialCond
+    for i in range(nrows):
+        for j in range(ncols):
+            # if the elem is node
+            if initialCond[i,j] == None:
+                # increment counter
+                node_counter+=1
+                # extract value in resultant vector
+                initialCond[i,j] = Tvec[node_counter-1] #-1 bc index
+            # whether found or not, parse
+                 
 mat = nxn(5,5)
 A,B = tempModel(mat)
 ic(A)
