@@ -10,7 +10,6 @@ def nxn(row,col):
     #set first row
     matrix = np.array([5.0]*col)
     matrix = np.mat(matrix)
-    ic(matrix)
 
     #set edges to 5
     for x in range(row-2):
@@ -119,7 +118,6 @@ def tempModel(initialCond):
         for j in range(ncols):
             if initialCond[i,j] == None:
                 totalNone += 1
-    ic(totalNone)
     # Use totalNone to make transitionary matrix for Temp nodes
     A = np.zeros((totalNone,totalNone))
     # Make B matrix for temp initials for transitionary matrix
@@ -286,41 +284,40 @@ def plotAsHeatmap(mat,dimx,dimy,units):
     ncols = mat.shape[1]
 
     # gap between node on physical model
-    xval = dimx/nrows
-    yval = dimy/ncols
-
-
-    # make dictionary for vals
-    rDefault = {"row":None,"col":None,"val":None}
+    xval = dimy/nrows
+    yval = dimx/ncols
 
 
     # indices of matrix
     i = 0
     j = 0
-    # temp row to add
-    r = rDefault
-    # empty dataframe 
-    df = pd.DataFrame(columns = ["row","col","val"])
+    # make dictionary for vals
+    r = {"row":[],"col":[],"val":[]}
 
     # for all elems
     for i in range(nrows):
         for j in range(ncols):
-            # make row = i*xval
-            df["row"] = pd.concat([df["row"], pd.Series(i*xval)],\
-                ignore_index = True)
-            ic(pd.Series(i*xval))
-            # make col = j*yval
-            df["col"] = pd.concat([df["col"], pd.Series(j*yval)],\
-                ignore_index = True)
-            # make val = val
-            df["val"] = pd.concat([df["val"], pd.Series(mat[i,j])],\
-                ignore_index = True)
+            r["row"].append(i*xval)
+            r["col"].append(j*yval)
+            r["val"].append(mat[i,j])
+    # after parsed, convert dict to df
+    df = pd.DataFrame(r)
+    #.pivot(index = "row", \
+     #columns = "col", values = "val")
 
-            # reset r
-            r = rDefault
-    ic(df)
+    plt.xlim(df["col"].max(),df["col"].min())
+    plt.ylim(df["row"].max(),df["row"].min())
 
-mat = nxn(5,5)
+    sns.set_palette("flare")
+
+    sns.kdeplot(data = df, x = "col", y = "row", weights = "val", \
+        thresh = 0, levels = 100, fill = True, cbar = True, cut = 0)\
+        .set(xlabel ="Width in "+str(units), ylabel = "Length in "+str(units))
+
+
+    plt.show()
+
+mat = nxn(60,60)
 A,B = tempModel(mat)
 ic(A)
 T = findTNodes(A,B)
