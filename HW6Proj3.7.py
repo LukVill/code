@@ -21,6 +21,22 @@ def nxn(row,col):
     matrix = np.r_[matrix, [[0.0]*col]]
     return matrix
 
+# Function to make top and bottom 10 degrees
+def rxr(row,col):
+    # set first row 
+    matrix = np.array([10.0]*col)
+    matrix = np.mat(matrix)
+
+    # set edges to 0
+    for x in range(row-2):
+        r = np.array(0.0)
+        r = np.append(r,[None]*(col-2))
+        r = np.append(r,0.0)
+        matrix = np.r_[matrix,[r]]
+    # set bottom to 10
+    matrix = np.r_[matrix,[[10.0]*col]]
+    return matrix
+
 
 # distanceParser
 # Function: increment count while negatively parsing left and up 
@@ -297,14 +313,11 @@ def plotAsHeatmap(mat,dimx,dimy,units):
 
     plt.show()
 
-mat = nxn(50,50)
+mat = rxr(10,25)
 A,B = tempModel(mat)
-ic(A)
 T = findTNodes(A,B)
-ic(T)
 result = insertTNodes(T,mat)
-ic(result)
-plotAsHeatmap(result,5,5,"cm")
+plotAsHeatmap(result,2,5,"cm")
 
 
 
