@@ -311,13 +311,13 @@ def plotAsHeatmap(mat,dimx,dimy,units):
     sns.set_palette("flare")
 
     sns.kdeplot(data = df, x = "col", y = "row", weights = "val", \
-        thresh = 0, levels = 100, fill = True, cbar = True, cut = 0)\
+        thresh = 0, levels = 100, fill = True, cbar = False, cut = 0)\
         .set(xlabel ="Width in "+str(units), ylabel = "Length in "+str(units))
 
 
     plt.show()
 
-mat = nxn(60,60)
+mat = nxn(120,120)
 A,B = tempModel(mat)
 ic(A)
 T = findTNodes(A,B)
