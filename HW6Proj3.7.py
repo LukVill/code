@@ -272,7 +272,53 @@ def insertTNodes(Tvec,initialCond):
     # When finished, return newly edited initialCond
     return initialCond
 
+# plotAsHeatmap
+# Function: takes a matrix formatted as a heatmap
+# and converts it into a table with columns (i,j,val)
+# based on row,col, and val of that cell
+# Parameters: tempModel matrix, x and y dimensions of desired
+# portrayed dimension of heatmap, units as str 
+# Returns: displays graph of heatmap with proper dimension units
+def plotAsHeatmap(mat,dimx,dimy,units):
 
+    # Rows and Cols of matrix
+    nrows = mat.shape[0]
+    ncols = mat.shape[1]
+
+    # gap between node on physical model
+    xval = dimx/nrows
+    yval = dimy/ncols
+
+
+    # make dictionary for vals
+    rDefault = {"row":None,"col":None,"val":None}
+
+
+    # indices of matrix
+    i = 0
+    j = 0
+    # temp row to add
+    r = rDefault
+    # empty dataframe 
+    df = pd.DataFrame(columns = ["row","col","val"])
+
+    # for all elems
+    for i in range(nrows):
+        for j in range(ncols):
+            # make row = i*xval
+            df["row"] = pd.concat([df["row"], pd.Series(i*xval)],\
+                ignore_index = True)
+            ic(pd.Series(i*xval))
+            # make col = j*yval
+            df["col"] = pd.concat([df["col"], pd.Series(j*yval)],\
+                ignore_index = True)
+            # make val = val
+            df["val"] = pd.concat([df["val"], pd.Series(mat[i,j])],\
+                ignore_index = True)
+
+            # reset r
+            r = rDefault
+    ic(df)
 
 mat = nxn(5,5)
 A,B = tempModel(mat)
@@ -281,15 +327,8 @@ T = findTNodes(A,B)
 ic(T)
 result = insertTNodes(T,mat)
 ic(result)
+plotAsHeatmap(result,5,5,"cm")
 
-# convert all types in
 
-# turn result into datafram
-df = pd.DataFrame(result)
 
-# graph result
-
-sns.heatmap(data = df)
-
-plt.show()
 
