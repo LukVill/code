@@ -283,41 +283,21 @@ def plotAsHeatmap(mat,dimx,dimy,units):
     nrows = mat.shape[0]
     ncols = mat.shape[1]
 
-    # gap between node on physical model
-    xval = dimy/nrows
-    yval = dimx/ncols
+    xaxis = np.linspace(0,dimx,ncols)
+    yaxis = np.linspace(dimy,0,nrows)
 
+    plt.set_cmap("YlOrRd")
 
-    # indices of matrix
-    i = 0
-    j = 0
-    # make dictionary for vals
-    r = {"row":[],"col":[],"val":[]}
+    plt.contourf(xaxis,yaxis,mat, levels = 200)
+    plt.title("Contour Temperature Heatmap")
+    plt.xlabel("Width in " +str(units))
+    plt.ylabel("Length in " + str(units))
 
-    # for all elems
-    for i in range(nrows):
-        for j in range(ncols):
-            r["row"].append(i*xval)
-            r["col"].append(j*yval)
-            r["val"].append(mat[i,j])
-    # after parsed, convert dict to df
-    df = pd.DataFrame(r)
-    #.pivot(index = "row", \
-     #columns = "col", values = "val")
-
-    plt.xlim(df["col"].max(),df["col"].min())
-    plt.ylim(df["row"].max(),df["row"].min())
-
-    sns.set_palette("flare")
-
-    sns.kdeplot(data = df, x = "col", y = "row", weights = "val", \
-        thresh = 0, levels = 100, fill = True, cbar = False, cut = 0)\
-        .set(xlabel ="Width in "+str(units), ylabel = "Length in "+str(units))
-
+    plt.colorbar()
 
     plt.show()
 
-mat = nxn(120,120)
+mat = nxn(50,50)
 A,B = tempModel(mat)
 ic(A)
 T = findTNodes(A,B)
