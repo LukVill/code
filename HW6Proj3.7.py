@@ -1,3 +1,5 @@
+# Function: plot out heatmap of shape of temperature nodes. Can do nxn 4-sided shape, or 1-D shape
+
 from icecream import ic
 import numpy as np
 import pandas as pd
