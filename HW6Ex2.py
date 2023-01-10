@@ -1,3 +1,5 @@
+# Function: to simulate a Redwood's population via stochastic approach (i.e. Markov chain)
+
 import numpy as np
 from icecream import ic
 import seaborn as sns
