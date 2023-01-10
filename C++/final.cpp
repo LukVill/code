@@ -1,8 +1,14 @@
+// Function: a simple AI where the robot (H) renews its energy with batteries (0)
+// Note: attributes of robot are randomized, but the best performing robots pass their
+// "genes" to the next generation
+// 
 // final.cpp
 // Luke Villanueva, CISP 400
 // 5/17/21
 
+
 #include <iostream>
+#include <string>
 #include <chrono>
 #include <thread>
 
