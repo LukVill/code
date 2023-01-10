@@ -1,3 +1,6 @@
+# Function: simulates a bobcat population vector through many different scenarios
+# The rates of the population and initial population vector are all hard-coded and givens
+
 import numpy as np
 from icecream import ic
 import random as rd
