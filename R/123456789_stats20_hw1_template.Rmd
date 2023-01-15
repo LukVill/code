@@ -1,0 +1,203 @@
+---
+title: "Stats 20, W23 -- Homework 1"
+author: "FIRST&LASTNAME -- UID"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+## Question 1
+
+### (a)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (b)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (c)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (d)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+## Question 2
+
+### (a)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (b)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+## Question 3
+
+### (a)
+<!-- COMPUTE THE QUANTITIES IN THE CODE CHUNK BELOW -->
+```{r Question 3a}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(iii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+### (b)
+<!-- COMPUTE THE QUANTITIES IN THE CODE CHUNK BELOW -->
+```{r Question 3b}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(iii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+### (c)
+<!-- COMPUTE THE QUANTITIES IN THE CODE CHUNK BELOW -->
+```{r Question 3c}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+## Question 4
+
+### (a)
+<!-- CREATE THE OBJECTS IN THE CODE CHUNK BELOW -->
+<!-- NAME THE OBJECTS EXACTLY AS STATED IN THE ASSIGNMENT -->
+```{r Question 4a}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+### (b)
+<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
+<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
+```{r Question 4b}
+
+```
+
+### (c)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 4c}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+## Question 5
+
+### (a)
+<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
+<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
+```{r Question 5a}
+
+```
+
+### (b)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 5b}
+
+```
+
+### (c)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (d)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 5d}
+
+```
+<!-- ENTER YOUR EXPLANATION BELOW -->
+
+## Question 6
+
+### (a)
+<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
+<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
+```{r Question 6a}
+
+```
+
+### (b)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 6b}
+
+```
+
+## Question 7
+
+### (a)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (b)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (c)
+<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
+<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
+```{r Question 7c}
+
+```
+
+### (d)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 7d}
+
+```
+
+(i) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(ii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+(iii) <!-- ENTER YOUR ANSWER TO THE RIGHT OF THIS OR BELOW -->
+
+### (e)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 7e}
+
+```
+<!-- ENTER YOUR EXPLANATION BELOW -->
+
+## Question 8
+<!-- THIS IS THE CODE GIVEN IN THE ASSIGNMENT -->
+```{r Question 8 Background, echo = TRUE}
+x <- 3
+y <- 4
+exp1 <- function() {
+  x^y
+}
+exp2 <- function(x = 2) {
+  x^y
+}
+exp_y <- function(x) {
+  function(y) {
+    x^y
+  }
+}
+```
+
+### (a)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (b)
+<!-- ENTER YOUR ANSWER BELOW -->
+
+### (c)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 8c}
+
+```
