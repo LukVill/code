@@ -10,8 +10,12 @@ output:
     code_folding: show  # allows hiding of code
 ---
 
+<!--Question 1-->
 # Question 1
+
+<!--a.-->
 ## a.
+
 “**Sometimes you have to make the hardest climb to see the most beautiful sunrise.** I read that
 once on an old lady’s decorative pillow, but it is really how I feel today. I’ve climbed a very weird and rocky
 mountain, and it was a pain in the ass, and my legs are tired, and I’m starving. But *the sun is rising over a
@@ -19,11 +23,15 @@ sea of love and waffles and possibility.* So *I’m just gonna relax and take a 
 as long as I possibly can.*” – Leslie Knope (from Parks and Recreation)
 
 <!--b.-->
+## b.
+
 | Homework | Midterm | Final Exam | Final Project |
 |---------:|--------:|-----------:|--------------:|
 | 18% | 30% | 40% | 12% |
 
 <!--c.-->
+## c. 
+
 - 2022
   - Fall
     - MATH115A - Linear Algebra
@@ -35,16 +43,22 @@ as long as I possibly can.*” – Leslie Knope (from Parks and Recreation)
      - STATS100A - Introduction to Probability
      
 <!--d.-->
+## d. 
+
 ![Source: [Kitten Link](https://www.google.com/search?q=kitten+picture&client=opera-gx&hs=a4a&sxsrf=AJOqlzUyTpakAFlj16hyoNA8lsB0O7yu8Q:1673824800437&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjXv5Wl28r8AhVAL0QIHerkBy8Q_AUoAXoECAEQAw&biw=1879&bih=939&dpr=1#imgrc=NdjwHMGdfG55NM)](kitten.jpg)
 
 
 <!--Question 2-->
 # Question 2
+
 <!--a.-->
 ## a.
+
 I think these videos are showing a lack of clear and concise communication between two parties. Therefore, the result is not exactly what either party desired in the first place. And so, I think this is related to the class because the professor and the student want to work together to accomplish a task (i.e. learning a certain statistic/R programming concept or complete a project). However, if either side provides vague and misleading information, the result will not be satisfactory. So, it is very important in a class that's introducing a new concept to students for communication to be concise and clear-cut. This way, the professor, graders, and students will all be successful.
 
+<!--b.-->
 ## b. 
+
 The following recipe is my own version of grilled cheese:
 
 1. Obtain the following materials:
@@ -147,3 +161,128 @@ The remainder can be found by using modulus.
 ```{r}
 119 %% 25
 ```
+
+So, we know that the remainder after 25 goes into 119 by 4 times is 19.
+
+
+
+<!--Question 4-->
+# Question 4
+
+<!--a.-->
+## a.
+
+<!--i.-->
+### i.
+
+```{r}
+
+vol_1 <- (4 / 3) * pi * (1^3)
+vol_1
+
+```
+
+<!--ii.-->
+### ii.
+
+```{r}
+
+vol_4 <- (4 / 3) * pi * (4^3)
+vol_4
+
+```
+
+<!--b.-->
+## b. 
+
+```{r}
+
+vol_sphere <- function(r = 1)
+{
+  
+  vol <- (4 / 3) * pi * (r^3)
+  vol
+  
+}
+
+```
+
+<!--c.-->
+## c. 
+
+<!--i.-->
+### i.
+
+```{r}
+
+vol_sphere()
+vol_1
+
+```
+
+The two values are the same, so default value of 1 in `vol_sphere()` is valid.
+
+<!--ii.-->
+### ii.
+
+```{r}
+
+vol_sphere(4)
+vol_4
+
+```
+
+The two values are the same, so value of `vol_sphere()` can change depending on inputted parameter.
+
+
+
+<!--Question 5-->
+# Question 5
+
+<!--a.-->
+## a.
+
+```{r}
+
+# Param: x = num of successes,
+# n = num of trials, 
+# p0 = hypothesized pop proportion
+z_prop <- function(x,n,p0)
+{
+  
+  # convert input successes into proportion
+  x <- x/n
+
+  z <- ( x - p0 ) / sqrt( (p0*(1-p0)) / (n) )
+  
+  z
+}
+
+```
+
+$\hat{p}$ is the value of x.
+
+<!--b.-->
+## b.
+
+```{r}
+
+z_prop(10,13,0.6)
+
+```
+
+<!--c.-->
+## c. 
+
+This z-statistic is the number of standard deviations from the mean value from the ideal population. Depending on the significance value, the z-statistic can lead to the null hypothesis being rejected or accepted. The null hypothesis in this case would be that 60% of Pawnee's residents like waffles over pancakes. This would call for a two-tailed test.
+
+<!--d.-->
+## d.
+
+```{r}
+
+z_prop(30, 39, 0.6)
+
+```
+
+The z-statistic changed because the proportion of the sample that likes waffles over pancakes changed in this new sample. This can be utilized to accept or reject the fact that the supposed hypothesis is that 60% of Pawnee's residents likes waffles over pancakes.
