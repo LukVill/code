@@ -1,0 +1,149 @@
+---
+title: "Stats 20, Winter 2023 - Homework 1"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Question 1
+## a.
+“**Sometimes you have to make the hardest climb to see the most beautiful sunrise.** I read that
+once on an old lady’s decorative pillow, but it is really how I feel today. I’ve climbed a very weird and rocky
+mountain, and it was a pain in the ass, and my legs are tired, and I’m starving. But *the sun is rising over a
+sea of love and waffles and possibility.* So *I’m just gonna relax and take a deep breath and enjoy this view for
+as long as I possibly can.*” – Leslie Knope (from Parks and Recreation)
+
+<!--b.-->
+| Homework | Midterm | Final Exam | Final Project |
+|---------:|--------:|-----------:|--------------:|
+| 18% | 30% | 40% | 12% |
+
+<!--c.-->
+- 2022
+  - Fall
+    - MATH115A - Linear Algebra
+    - LBR STD 10 - Introduction to Labor and Workplace Studies
+    - MATH42 - Introduction to Data-Driven Mathematical Modeling: Life, Universe, and Everything
+  - Winter
+     - MATH131A - Real Analysis
+     - STATS20 - Introduction to Statistical Programming with R
+     - STATS100A - Introduction to Probability
+     
+<!--d.-->
+![Source: [Kitten Link](https://www.google.com/search?q=kitten+picture&client=opera-gx&hs=a4a&sxsrf=AJOqlzUyTpakAFlj16hyoNA8lsB0O7yu8Q:1673824800437&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjXv5Wl28r8AhVAL0QIHerkBy8Q_AUoAXoECAEQAw&biw=1879&bih=939&dpr=1#imgrc=NdjwHMGdfG55NM)](kitten.jpg)
+
+
+<!--Question 2-->
+# Question 2
+<!--a.-->
+## a.
+I think these videos are showing a lack of clear and concise communication between two parties. Therefore, the result is not exactly what either party desired in the first place. And so, I think this is related to the class because the professor and the student want to work together to accomplish a task (i.e. learning a certain statistic/R programming concept or complete a project). However, if either side provides vague and misleading information, the result will not be satisfactory. So, it is very important in a class that's introducing a new concept to students for communication to be concise and clear-cut. This way, the professor, graders, and students will all be successful.
+
+## b. 
+The following recipe is my own version of grilled cheese:
+
+1. Obtain the following materials:
+  - frying pan
+  - spatula
+  - 1 stick of butter 
+  - 1 loaf of sliced bread
+  - 1 pack of prepackaged sliced cheese
+2. Turn the stove to medium-high heat
+3. Wait for 2-3 minutes for the pan to heat up, while doing so, open the packaged loaf of bread
+4. Take out 2 slices of bread and lay them on a flat surface
+5. Open the packaged cheese and take out 2 pieces of cheese and lay them next to the bread
+6. Open one end of the stick of butter and rip off the packaging so that 1 inch of the stick of butter is exposed
+7. With the pan heated, grab the unexposed part of the butter stick and press the exposed end against the pan, making circle motions in order to cover the pan with melted butter (there should be sizzling and the butter should be a bit browned)
+8. Grab one slice of bread on the flat surface and press one side of the bread into the pan, letting the butter seep into the bread
+9. Open 1 slice of the packaged cheese and lay the slice on the bread in the pan
+10. Let the bread sear while occasionally grabbing the pan and tilting it to let the melted butter surround the bread more
+11. In the same pan, melt more butter the same way as described before
+12. Lay the next slice of bread in the pan, and open the second slice of cheese and lay it onto that new slice of bread
+13. Use the spatula to flip the first slice of bread onto the second slice, so that the sides with cheese are facing each other
+14. Continue cooking the sandwich until both sides are golden brown or crispy
+
+<!---Question 3-->
+# Question 3
+
+<!--a.-->
+## a. 
+
+<!--i.-->
+### i. 
+
+Calculate $\frac{6^8}{16^5}$
+
+```{r}
+( 6^8 ) / ( 16^5 )
+```
+
+<!--ii.-->
+### ii.
+
+Calculate $101^{- \frac{8}{7}}$
+
+```{r}
+101^(-8/7)
+```
+
+<!--iii.-->
+### iii.
+
+Calculate $8 + 3 * \pi - 3 + 4/2 * -1$
+
+```{r}
+8 + ( 3 * pi ) - 3 + (4 / 2) * (-1)
+```
+
+<!--b.-->
+## b.
+
+<!--i.-->
+### i.
+
+```{r}
+# log base 2 on 54
+log(54,2)
+```
+
+<!--ii.-->
+### ii.
+
+```{r}
+exp(1)^( exp(1)^( sqrt(2) )  )
+```
+
+<!--iii.-->
+### iii.
+
+```{r}
+( (exp(1)^(pi)) + (exp(1)^(-pi)) ) / ( 2 )
+```
+
+<!--c.-->
+## c.
+
+<!--i.-->
+### i.
+
+To find number of times 25 goes into 119, we can use division and ignore the decimal.
+
+```{r}
+119 / 25
+```
+
+So, we know that 25 can go into 119 by 4 times.
+
+<!--ii.-->
+### ii.
+
+The remainder can be found by using modulus.
+
+```{r}
+119 %% 25
+```
