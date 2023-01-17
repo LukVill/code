@@ -502,6 +502,6 @@ exp_y <- function(x)
 }
 
 # to output 15^4, input 15 first and then 4
-(exp_y(15))(4)
+(exp_y(15))(4) 
 
 ```
