@@ -286,3 +286,181 @@ z_prop(30, 39, 0.6)
 ```
 
 The z-statistic changed because the proportion of the sample that likes waffles over pancakes changed in this new sample. This can be utilized to accept or reject the fact that the supposed hypothesis is that 60% of Pawnee's residents likes waffles over pancakes.
+
+<!--Question 6-->
+# Question 6
+
+<!--a.-->
+## a.
+
+```{r}
+
+lease_calc <- function( msrp, price, down, n = 36, res = 0.6, mf = 0.001, tax = 0.095 )
+{
+  
+  capitalized_cost <- price - down
+  
+  residual_value <- msrp * res
+  
+  monthly_depreciation <- ( capitalized_cost - residual_value ) / n
+  
+  monthly_finance_charge <- ( capitalized_cost + residual_value ) * mf
+  
+  sub_total <- monthly_depreciation + monthly_finance_charge
+  
+  total <- sub_total * ( 1 + tax  )
+  
+  total
+  
+}
+
+```
+
+<!--b.-->
+## b. 
+
+```{r}
+
+lease_calc(31495,29895,2500, 36, 0.52, 0.0016, 0.095)
+
+```
+
+<!--Question 7-->
+# Question 7
+
+<!--a.-->
+## a.
+
+To get the minimum number of coins, we would get the most coins starting from the bigger denominations.
+
+So, we can fit 1 quarter into 47 cents. That leaves 22 cents. We can fit 2 dimes. That leaves 2 cents. And lastly, 2 pennies.
+
+So, the least amount of coins would be 5 coins: 1 quarter, 2 dimes, 2 pennies.
+
+<!--b.-->
+## b.
+
+For an arbitrary number of cents, the generalized logic would be similar to the previous part:
+
+1. Starting from the biggest denomination, fit the coin until it cannot fit as a whole.
+2. Move down to the next denomination and fill as much as you can with that coin.
+3. Continue this process until the total cent amount is covered.
+
+The following is the code logic for the process:
+
+```
+
+INPUT cents
+
+LET q_val = 25, d_val = 10, n_val = 5, p_val = 1
+
+LET q = 0, d = 0, n = 0, p = 0
+
+SET q = cents FLOOR q_val
+SET cents = cents - (q * q_val)
+
+SET d = cents FLOOR d_val
+SET cents = cents - (d * d_val)
+
+
+SET n = cents FLOOR n_val
+SET cents = cents - (n * n_val)
+
+SET p = cents FLOOR p_val
+SET cents = cents - (p * p_val)
+
+```
+
+<!--c.-->
+## c.
+
+```{r}
+
+get_minimum_coins <- function(cents)
+{
+
+  # declare coin vals
+  q_val <- 25
+  d_val <- 10
+  n_val <- 5
+  p_val <- 1
+  
+  # declare coin amts based on floor division
+  q <- cents %/% q_val
+  
+  # update cents amt
+  cents <- cents - (q * q_val)
+  
+  # Note: repeat process for the other coins
+  
+  d <- cents %/% d_val
+  cents <- cents - (d * d_val)
+  
+  n <- cents %/% n_val
+  cents <- cents - (n * n_val)
+  
+  p <- cents %/% p_val
+  cents <- cents - (p * p_val)
+  
+  # total up coin amounts
+  total_coin <- q + d + n + p
+  
+  # print coin amt
+  total_coin
+}
+
+```
+
+<!--d.-->
+## d.
+
+<!--i.-->
+### i.
+
+Testing `get_minimum_coins()` with 31 cents:
+
+```{r}
+
+get_minimum_coins(31)
+
+```
+
+<!--ii.-->
+
+### ii.
+
+Testing 48 cents:
+
+```{r}
+
+get_minimum_coins(48)
+
+```
+
+<!--iii.-->
+### iii.
+
+```{r}
+
+get_minimum_coins(139)
+
+```
+
+<!--e.-->
+## e.
+
+Initially, the number has to have a 4 or 9 in the rightmost digit place. If it were 5 or 0, the total can be replaced with a nickel or dime, so to maximize the amount of pennies, the total's rightmost digit must be a 4 or 9. Thus, the max amount of pennies would be 4.
+
+The function will first consider quarters as the initial denomination. So, the max quarters allowed would be 3 since 4 quarters is exactly 100 cents. So, we have 75 cents of quarters plus 4 pennies, which equals to the total so far of 79 cents.
+
+Next, the max amount of dimes would be found by the function. The most amount of dimes that can be added to 79 cents is 2 because 2 dimes is 20 cents. 79 plus 20 equals 99. So, 99 is our total cents.
+
+Since 99 is 1 less than 100, there is no more room to grow in amount, so the max amount of coins is 3 quarters, 2 dimes, and 4 pennies. This totals up to 9 coins.
+
+To verify:
+
+```{r}
+
+get_minimum_coins(99)
+
+```
