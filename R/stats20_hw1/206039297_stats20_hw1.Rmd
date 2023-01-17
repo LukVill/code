@@ -11,10 +11,10 @@ output:
 ---
 
 <!--Question 1-->
-# Question 1
+## Question 1
 
 <!--a.-->
-## a.
+### a.
 
 “**Sometimes you have to make the hardest climb to see the most beautiful sunrise.** I read that
 once on an old lady’s decorative pillow, but it is really how I feel today. I’ve climbed a very weird and rocky
@@ -23,14 +23,14 @@ sea of love and waffles and possibility.* So *I’m just gonna relax and take a 
 as long as I possibly can.*” – Leslie Knope (from Parks and Recreation)
 
 <!--b.-->
-## b.
+### b.
 
 | Homework | Midterm | Final Exam | Final Project |
 |---------:|--------:|-----------:|--------------:|
 | 18% | 30% | 40% | 12% |
 
 <!--c.-->
-## c. 
+### c. 
 
 - 2022
   - Fall
@@ -43,21 +43,21 @@ as long as I possibly can.*” – Leslie Knope (from Parks and Recreation)
      - STATS100A - Introduction to Probability
      
 <!--d.-->
-## d. 
+### d. 
 
 ![Source: [Kitten Link](https://www.google.com/search?q=kitten+picture&client=opera-gx&hs=a4a&sxsrf=AJOqlzUyTpakAFlj16hyoNA8lsB0O7yu8Q:1673824800437&source=lnms&tbm=isch&sa=X&ved=2ahUKEwjXv5Wl28r8AhVAL0QIHerkBy8Q_AUoAXoECAEQAw&biw=1879&bih=939&dpr=1#imgrc=NdjwHMGdfG55NM)](kitten.jpg)
 
 
 <!--Question 2-->
-# Question 2
+## Question 2
 
 <!--a.-->
-## a.
+### a.
 
 I think these videos are showing a lack of clear and concise communication between two parties. Therefore, the result is not exactly what either party desired in the first place. And so, I think this is related to the class because the professor and the student want to work together to accomplish a task (i.e. learning a certain statistic/R programming concept or complete a project). However, if either side provides vague and misleading information, the result will not be satisfactory. So, it is very important in a class that's introducing a new concept to students for communication to be concise and clear-cut. This way, the professor, graders, and students will all be successful.
 
 <!--b.-->
-## b. 
+### b. 
 
 The following recipe is my own version of grilled cheese:
 
@@ -82,13 +82,13 @@ The following recipe is my own version of grilled cheese:
 14. Continue cooking the sandwich until both sides are golden brown or crispy
 
 <!---Question 3-->
-# Question 3
+## Question 3
 
 <!--a.-->
-## a. 
+### a. 
 
 <!--i.-->
-### i. 
+(i) 
 
 Calculate $\frac{6^8}{16^5}$
 
@@ -97,7 +97,7 @@ Calculate $\frac{6^8}{16^5}$
 ```
 
 <!--ii.-->
-### ii.
+(ii)
 
 Calculate $101^{- \frac{8}{7}}$
 
@@ -106,7 +106,7 @@ Calculate $101^{- \frac{8}{7}}$
 ```
 
 <!--iii.-->
-### iii.
+(iii)
 
 Calculate $8 + 3 * \pi - 3 + 4/2 * -1$
 
@@ -115,10 +115,10 @@ Calculate $8 + 3 * \pi - 3 + 4/2 * -1$
 ```
 
 <!--b.-->
-## b.
+### b.
 
 <!--i.-->
-### i.
+(i.)
 
 ```{r}
 # log base 2 on 54
@@ -126,24 +126,24 @@ log(54,2)
 ```
 
 <!--ii.-->
-### ii.
+(ii.)
 
 ```{r}
 exp(1)^( exp(1)^( sqrt(2) )  )
 ```
 
 <!--iii.-->
-### iii.
+(iii.)
 
 ```{r}
 ( (exp(1)^(pi)) + (exp(1)^(-pi)) ) / ( 2 )
 ```
 
 <!--c.-->
-## c.
+### c.
 
 <!--i.-->
-### i.
+(i.)
 
 To find number of times 25 goes into 119, we can use division and ignore the decimal.
 
@@ -154,7 +154,7 @@ To find number of times 25 goes into 119, we can use division and ignore the dec
 So, we know that 25 can go into 119 by 4 times.
 
 <!--ii.-->
-### ii.
+(ii.)
 
 The remainder can be found by using modulus.
 
@@ -167,13 +167,13 @@ So, we know that the remainder after 25 goes into 119 by 4 times is 19.
 
 
 <!--Question 4-->
-# Question 4
+## Question 4
 
 <!--a.-->
-## a.
+### a.
 
 <!--i.-->
-### i.
+(i)
 
 ```{r}
 
@@ -183,7 +183,7 @@ vol_1
 ```
 
 <!--ii.-->
-### ii.
+(ii)
 
 ```{r}
 
@@ -193,7 +193,7 @@ vol_4
 ```
 
 <!--b.-->
-## b. 
+### b. 
 
 ```{r}
 
@@ -208,10 +208,10 @@ vol_sphere <- function(r = 1)
 ```
 
 <!--c.-->
-## c. 
+### c. 
 
 <!--i.-->
-### i.
+(i.)
 
 ```{r}
 
@@ -223,7 +223,7 @@ vol_1
 The two values are the same, so default value of 1 in `vol_sphere()` is valid.
 
 <!--ii.-->
-### ii.
+(ii.)
 
 ```{r}
 
@@ -237,10 +237,10 @@ The two values are the same, so value of `vol_sphere()` can change depending on 
 
 
 <!--Question 5-->
-# Question 5
+## Question 5
 
 <!--a.-->
-## a.
+### a.
 
 ```{r}
 
@@ -263,7 +263,7 @@ z_prop <- function(x,n,p0)
 $\hat{p}$ is the value of x.
 
 <!--b.-->
-## b.
+### b.
 
 ```{r}
 
@@ -272,12 +272,12 @@ z_prop(10,13,0.6)
 ```
 
 <!--c.-->
-## c. 
+### c. 
 
 This z-statistic is the number of standard deviations from the mean value from the ideal population. Depending on the significance value, the z-statistic can lead to the null hypothesis being rejected or accepted. The null hypothesis in this case would be that 60% of Pawnee's residents like waffles over pancakes. This would call for a two-tailed test.
 
 <!--d.-->
-## d.
+### d.
 
 ```{r}
 
@@ -288,10 +288,10 @@ z_prop(30, 39, 0.6)
 The z-statistic changed because the proportion of the sample that likes waffles over pancakes changed in this new sample. This can be utilized to accept or reject the fact that the supposed hypothesis is that 60% of Pawnee's residents likes waffles over pancakes.
 
 <!--Question 6-->
-# Question 6
+## Question 6
 
 <!--a.-->
-## a.
+### a.
 
 ```{r}
 
@@ -317,7 +317,7 @@ lease_calc <- function( msrp, price, down, n = 36, res = 0.6, mf = 0.001, tax = 
 ```
 
 <!--b.-->
-## b. 
+### b. 
 
 ```{r}
 
@@ -326,10 +326,10 @@ lease_calc(31495,29895,2500, 36, 0.52, 0.0016, 0.095)
 ```
 
 <!--Question 7-->
-# Question 7
+## Question 7
 
 <!--a.-->
-## a.
+### a.
 
 To get the minimum number of coins, we would get the most coins starting from the bigger denominations.
 
@@ -338,7 +338,7 @@ So, we can fit 1 quarter into 47 cents. That leaves 22 cents. We can fit 2 dimes
 So, the least amount of coins would be 5 coins: 1 quarter, 2 dimes, 2 pennies.
 
 <!--b.-->
-## b.
+### b.
 
 For an arbitrary number of cents, the generalized logic would be similar to the previous part:
 
@@ -372,7 +372,7 @@ SET cents = cents - (p * p_val)
 ```
 
 <!--c.-->
-## c.
+### c.
 
 ```{r}
 
@@ -412,10 +412,10 @@ get_minimum_coins <- function(cents)
 ```
 
 <!--d.-->
-## d.
+### d.
 
 <!--i.-->
-### i.
+(i.)
 
 Testing `get_minimum_coins()` with 31 cents:
 
@@ -427,7 +427,7 @@ get_minimum_coins(31)
 
 <!--ii.-->
 
-### ii.
+(ii.)
 
 Testing 48 cents:
 
@@ -438,7 +438,7 @@ get_minimum_coins(48)
 ```
 
 <!--iii.-->
-### iii.
+(iii.)
 
 ```{r}
 
@@ -447,7 +447,9 @@ get_minimum_coins(139)
 ```
 
 <!--e.-->
-## e.
+### e.
+
+To max the coins, we have to pick a number that would maximize each denomination. Unfortunately, we can't do this efficiently because we are limited to the given function `get_minimum_coins()`, which considers quarters first and descends onward from there. However, we can somewhat start with pennies first by focusing on the rightmost digit.
 
 Initially, the number has to have a 4 or 9 in the rightmost digit place. If it were 5 or 0, the total can be replaced with a nickel or dime, so to maximize the amount of pennies, the total's rightmost digit must be a 4 or 9. Thus, the max amount of pennies would be 4.
 
@@ -462,5 +464,44 @@ To verify:
 ```{r}
 
 get_minimum_coins(99)
+
+```
+
+
+<!--Question 8-->
+## Question 8
+
+<!--a.-->
+### a.
+
+`exp1()` is expected to provide a different output than `exp2()` because `exp2()` has a default value for its parameter. So, even if the two functions have the same body code, the values for `x` are different. 
+
+<!--b.-->
+### b.
+
+By placing a function within a function with two uninitialized parameters, we are creating a function that sets up the code for another function. Meaning, the outer most `function()` code block gets used first, placing the parameter into the given code block and then assigning the function code block to the variable name (which is `exp_y` in this case). Afterward, the code can be inputted with another parameter because the function has been "set up" already.
+
+
+<!--c.-->
+### c.
+
+```{r}
+x <- 3
+y <- 4
+
+exp_y <- function(x)
+{
+  
+  function(y)
+  {
+    
+    x^y
+    
+  }
+  
+}
+
+# to output 15^4, input 15 first and then 4
+(exp_y(15))(4)
 
 ```
