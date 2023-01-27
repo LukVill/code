@@ -1,0 +1,394 @@
+---
+title: "Stats 20, 23W -- Homework 1"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+## Question 1
+
+```{r Question 1 Background}
+mixed1 <- c(TRUE, FALSE, FALSE, TRUE, 4, 0, 3)
+mixed1
+mixed2 <- c(TRUE, FALSE, FALSE, TRUE, 4, 0, "3")
+mixed2
+mixed3 <- c(c(TRUE, FALSE, FALSE, TRUE, 4, 0), "3")
+mixed3
+```
+
+### (a)
+`mixed2` and `mixed3` are different because the "3" values in `mixed2` makes `mixed2`'s mode be a character vector. On the other hand, `mixed3` is initially made to be a numeric vector because of the integers. This makes the boolean values turn into numeric values. Afterward, it is concatenated with "3", making the type become a character vector. This makes all the numbers become characters.
+
+### (b)
+<!-- ENTER YOUR ANSWER BELOW, IT CAN BE JUST THE COMMAND. NO NEED TO STORE AN OBJECT -->
+```{r Question 1b}
+c(TRUE, FALSE, c(FALSE, TRUE, 4), 0, "3")
+```
+
+## Question 2
+
+### (a)
+```{r}
+as.numeric(mixed2)
+as.numeric(mixed3)
+```
+`mixed2` as numeric has NA's because it's mode is character. So, turning characters into numeric values is only viable if the character is a number. The values that the NA's replaced were the TRUE and FALSE as character values, so there was no associate number for them.
+
+On the other hand, `mixed3` was able to coerce into all numbers because its final mode was character but all values were numbers in character form. So, the coercion was able to associate the character values to a numeric value.
+
+### (b)
+```{r}
+as.logical(mixed2)
+as.logical(mixed3)
+```
+
+`mixed2` as logical will not take any character value besides "TRUE" or "FALSE". Any other value would be made NA. And so, we see that for values 4, 0, and "3"; they were made into NA's.
+
+On the other hand, `mixed3` was made entirely NA because all character values held no TRUE or FALSE in the strings. So, they were all associated with NA when made logical.
+
+### (c)
+
+```{r Question 2c}
+
+as.logical(as.numeric(mixed3))
+
+```
+
+## Question 3
+
+### (a)
+<!-- ENTER YOUR ANSWERS BELOW, THEY CAN BE JUST THE COMMANDs. NO NEED TO STORE OBJECTs -->
+```{r Question 3a}
+
+# first way
+seq(1,25)
+
+# second way
+1:25
+
+# third way
+seq_len(25)
+
+# fourth way
+seq_along(seq(25))
+
+```
+
+### (b)
+
+i.
+```{r}
+seq(8, 2, by = -0.5)
+```
+
+ii.
+```{r}
+rep(c(-1, 0, 3, 5), 5)
+```
+
+iii.
+```{r}
+rep(seq(5,1),5)
+```
+iv.
+```{r}
+rep(seq(5,1), rep(5,5))
+```
+
+v.
+```{r}
+rep(seq(10,6), seq(1,5))
+```
+
+### (c)
+The given sequence cannot be made only with `seq()` and `rep()` because the sequence skips numbers and goes up and down by intervals greater than 1. These changes cannot be considered by only `seq()` and `rep()`.
+
+We can generate this sequence by the following code:
+
+```{r Question 3c}
+# set vars for seq start and end
+beg <- 10
+last <- 6
+
+s <- seq(beg,last)
+
+beg <- beg - 1
+last <- last -1
+
+s <- c(s,seq(beg,last))
+
+beg <- beg - 1
+last <- last -1
+
+s <- c(s,seq(beg,last))
+
+beg <- beg - 1
+last <- last -1
+
+s <- c(s,seq(beg,last))
+
+beg <- beg - 1
+last <- last -1
+
+s <- c(s,seq(beg,last))
+
+beg <- beg - 1
+last <- last -1
+
+s
+```
+
+
+## Question 4
+
+```{r Question 4a}
+sin(0:100 * pi)
+```
+
+The given vector has values very close to 0. This is because R stores pi not exactly as pi, so the sine of pi won't exactly equal 0, except when it's 0 times pi because that is just 0.
+
+## Question 5
+
+### (a)
+
+<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
+```{r Question 5a}
+my_skew <- function(x)
+{
+  
+  n <- length(x)
+  
+  xbar <- sum(x)/n
+  
+  numerator <- sqrt(n) * sum((x - xbar)^3)
+  
+  denominator <- (sum((x - xbar)^2))^(3/2)
+  
+  numerator/denominator
+  
+}
+```
+
+### (b)
+<!-- USE THE CODE CHUNK BELOW -->
+```{r Question 5b}
+
+running_times <- c(51, 40, 57, 34, 47, 50, 50, 56, 41, 38)
+
+my_skew(running_times)
+
+```
+
+### (c)
+
+```{r Question 5c}
+
+my_skew_one <- function(x)
+{
+  
+  n <- length(x)
+  
+  xbar <- sum(x)/n
+  
+  numerator <- sqrt(n) * ((sum(x^3)) - (3 * xbar * sum(x^2)) + (2 * n * (xbar^3)))
+  
+  denominator <- ((sum(x^2)) - (n * xbar^2))^(3/2)
+
+  numerator/denominator
+}
+
+my_skew_one(running_times)
+
+```
+
+### (d)
+
+```{r Question 5d}
+running_times <- running_times * (10^10)
+
+my_skew_one(running_times)
+```
+
+The results are the same as b and c. This is because mathematically, the formulas should be equivalent to each other.
+
+### (e)
+
+```{r Question 5e}
+my_skew(running_times) - my_skew_one(running_times)
+```
+
+The difference is not exactly 0 because the later decimals are not going to be exactly the same. This is because one-pass and two-pass values won't be exactly the same due to how the computer and R stores values. Round off errors tend to happen more frequently on one-pass functions.
+
+## Question 6
+
+### (a)
+
+```{r Question 6a}
+
+my_length <- function(x)
+{
+  
+  # concat additional 0 to consider 0 length case
+  count <- max(c(0,seq_along(x)))
+  count
+  
+}
+
+```
+
+### (b)
+```{r Question 6b}
+
+# i.
+my_length(numeric(0))
+
+# ii.
+my_length(seq(1, 99, by = 2))
+
+# iii.
+my_length(c("waffles", "friends", "work"))
+
+```
+
+## Question 7
+
+### (a)
+
+```{r Question 7a}
+
+my_rev <- function(x)
+{
+  
+  # print reverse order
+  x[length(x):0]
+  
+}
+
+```
+
+### (b)
+```{r Question 7b}
+
+# i.
+my_rev(numeric(0))
+
+# ii.
+my_rev(seq(1, 99, by = 2))
+
+# iii.
+my_rev(c("waffles", "friends", "work"))
+
+```
+
+## Question 8
+
+### (a)
+
+```{r Question 8a}
+
+
+front <- function(x,n)
+{
+  # length of x
+  len <- length(x)
+  
+  # subset to length n
+  res <- x[0:n]
+  
+  # exclude NA's past len
+  res <- res[-(len+1:n)]
+  
+  # print result
+  res
+  
+}
+
+# verification with n = 6
+
+front(numeric(0),6)
+
+front(seq(1, 99, by = 2), 6)
+
+front(c("waffles", "friends", "work"), 6)
+
+
+# verification with n = 0
+front(seq(1, 99, by = 2), 0)
+
+
+```
+
+### (b)
+
+```{r Question 8b}
+
+back <- function(x, n)
+{
+  
+  # get length of x
+  len <- length(x)
+  
+  # reverse x
+  x <- rev(x)
+  
+    # subset to length n
+  res <- x[0:n]
+  
+  # exclude NA's past len
+  res <- res[-(len+1:n)]
+  
+  # reverse back
+  rev(res)
+  
+}
+
+# verification with n = 6
+back(numeric(0), 6)
+
+back(seq(1, 99, by = 2), 6)
+
+back(c("waffles", "friends", "work"), 6)
+
+# verification with n = 0
+back(seq(1, 99, by = 2), 0)
+
+```
+
+### (c)
+
+```{r Question 8c}
+
+insert_at <- function(x, values, at)
+{
+
+  # make beginning
+  beginning <- front(x, at-1)
+  
+  # make ending
+  ending <- back(x, (length(x)-at+1))
+  
+  # concat beg, ending, and values
+  c(beginning, values, ending)
+  
+}
+
+```
+
+### (d)
+
+```{r Question 8d}
+
+insert_at(1:5, c(0, 0, 0), at = 1)
+
+insert_at(1:5, c(0, 0, 0), at = 3)
+
+insert_at(1:5, c(0, 0, 0), at = 5)
+
+insert_at(1:5, c(0, 0, 0), at = 6)
+
+```
