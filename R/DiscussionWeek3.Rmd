@@ -1,0 +1,207 @@
+---
+title: "Stats 20, 23W -- Discussion Week 3"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+## Problem 1
+
+### a.
+
+`x[3] + y[4]`
+
+### b.
+
+`sum(x[1:4])`
+
+### c. 
+
+`(x[5] * x[10]) / (y[8] - y[5])`
+
+### d.
+
+`x[c(6,4,7,3)]`
+
+### e. 
+
+`y[c(5,rep(1,3),rep(4,2),7)]`
+
+### f.
+
+`length(x) + length(y)`
+
+
+
+## Problem 2
+
+```{r}
+
+extract_not_missing <- function(x)
+{
+
+  # returns true if element is missing (NA or NaN)
+  na_list <- is.na(x)
+
+  # extract not missing
+  x[!na_list]
+  
+}
+
+tc1 <- c(2, 4, NA, NA, 9, NaN, 0)
+tc2 <- 5:9
+tc3 <- rep(NA, 10)
+tc4 <- character(0)
+
+extract_not_missing(tc1)
+extract_not_missing(tc2)
+extract_not_missing(tc3)
+extract_not_missing(tc4)
+
+
+```
+
+## Problem 3
+
+```{r}
+
+impute_missing_values <- function(x, impute_value = mean(x, na.rm = TRUE))
+{
+
+  # get indices where missing values
+  indx <- which(is.na(x))
+  
+  # change values of x
+  x[indx] <- impute_value
+  
+  x
+
+}
+
+```
+
+## Problem 4
+
+```{r}
+
+# a.
+x <- -6:6
+
+# get indices satisfying condition
+indx <- which(x <= -5)
+indx <- c(indx, which(x > 5))
+
+# make logical vector length of x
+res <- logical(length(x))
+
+# change indices to be true, set rest to be false
+res[indx] <- TRUE
+res[-indx] <- FALSE
+
+res
+
+# b.
+x <- 9:13
+# make logical vector length of x
+res <- logical(length(x))
+
+# get indices where x != 10,11 or 12
+indx <- which(x != 10 & x != 11 & x != 12)
+
+# set indices to be TRUE, set rest to be FALSE
+res[indx] <- TRUE
+res[-indx] <- FALSE
+
+res
+
+
+# c. 
+x <- -5:5
+length(which(x > 0))
+
+
+# d. 
+x <- 8:20
+# subset x to greater than 6, then get min
+min(x[x>6])
+
+
+# e.
+x <- -10:8
+# get negative, then abs
+abs(x[x < 0])
+
+# f.
+
+x <- c(NA,NaN,NA,5,6,7)
+
+# make logical vector length x
+res <- logical(length(x))
+
+# get indices that satisfies is.na but NOT is.nan
+indx <- which(is.na(x) & (!is.nan(x)))
+
+# set NA vals in res to be TRUE, set rest to be FALSE
+res[indx] <- TRUE
+res[-indx] <- FALSE
+
+res
+
+```
+
+## Problem 5
+
+```{r}
+
+# given
+x <- -rev(seq_len(11))
+
+# a.
+idx_num <- seq_len(5)
+
+x[idx_num]
+
+x[-idx_num]
+
+# b.
+
+idx_log <- rep(c(TRUE, FALSE), c(5,6))
+
+x[idx_log]
+
+x[!idx_log]
+
+```
+
+## Problem 6
+
+```{r}
+
+check_same <- function(a, b)
+{
+
+  # check mode
+  (mode(a) == mode(b)) && (length(a) == length(b)) && (all(a == b))
+  
+}
+
+# test case 1: a1,b1 ; expected output: TRUE
+a1 <- 3:6
+b1 <- c(3, 4, 5, 6)
+# test case 2: a2,b2 ; expected output: FALSE
+a2 <- c(TRUE, FALSE)
+b2 <- as.numeric(a2)
+# test case 3: a3,b3 ; expected output: FALSE
+a3 <- rep(9:7, 2)
+b3 <- 9:7
+
+check_same(a1,b1)
+check_same(a2,b2)
+check_same(a3,b3)
+
+```
