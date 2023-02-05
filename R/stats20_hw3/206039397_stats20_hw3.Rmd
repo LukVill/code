@@ -631,8 +631,6 @@ extract_longest_substring <- function(strand1, strand2)
       else
       {
         res_candidate <- strand1[i:(i + length(test_substr) - 1)]
-        print("res_candidate:")
-        print(res_candidate)
      
         break
       }
@@ -657,6 +655,6 @@ extract_longest_substring <- function(strand1, strand2)
 extract_longest_substring(seq1,seq2)
 
 # extract from dna1 and dna2
-extract_longest_substring(c(rep("a",100),rep("b",100)),c(rep("b",100),rep("a",100)))
+extract_longest_substring(dna1,dna2)
 
 ```
