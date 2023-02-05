@@ -1,0 +1,261 @@
+---
+title: "Stats 20, W23 -- Homework 3"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Problem 1
+
+## a.
+
+```
+FUNCTION first_or_last_n, input: z, n, first
+
+IF n < 0 OR n != integer(n)
+
+THEN stop code and print error message
+
+ELSE
+
+IF length of z < n
+THEN return z
+
+ELSE
+THEN 
+{
+
+IF first is True
+THEN return z from 0 -> n
+
+ELSE
+THEN reverse z, subset from 0 -> n, reverse back
+
+}
+
+```
+
+## b.
+
+```{r error=TRUE}
+
+# z, n, first
+first_or_last_n <- function(z, n = 3, first = TRUE)
+{
+  
+  # if n not positive or whole number, throw error
+  if (any(length(n) > 1 | n != as.integer(n) | n < 0))
+    {
+     
+      stop("n must be a non-negative whole number")
+      
+    }
+  
+  # if inputs are valid
+  else{
+        # if length of z < n, output z
+        if(length(z) < n)
+        {
+          # return z
+          z
+        }
+        else
+        {
+          if(first == TRUE)
+          {
+            # subset
+            z[0:n]
+          } 
+          else
+          {
+            # reverse, subset, then reverse back
+            rev(rev(z)[0:n])
+          }  
+        }
+      }
+}
+
+
+# TEST CASES
+
+# 1
+first_or_last_n(logical(0))
+
+# 2 
+first_or_last_n(c(5:9,NA), n = 2, first = FALSE)
+
+# 3
+first_or_last_n(c("a","b","c","d"), n = 0)
+
+# 4 
+first_or_last_n(3:5, n = 9, first = FALSE)
+
+# 5
+first_or_last_n(z4, n = 9:8)
+
+# 6
+first_or_last_n(z4, n = 2.4)
+
+# 7
+first_or_last_n(z4, n = -1)
+
+```
+
+# Problem 2
+
+```{r error=TRUE}
+
+dot <- function(a,b)
+{
+  
+  # input validate
+  if(length(a) != length(b))
+  {
+    
+    stop("input vectors are not the same length")
+    
+  }
+  
+  # inputs are valid
+  else
+  {
+    
+    # for length of vector, dot product and add sum
+    
+    sum <- 0
+    
+    for (i in seq_along(a))
+    {
+      # multiply elems
+      sum <- sum + (a[i] * b[i])
+    }
+    
+    sum
+    
+  }
+}
+
+dot(c(1,2),c(3,4,5))
+dot(c(1,2),c(3,4))
+
+```
+
+
+# Problem 3
+
+```{r}
+
+# nums - numeric, fizz - numeric(1), buzz - numeric(1)
+fizz_buzz <- function(nums, fizz, buzz)
+{
+  
+  # find indices for fizz
+  fizz_indx <- which(nums %% fizz == 0)
+  
+  # find indices for buzz
+  buzz_indx <- which(nums %% buzz == 0)
+  
+  # find indices for fizz_buzz
+  fizz_buzz_indx <- which(nums %% fizz == 0 & nums %% buzz == 0)
+  
+  # change fizz
+  nums[fizz_indx] = "fizz"
+  
+  # change buzz
+  nums[buzz_indx] = "buzz"
+  
+  # change fizz-buzz
+  nums[fizz_buzz_indx] = "fizz-buzz"
+  
+  nums
+  
+}
+
+```
+
+# Problem 4
+
+```{r error=TRUE}
+# a.
+for(i in seq_along(x))
+{
+  x[i]
+}
+
+# b.
+for(i in seq_along(x))
+{
+  i
+}
+
+# c.
+for(i in seq_along(x))
+{
+  rev(x)[i]
+}
+
+# d. 
+for(i in seq_along(x))
+{
+  sort(x)[i]
+}
+
+# e.
+for(i in seq_along(x))
+{
+  FUN(x[i])
+}
+
+
+```
+
+# Problem 5
+
+```{r}
+
+sum_pairs <- function(x)
+{
+  
+  # calculate length of res vector by taking combination of length of x and 2
+  len <- factorial(length(x)) / (factorial(length(x)-2) * 2)
+  
+  # make res vec
+  res <- numeric(len)
+  
+  # make indexer for res vec
+  i <- 1
+  
+  # 1st elem: restrict to all but last elem
+  for(j in (seq_along(x)[1:(length(x)-1)]))
+  {
+    # 2nd elem: start at elem next to j (j+1), 
+    for(k in seq_along(x)[(j+1):length(x)])
+    {
+      # res at i = left elem times right elem
+      res[i] <- x[j] + x[k]
+      i <- i + 1
+    }
+  }
+
+  # output
+  sort(res)
+  
+}
+
+sum_pairs(1:2)
+
+sum_pairs(3:5)
+
+sum_pairs(5:3)
+
+sum_pairs(c(9,5,3,7))
+
+sum_pairs(rep(1,4))
+
+```
+

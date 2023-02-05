@@ -139,14 +139,21 @@ get_minimum_coins <- function(cents)
 ### (a)
 <!-- ENTER YOUR ANSWER BELOW -->
 
+Yes, my function is vectorized because it uses primitive functions built-in R. And so, because most primitive functions in R are vectorized, my function is also vectorized.
+
 <!-- USE THE CODE CHUNK BELOW IF YOU'D LIKE -->
 ```{r Question 3a}
+
+get_minimum_coins(c(5,10,25,100))
 
 ```
 
 ### (b)
 <!-- ENTER YOUR ANSWER BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
 ```{r Question 3b}
+
+# get all cents from 1->100, then get minimum coins, then get indices of all numbers with max val, then subset cent sequence
+which(get_minimum_coins(1:100) == max(get_minimum_coins(1:100)))
 
 ```
 
@@ -158,11 +165,71 @@ get_minimum_coins <- function(cents)
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 4a}
 
+my_min <- function(v, na.rm = FALSE)
+{
+  
+  # min val
+  res <- Inf
+  
+  # parse through vector
+  for (i in seq_along(v))
+  {
+    # if NA found
+    if(is.na(v[i]))
+    {
+      # check na.rm, if FALSE, break loop and return NA
+      if(na.rm == FALSE)
+      {
+        res <- NA
+        break
+      }
+      # if TRUE, ignore and pass to next iteration
+    }
+    # else, check if v[i] < res
+    else
+    {
+      if(v[i] < res)
+      {
+        # if true, set res = v[i]
+        res <- v[i]
+      }
+    }
+  }
+  
+  # check if res changed vals, if not, send warning
+  if(!is.na(res) & res == Inf)
+  {
+    warning("no non-missing arguments to my_min; returning Inf")
+  }
+  
+  # return val
+  res
+  
+}
+
 ```
 
 ###
 <!-- USE THE CODE CHUNK BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
-```{r Question 4b}
+```{r Question 4b, error=TRUE}
+# i.
+my_min(c(4, 1, 0, 2, -3, -5, -4))
+
+# ii.
+my_min(c("bears", "beets", "Battlestar Galactica"))
+
+# iii.
+my_min(7)
+
+# iv.
+my_min(c("Pawnee", "rules", "Eagleton", NA), na.rm = TRUE)
+
+my_min(c("Pawnee", "rules", "Eagleton", NA), na.rm = FALSE)
+
+# v.
+my_min(NA, na.rm = TRUE)
+
+my_min(NA, na.rm = FALSE)
 
 ```
 
@@ -173,24 +240,57 @@ get_minimum_coins <- function(cents)
 <!-- USE THE CODE CHUNK BELOW -->
 ```{r Question 5a}
 
+fib1 <- 1
+fib2 <- 1
+full_fib <- c(fib1, fib2)
+while(fib1 + fib2 < 500)
+{
+  fib2 <- fib1 + fib2
+  full_fib <- c(full_fib, fib2)
+  fib1 <- fib2 - fib1
+}
+
+full_fib
+
 ```
 
 ### (b)
 <!-- USE THE CODE CHUNK BELOW -->
 ```{r Question 5b}
 
+full_fib <- c(1,1)
+while(full_fib[length(full_fib)] + full_fib[length(full_fib)-1] < 500)
+{
+  full_fib <- c(full_fib,(full_fib[length(full_fib)] + full_fib[length(full_fib)-1]))
+}
+full_fib
 ```
 
 ### (c)
 <!-- USE THE CODE CHUNK BELOW -->
 ```{r Question 5c}
 
+# make sequence less than 10^9
+full_fib <- c(1,1)
+while(full_fib[length(full_fib)] + full_fib[length(full_fib)-1] < (10^9))
+{
+  full_fib <- c(full_fib,(full_fib[length(full_fib)] + full_fib[length(full_fib)-1]))
+}
+
+# get length of sequence
+length(full_fib)
+
 ```
 <!-- ENTER YOUR EXPLANATION BELOW (USING INLINE R AS YOU WILL). ONE SENTENCE OR 'MY ANSWER IS __' IS FINE. -->
+
+By changing the boundary of the while loop to be `10^9` and then taking the length of the entire sequence of `full_fib`, the length provided the number of Fibonacci numbers less than `10^9`. The answer is 44.
 
 ## Question 6
 <!-- USE THE CODE CHUNK BELOW -->
 ```{r Question 6}
+
+jerry <- 2:(((8 * 5) %%  3)^-2:(7 > 2))
+jerry
 
 ```
 
@@ -202,11 +302,62 @@ get_minimum_coins <- function(cents)
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 7a}
 
+my_ifelse <- function(test, yes, no)
+{
+
+  # get indices where test is true
+  indx <- which(test)
+
+  # make indices for result and for replacers
+  i <- 1
+  j <- 1
+  k <- 1
+  
+  # change vals @ indx
+  while(i <= length(test))
+  {
+    # if elem is in indx, change val to yes val
+    if(any(indx == i))
+    {
+      test[i] <- yes[j]
+    }
+    # if elem not in indx, change val to no val
+    else
+    {
+      test[i] <- no[k]
+    }
+    
+    # increment indices
+    i <- i + 1
+    j <- j + 1
+    k <- k + 1
+    
+    # if the index of replacer is @ end, reset index
+    if(j > length(yes))
+    {
+      j <- 1
+    }
+    if(k > length(no))
+    {
+      k <- 1
+    }
+    
+  }
+  
+  # return result
+  
+  test
+  
+}
+
 ```
 
 ### (b)
 <!-- USE THE CODE CHUNK BELOW -->
 ```{r Question 7b}
+
+x <- (1:10) * pi
+my_ifelse(x%% 1 >= 0.5, x %/% 1 + 1, x %/% 1)
 
 ```
 
@@ -215,6 +366,36 @@ get_minimum_coins <- function(cents)
 <!-- NAME THE FUNCTIONs AND THEIR INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 7c}
+
+my_abs <- function(x)
+{
+  
+  my_ifelse(x < 0, -x, x)
+  
+}
+
+# test my_abs()
+my_abs(c(-5,2,0,0,1,-1))
+
+my_sign <- function(x)
+{
+  
+  # get all negatives indices
+  indx <- which(x < 0)
+  
+  # change all non 0 to 1
+  x <- my_ifelse(my_abs(x) > 0, 1, 0)
+
+  # change sign for negatives @ indx
+  x[indx] <- -1
+  
+  # result
+  x
+  
+}
+
+# test my_sign
+my_sign(c(1,-5,0,-6,2))
 
 ```
 <!-- REMINDER TO USE my_ifelse() TO WRITE THE FUNCTIONS. THERE ARE OTHER WAYS TO WRITE THESE FUNCTIONS WITHOUT USING my_ifelse() BUT PLEASE FOLLOW THE DIRECTIONS. -->
@@ -227,11 +408,114 @@ get_minimum_coins <- function(cents)
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 8a}
 
+merge <- function(left, right)
+{
+  
+  merged <- numeric(0)
+
+  # while length of left > 0
+  while(length(left) > 0)
+  {
+    # if length of right > 0
+    if(length(right) > 0)
+    {
+      # if first elem of left < first elem of right
+      if(left[1] < right[1])
+      {
+        # set merged to merge + first elem of left
+        merged <- c(merged, left[1])
+       
+        # remove the first elem of left by subsetting
+        # only if left is longer or equal to 2
+        if(length(left) >= 2)
+        {
+          left <- left[2:length(left)]
+        }
+        # else, just remove the vector
+        else
+        {
+          left <- numeric(0)
+        }
+      }
+      # else, do right elems
+      else
+      {
+        # set merged to merged + first elem of right
+        merged <- c(merged, right[1])
+        
+        # remove first elem of right
+        # only if length of right >= 2
+        if(length(right) >= 2)
+        {
+          right <- right[2: length(right)]
+        }
+        # else, just remove vector
+        else
+        {
+          right <- numeric(0)
+        }
+      }
+    }
+    
+    # else, all of left is sorted, so combine
+    else
+    {
+      merged <- c(merged, left)
+      
+      # remove all elements of left
+      left <- numeric(0)
+    }
+    
+  }
+  
+  # output: merged + right
+  c(merged, right)
+  
+}
+
+
+
+merge_sort <- function(x)
+{
+  
+  if(length(x) > 1)
+  {
+    # split x in half (if not exactly half, make left smaller than right), find indx of that half point
+    halfIndx <- length(x)%/%2
+    
+    # make left and right portions
+    left <- x[1:halfIndx]
+    right <- x[(halfIndx+1): length(x)]
+
+    # sort these portions
+    sorted_left <- merge_sort(left)
+    sorted_right <- merge_sort(right)
+    
+    # return x
+    x <- merge(sorted_left, sorted_right)
+    
+  }
+  
+  #output
+  x
+    
+}
+
+
 ```
 
 ### (b)
 <!-- USE THE CODE CHUNK BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
 ```{r Question 8b}
+
+# i. 
+merge_sort(numeric(0))
+
+# ii
+merge_sort(7)
+
+# iii.
+merge_sort(10:1)
 
 ```
 
@@ -247,6 +531,63 @@ load("dna.RData")
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 9a}
 
+locate_motif <- function(strand, motif)
+{
+  
+  # parse through elems, if first elem found, then parse through section for length of motif (i.e. substring for length of motif and check if it's the motif)
+ 
+  # res var
+  res <- integer(0)
+  # length of motif
+  len_motif <- length(motif)
+  # bool for found
+  is_found <- FALSE
+ 
+  for(i in seq_along(strand))
+  {
+  
+    # found first elem, check if there's room for rest of strand for motif
+    if(strand[i] == motif[1] & (i+len_motif-1) <= length(strand))
+    {
+  
+      # initially make found bool true
+      is_found <- TRUE
+      
+      # make substring of i to i+len_motif-1
+      test_substr <- strand[i:(i+len_motif-1)]
+      
+      # check if each elem in substring is the motif
+      for(j in seq_along(test_substr))
+      {
+        # if any is wrong, set is_found to false
+        if(test_substr[j] != motif[j])
+        {
+          is_found <- FALSE
+        }
+      }
+      
+      # if found bool is true, set res to i, break loop
+      if(is_found == TRUE)
+      {
+        res <- i
+        break
+      }
+      # else, move on
+
+    }
+  }
+  
+  message("Completed locate_motif()")
+  
+  # output res
+  res
+  
+}
+
+
+# find gattaca
+locate_motif(dna1, c("G","A","T","T","A","C","A"))
+
 ```
 
 ### (b)
@@ -254,5 +595,68 @@ load("dna.RData")
 <!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
 <!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
 ```{r Question 9b}
+
+
+seq1 <- c("A","C","A","G","T")
+seq2 <- c("T","A","G","T","A")
+
+
+# make extract_longest_substring()
+extract_longest_substring <- function(strand1, strand2)
+{
+  
+  # result initially empty char vector
+  res <- character(0)
+  res_candidate <- character(0)
+  
+  # parse through every character of first strand and decrease length for each failed substring test in strand2
+  # if substring found, set res to found substring and break for loop
+  # if length < 2, parse to next starting character
+  for(i in seq_along(strand1))
+  {
+    # make substr of i to end of strand1
+    test_substr <- strand1[i:length(strand1)]
+
+    # try to find test_substr in strand2
+    while(length(test_substr) >= 2)
+    {
+      indx_test_substr <- locate_motif(strand2, test_substr)
+      
+      # if int(0) returns, remove last elem of test_substr and try again
+      if(length(indx_test_substr) == 0)
+      {
+        test_substr <- test_substr[1:(length(test_substr)-1)]
+      }
+      # else, substr is found in strand2, set res to found substr and break
+      else
+      {
+        res_candidate <- strand1[i:(i + length(test_substr) - 1)]
+        print("res_candidate:")
+        print(res_candidate)
+     
+        break
+      }
+    }
+    
+    # if res_candidate is not char(0),check if length is longer than previous res, if so, set res to res_candidate
+    if(length(res_candidate) != 0 & length(res_candidate) > length(res))
+    {
+      res <- res_candidate
+    }
+    
+    # if res_candidate is still character(0), move to next i
+    
+  }
+  
+  # output res
+  res
+  
+}
+
+# test
+extract_longest_substring(seq1,seq2)
+
+# extract from dna1 and dna2
+extract_longest_substring(c(rep("a",100),rep("b",100)),c(rep("b",100),rep("a",100)))
 
 ```

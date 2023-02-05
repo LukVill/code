@@ -11,7 +11,7 @@
 
 <meta name="author" content="Luke Villanueva – 206039397" />
 
-<meta name="date" content="2023-02-02" />
+<meta name="date" content="2023-02-03" />
 
 <title>Stats 20, W23 – Homework 3</title>
 
@@ -1575,229 +1575,242 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Stats 20, W23 – Homework 3</h1>
 <h4 class="author">Luke Villanueva – 206039397</h4>
-<h4 class="date">02/02/23</h4>
+<h4 class="date">02/03/23</h4>
 
 </div>
 
 
-<div id="question-1" class="section level2">
-<h2>Question 1</h2>
-<div id="a" class="section level3">
-<h3>(a)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-<pre class="r"><code># store values in vector
-commute_times &lt;- c(14,12,20,19,15,20,28,20,20,18)
+<div id="problem-1" class="section level1">
+<h1>Problem 1</h1>
+<div id="a." class="section level2">
+<h2>a.</h2>
+<pre><code>FUNCTION first_or_last_n, input: z, n, first
 
-# boundary values based on 1 std dev
-upper &lt;- mean(commute_times) + sd(commute_times)
+IF n &lt; 0 OR n != integer(n)
 
-lower &lt;- mean(commute_times) - sd(commute_times)
+THEN stop code and print error message
 
-# to get which days, make seq indexing the vector
-days &lt;- seq_along(commute_times)
+ELSE
 
-# logical index: get indices where |mean - std dev| &gt; 1 or
-days_outside_sd &lt;- days[commute_times &lt; lower | commute_times &gt; upper]
+IF length of z &lt; n
+THEN return z
 
-# prints out days where time greater than 1 std dev
-days_outside_sd</code></pre>
-<pre><code>## [1] 1 2 7</code></pre>
-<pre class="r"><code># prints out times on those days
-commute_times[days_outside_sd]</code></pre>
-<pre><code>## [1] 14 12 28</code></pre>
-<!-- ENTER YOUR EXPLANATION BELOW (USING INLINE R AS YOU WILL) -->
-<p>The days (or indices) where the days are past 1 standard deviation
-are days 1, 2, and 7. In addition, their values are 14, 12, and 28,
-respectively.</p>
-</div>
-<div id="b" class="section level3">
-<h3>(b)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-<pre class="r"><code># do contra positive of logical index, get vals in boundaries
-days_inside_sd &lt;- days[-days_outside_sd]
-
-# days
-days_inside_sd</code></pre>
-<pre><code>## [1]  3  4  5  6  8  9 10</code></pre>
-<pre class="r"><code># and their respective values
-commute_times[days_inside_sd]</code></pre>
-<pre><code>## [1] 20 19 15 20 20 20 18</code></pre>
-<!-- ENTER YOUR EXPLANATION BELOW (USING INLINE R AS YOU WILL) -->
-<p>The days that stayed within 1 standard deviation are days 3, 4, 5, 6,
-8, 9, 10. Their values are 20, 19, 15, 20, 20, and 18, respectively.</p>
-</div>
-<div id="c" class="section level3">
-<h3>(c)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-<pre class="r"><code>num_days_in_sd &lt;- length(days) - length(days_outside_sd)
-
-# print out num_days_in_sd / total days
-
-num_days_in_sd / length(days)</code></pre>
-<pre><code>## [1] 0.7</code></pre>
-<!-- ENTER YOUR EXPLANATION BELOW (USING INLINE R AS YOU WILL) -->
-<p>The proportion of Andy’s commute time within 1 standard deviation is
-0.7 (i.e. 70% of days were within the standard deviation).</p>
-</div>
-</div>
-<div id="question-2" class="section level2">
-<h2>Question 2</h2>
-<pre class="r"><code>NA &amp; TRUE</code></pre>
-<pre><code>## [1] NA</code></pre>
-<pre class="r"><code>NA &amp; FALSE</code></pre>
-<pre><code>## [1] FALSE</code></pre>
-<pre class="r"><code>NA | TRUE</code></pre>
-<pre><code>## [1] TRUE</code></pre>
-<pre class="r"><code>NA | FALSE</code></pre>
-<pre><code>## [1] NA</code></pre>
-<!-- ENTER YOUR EXPLANATION BELOW, FEEL FREE TO EDIT THE ABOVE CODE CHUNK -->
-<p>For the <code>&amp;</code> operator, the compiler does not have to
-check both sides if and only if one side is already false. The entire
-statement will automatically be false if one expression is false.</p>
-<p>And so, this supports why <code>NA &amp; TRUE</code> is NA. Since the
-right side is true, the compiler has to check what the left side is.
-Since it’s NA, the output will also be NA.</p>
-<p>The reason why <code>NA &amp; FALSE</code> is false is because the
-right expression is already false. So, there is no reason for the
-compiler to check the left side, for the result will be false
-regardless.</p>
-<p>Now, for the <code>|</code> operator, the compiler does not have to
-check both sides if and only if one expression is true. If one side is
-already true, there is no reason to check the other side.</p>
-<p>And so, this supports the output of <code>NA | TRUE</code>. Since one
-side is already true, there is no reason to check the other side. So,
-the output is <code>TRUE</code></p>
-<p>On the other hand, since <code>NA | FALSE</code> has false on the
-right side, the compiler has to check what <code>NA</code> results in,
-but it’s NA. So, the result is NA.</p>
-</div>
-<div id="question-3" class="section level2">
-<h2>Question 3</h2>
-<!-- PUT YOUR get_minimum_coins() FROM HW 1 HERE -->
-<pre class="r"><code>get_minimum_coins &lt;- function(cents)
+ELSE
+THEN 
 {
 
-  # declare coin vals
-  q_val &lt;- 25
-  d_val &lt;- 10
-  n_val &lt;- 5
-  p_val &lt;- 1
+IF first is True
+THEN return z from 0 -&gt; n
+
+ELSE
+THEN reverse z, subset from 0 -&gt; n, reverse back
+
+}
+</code></pre>
+</div>
+<div id="b." class="section level2">
+<h2>b.</h2>
+<pre class="r"><code># z, n, first
+first_or_last_n &lt;- function(z, n = 3, first = TRUE)
+{
   
-  # declare coin amts based on floor division
-  q &lt;- cents %/% q_val
+  # if n not positive or whole number, throw error
+  if (any(length(n) &gt; 1 | n != as.integer(n) | n &lt; 0))
+    {
+     
+      stop(&quot;n must be a non-negative whole number&quot;)
+      
+    }
   
-  # update cents amt
-  cents &lt;- cents - (q * q_val)
+  # if inputs are valid
+  else{
+        # if length of z &lt; n, output z
+        if(length(z) &lt; n)
+        {
+          # return z
+          z
+        }
+        else
+        {
+          if(first == TRUE)
+          {
+            # subset
+            z[0:n]
+          } 
+          else
+          {
+            # reverse, subset, then reverse back
+            rev(rev(z)[0:n])
+          }  
+        }
+      }
+}
+
+
+# TEST CASES
+
+# 1
+first_or_last_n(logical(0))</code></pre>
+<pre><code>## logical(0)</code></pre>
+<pre class="r"><code># 2 
+first_or_last_n(c(5:9,NA), n = 2, first = FALSE)</code></pre>
+<pre><code>## [1]  9 NA</code></pre>
+<pre class="r"><code># 3
+first_or_last_n(c(&quot;a&quot;,&quot;b&quot;,&quot;c&quot;,&quot;d&quot;), n = 0)</code></pre>
+<pre><code>## character(0)</code></pre>
+<pre class="r"><code># 4 
+first_or_last_n(3:5, n = 9, first = FALSE)</code></pre>
+<pre><code>## [1] 3 4 5</code></pre>
+<pre class="r"><code># 5
+first_or_last_n(z4, n = 9:8)</code></pre>
+<pre><code>## Error in first_or_last_n(z4, n = 9:8): n must be a non-negative whole number</code></pre>
+<pre class="r"><code># 6
+first_or_last_n(z4, n = 2.4)</code></pre>
+<pre><code>## Error in first_or_last_n(z4, n = 2.4): n must be a non-negative whole number</code></pre>
+<pre class="r"><code># 7
+first_or_last_n(z4, n = -1)</code></pre>
+<pre><code>## Error in first_or_last_n(z4, n = -1): n must be a non-negative whole number</code></pre>
+</div>
+</div>
+<div id="problem-2" class="section level1">
+<h1>Problem 2</h1>
+<pre class="r"><code>dot &lt;- function(a,b)
+{
   
-  # Note: repeat process for the other coins
+  # input validate
+  if(length(a) != length(b))
+  {
+    
+    stop(&quot;input vectors are not the same length&quot;)
+    
+  }
   
-  d &lt;- cents %/% d_val
-  cents &lt;- cents - (d * d_val)
+  # inputs are valid
+  else
+  {
+    
+    # for length of vector, dot product and add sum
+    
+    sum &lt;- 0
+    
+    for (i in seq_along(a))
+    {
+      # multiply elems
+      sum &lt;- sum + (a[i] * b[i])
+    }
+    
+    sum
+    
+  }
+}
+
+dot(c(1,2),c(3,4,5))</code></pre>
+<pre><code>## Error in dot(c(1, 2), c(3, 4, 5)): input vectors are not the same length</code></pre>
+<pre class="r"><code>dot(c(1,2),c(3,4))</code></pre>
+<pre><code>## [1] 11</code></pre>
+</div>
+<div id="problem-3" class="section level1">
+<h1>Problem 3</h1>
+<pre class="r"><code># nums - numeric, fizz - numeric(1), buzz - numeric(1)
+fizz_buzz &lt;- function(nums, fizz, buzz)
+{
   
-  n &lt;- cents %/% n_val
-  cents &lt;- cents - (n * n_val)
+  # find indices for fizz
+  fizz_indx &lt;- which(nums %% fizz == 0)
   
-  p &lt;- cents %/% p_val
-  cents &lt;- cents - (p * p_val)
+  # find indices for buzz
+  buzz_indx &lt;- which(nums %% buzz == 0)
   
-  # total up coin amounts
-  total_coin &lt;- q + d + n + p
+  # find indices for fizz_buzz
+  fizz_buzz_indx &lt;- which(nums %% fizz == 0 &amp; nums %% buzz == 0)
   
-  # print coin amt
-  total_coin
+  # change fizz
+  nums[fizz_indx] = &quot;fizz&quot;
+  
+  # change buzz
+  nums[buzz_indx] = &quot;buzz&quot;
+  
+  # change fizz-buzz
+  nums[fizz_buzz_indx] = &quot;fizz-buzz&quot;
+  
+  nums
+  
 }</code></pre>
-<div id="a-1" class="section level3">
-<h3>(a)</h3>
-<!-- ENTER YOUR ANSWER BELOW -->
-<!-- USE THE CODE CHUNK BELOW IF YOU'D LIKE -->
 </div>
-<div id="b-1" class="section level3">
-<h3>(b)</h3>
-<!-- ENTER YOUR ANSWER BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
+<div id="problem-4" class="section level1">
+<h1>Problem 4</h1>
+<pre class="r"><code># a.
+for(i in seq_along(x))
+{
+  x[i]
+}</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre>
+<pre class="r"><code># b.
+for(i in seq_along(x))
+{
+  i
+}</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre>
+<pre class="r"><code># c.
+for(i in seq_along(x))
+{
+  rev(x)[i]
+}</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre>
+<pre class="r"><code># d. 
+for(i in seq_along(x))
+{
+  sort(x)[i]
+}</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre>
+<pre class="r"><code># e.
+for(i in seq_along(x))
+{
+  FUN(x[i])
+}</code></pre>
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;x&#39; not found</code></pre>
 </div>
-</div>
-<div id="question-4" class="section level2">
-<h2>Question 4</h2>
-<div id="a-2" class="section level3">
-<h3>(a)</h3>
-<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-</div>
-<div id="section" class="section level3">
-<h3></h3>
-<!-- USE THE CODE CHUNK BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
-</div>
-</div>
-<div id="question-5" class="section level2">
-<h2>Question 5</h2>
-<div id="a-3" class="section level3">
-<h3>(a)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-</div>
-<div id="b-2" class="section level3">
-<h3>(b)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-</div>
-<div id="c-1" class="section level3">
-<h3>(c)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-<!-- ENTER YOUR EXPLANATION BELOW (USING INLINE R AS YOU WILL). ONE SENTENCE OR 'MY ANSWER IS __' IS FINE. -->
-</div>
-</div>
-<div id="question-6" class="section level2">
-<h2>Question 6</h2>
-<!-- USE THE CODE CHUNK BELOW -->
-</div>
-<div id="question-7" class="section level2">
-<h2>Question 7</h2>
-<div id="a-4" class="section level3">
-<h3>(a)</h3>
-<!-- CREATE THE FUNCTION IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-</div>
-<div id="b-3" class="section level3">
-<h3>(b)</h3>
-<!-- USE THE CODE CHUNK BELOW -->
-</div>
-<div id="c-2" class="section level3">
-<h3>(c)</h3>
-<!-- CREATE THE FUNCTIONs IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTIONs AND THEIR INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-<!-- REMINDER TO USE my_ifelse() TO WRITE THE FUNCTIONS. THERE ARE OTHER WAYS TO WRITE THESE FUNCTIONS WITHOUT USING my_ifelse() BUT PLEASE FOLLOW THE DIRECTIONS. -->
-</div>
-</div>
-<div id="question-8" class="section level2">
-<h2>Question 8</h2>
-<div id="a-5" class="section level3">
-<h3>(a)</h3>
-<!-- CREATE THE FUNCTIONs IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTIONs AND THEIR INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-</div>
-<div id="b-4" class="section level3">
-<h3>(b)</h3>
-<!-- USE THE CODE CHUNK BELOW, IT CAN BE JUST COMMANDs; NO NEED TO STORE OBJECTs -->
-</div>
-</div>
-<div id="question-9" class="section level2">
-<h2>Question 9</h2>
-<!-- MAKE SURE dna.RData IS IN THE SAME DIRECTORY (FOLDER) AS THIS .RMD -->
-<pre class="r"><code>load(&quot;dna.RData&quot;)</code></pre>
-<div id="a-6" class="section level3">
-<h3>(a)</h3>
-<!-- CREATE THE FUNCTION AND TEST IT AS ASKED IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-</div>
-<div id="b-5" class="section level3">
-<h3>(b)</h3>
-<!-- CREATE THE FUNCTION AND TEST IT AS ASKED IN THE CODE CHUNK BELOW -->
-<!-- NAME THE FUNCTION AND ITS INPUTS EXACTLY AS STATED IN THE ASSIGNENT -->
-<!-- PLAN OUT YOUR APPROACH BEFORE YOU START CODING ANY FUNCTION. -->
-</div>
+<div id="problem-5" class="section level1">
+<h1>Problem 5</h1>
+<pre class="r"><code>sum_pairs &lt;- function(x)
+{
+  
+  # calculate length of res vector by taking combination of length of x and 2
+  len &lt;- factorial(length(x)) / (factorial(length(x)-2) * 2)
+  
+  # make res vec
+  res &lt;- numeric(len)
+  
+  # make indexer for res vec
+  i &lt;- 1
+  
+  # 1st elem: restrict to all but last elem
+  for(j in (seq_along(x)[1:(length(x)-1)]))
+  {
+    # 2nd elem: start at elem next to j (j+1), 
+    for(k in seq_along(x)[(j+1):length(x)])
+    {
+      # res at i = left elem times right elem
+      res[i] &lt;- x[j] + x[k]
+      i &lt;- i + 1
+    }
+  }
+
+  # output
+  sort(res)
+  
+}
+
+sum_pairs(1:2)</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>sum_pairs(3:5)</code></pre>
+<pre><code>## [1] 7 8 9</code></pre>
+<pre class="r"><code>sum_pairs(5:3)</code></pre>
+<pre><code>## [1] 7 8 9</code></pre>
+<pre class="r"><code>sum_pairs(c(9,5,3,7))</code></pre>
+<pre><code>## [1]  8 10 12 12 14 16</code></pre>
+<pre class="r"><code>sum_pairs(rep(1,4))</code></pre>
+<pre><code>## [1] 2 2 2 2 2 2</code></pre>
 </div>
 
 
