@@ -577,8 +577,6 @@ locate_motif <- function(strand, motif)
     }
   }
   
-  message("Completed locate_motif()")
-  
   # output res
   res
   
