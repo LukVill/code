@@ -1,0 +1,264 @@
+---
+title: "Stats 20, W23 -- Discussion Week 5"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Problem 1
+```{r}
+
+find_max_logical <- function(x,y)
+{
+  
+  # get indices of max of each vector, then change those indices to be true
+  ifelse(x == max(x) | y == max(y), TRUE, FALSE)
+
+}
+
+x <- c(Inf, 3, 2, 6, 99)
+y <- c(12, 1, 0, 40, 5)
+find_max_logical(x,y)
+
+x <- 1:5
+y <- 1:5
+find_max_logical(x,y)
+
+x <- c(1,4,9)
+y <- c(1,4,2)
+find_max_logical(x,y)
+
+
+```
+
+# Problem 2
+
+```{r}
+
+is_mat_multipliable <- function(x,y)
+{
+  
+  res <- FALSE
+  
+  # if col1 == row2, yes
+  if (nrow(x) == ncol(y))
+  {res <- TRUE}
+  
+  res
+  
+}
+
+x <- matrix(logical(12), 4)
+y <- matrix(logical(12),3)
+is_mat_multipliable(x,y)
+
+x <- matrix(logical(16), 4)
+y <- matrix(1,5)
+is_mat_multipliable(x,y)
+
+x <- matrix(1)
+y <- matrix(1)
+is_mat_multipliable(x,y)
+
+```
+
+# Problem 3
+
+```{r}
+A<-matrix(1:9,3,3)
+B<-matrix(1:12,4,3)
+
+stack_matrices <- function(A,B)
+{
+  
+  # validate if A and B are matrices
+  if(is.null(nrow(A)) | is.null(nrow(B)))
+  {
+    stop("Error: one or both of the inputs are not matrices")
+  }
+  # validate A and B cols match
+  if(ncol(A) != ncol(B))
+  {
+    stop("Error: columns of matrices do not match")
+  }
+  
+  # make matrix of dim (row1+row2, col1&2)
+  res <- matrix(0, (nrow(A)+nrow(B)), ncol(A))
+  
+  # use for loop to parse through each element, starting with first matrix
+  # i for indexer of matrix
+  i <- 1
+  for(c in (1:ncol(A)))
+  {
+    for(r in (1:nrow(A)))
+    {
+      res[r,c] <- A[i]
+      # parse
+      i <- i + 1
+    }
+  }
+  # now parse second matrix in
+  i <- 1
+  for(c in (1:ncol(res)))
+  {
+    for(r in ((nrow(A)+1):nrow(res)))
+    {
+      res[r,c] <- B[i]
+      # parse
+      i <- i + 1
+    }
+  }
+
+  # output
+  res
+  
+}
+
+stack_matrices(A,B)
+# check result
+rbind(A,B)
+
+```
+
+# Problem 4
+
+```{r error=TRUE}
+
+make_checkerboard <- function(n)
+{
+  
+  # make board
+  board <- matrix(1,n,n)
+  
+  # validate input n to be single digit, whole, and > 0
+  if(length(n) != 1 | any(as.integer(n) != n) | any(n <= 0))
+  {
+    stop("invalid n")
+  }
+
+  # parse through board, making every even index a 0
+  for (i in seq_along(board))
+  {
+    if (i%%2 == 0)
+    {
+      board[i] <- 0
+    }
+  }
+  
+  # output 
+  board
+  
+}
+
+make_checkerboard(3)
+make_checkerboard(4)
+make_checkerboard(0)
+make_checkerboard(5:6)
+
+```
+
+# Problem 5
+
+```{r error=TRUE}
+
+get_values_from_coords <- function(A,x,y)
+{
+  
+  # validate length of x and y
+  if(length(x) != length(y))
+  {
+    stop("lengths of matrices are not equal")
+  }
+  
+  # validate value of x and y
+  if(any(x <= 0) | any(y <= 0) | any(x > nrow(A)) | any(y > ncol(A)))
+  {
+    stop("values in input vectors are invalid based on matrix's dimensions")
+  }
+    
+  # make result matrix length of x
+  res <- length(x)
+  
+  # parse through indices via index and get value from matrix
+  for (i in seq_along(x))
+  {
+    res[i] <- A[x[i],y[i]]
+  }
+  
+  # output
+  res
+  
+}
+
+# test
+A <- matrix(1:9,3,3)
+x <- c(2,3,1)
+y <- c(1,2,3)
+get_values_from_coords(A,x,y)
+# error test
+x <- c(2,3,1,2)
+get_values_from_coords(A,x,y)
+# error test 2
+x <- c(2,3,6)
+get_values_from_coords(A,x,y)
+
+```
+
+# Problem 6
+
+```{r}
+
+set_border_NA <- function(A)
+{
+  
+  # validate dim of A
+  if(nrow(A) == 1 | ncol(A) == 1)
+  {
+    stop("dimensions are not suitable for NA border")
+  }
+  
+  # set left side NA
+  c <- 1
+  for (r in 1:nrow(A))
+  {
+    A[r,c] <- NA
+  }
+  
+  # set top side NA
+  r <- 1
+  for (c in 1:ncol(A))
+  {
+    A[r,c] <- NA
+  }
+  
+  # set right side NA
+  c <- ncol(A)
+  for (r in 1:nrow(A))
+  {
+    A[r,c] <- NA
+  }
+  
+  # set bottom side NA
+  r <- nrow(A)
+  for (c in 1:ncol(A))
+  {
+    A[r,c] <- NA
+  }
+  
+  # output
+  A
+  
+}
+
+# test
+A <- matrix(1:9,3,3)
+set_border_NA(A)
+A <- matrix(1:9,6,6)
+set_border_NA(A)
+
+```
