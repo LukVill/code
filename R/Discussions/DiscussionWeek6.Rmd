@@ -140,7 +140,7 @@ is_attribute(sum,"function")
 
 # Problem 5
 
-```{r}
+```{r error=TRUE}
 
 get_name_of_min <- function(x)
 {
@@ -178,6 +178,15 @@ get_name_of_min(as.character(z))
 ```{r}
 
 # 1: checks diagonal, so for matrix with data but no nrow/ncol, it is 1 col matrix
-diag(matrix(1:9))
+1 == diag(matrix(1:9))
+
+# 2: diag makes identity matrix with nrows, so 
+all(diag(5) == diag(nrow = 5))
+
+# 3: diag makes identity matrix of nxn
+nrow(diag(5)) == 5
+
+# 4: diag treats this vector as a "data" vector, making identity matrix with this data along the diagonal
+all(diag(diag(1:5)) == 1:5)
 
 ```
