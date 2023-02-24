@@ -11,7 +11,7 @@
 
 <meta name="author" content="Luke Villanueva – 206039397" />
 
-<meta name="date" content="2023-02-18" />
+<meta name="date" content="2023-02-20" />
 
 <title>Stats 20, W23 – Homework 4</title>
 
@@ -1575,7 +1575,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Stats 20, W23 – Homework 4</h1>
 <h4 class="author">Luke Villanueva – 206039397</h4>
-<h4 class="date">02/18/23</h4>
+<h4 class="date">02/20/23</h4>
 
 </div>
 
@@ -1997,6 +1997,643 @@ which(xmat%%2==0,arr.ind = FALSE)</code></pre>
 <h1>Question 6</h1>
 <div id="a.-2" class="section level2">
 <h2>a.</h2>
+<pre class="r"><code>load(&quot;mlb.RData&quot;)
+
+# i.
+
+# on hit data, group by team, apply max
+tapply(hit, team, max)</code></pre>
+<pre><code>## ARI ATL BAL BOS CHA CHN CIN CLE COL DET HOU KCA LAA LAN MIA MIL MIN NYA NYN OAK 
+## 172 191 163 188 145 176 182 183 182 185 170 192 162 145 165 187 161 170 142 161 
+## PHI PIT SDN SEA SFN SLN TBA TEX TOR WAS 
+## 153 155 155 178 135 163 148 148 129 180</code></pre>
+<pre class="r"><code># ii. 
+table(team)</code></pre>
+<pre><code>## team
+## ARI ATL BAL BOS CHA CHN CIN CLE COL DET HOU KCA LAA LAN MIA MIL MIN NYA NYN OAK 
+##  49  59  56  44  51  50  53  49  41  49  41  49  60  52  51  53  54  50  56  53 
+## PHI PIT SDN SEA SFN SLN TBA TEX TOR WAS 
+##  48  48  49  53  48  49  54  50  63  53</code></pre>
+<pre class="r"><code># iii.
+# make logical vector of 1&#39;s, group by team, then sum for each team
+tapply(as.numeric(hr &gt; 0), team, sum)</code></pre>
+<pre><code>## ARI ATL BAL BOS CHA CHN CIN CLE COL DET HOU KCA LAA LAN MIA MIL MIN NYA NYN OAK 
+##  18  17  22  18  18  16  23  21  19  18  17  19  23  17  16  23  18  19  19  16 
+## PHI PIT SDN SEA SFN SLN TBA TEX TOR WAS 
+##  23  18  19  17  19  21  24  17  21  19</code></pre>
+</div>
+<div id="b.-3" class="section level2">
+<h2>b.</h2>
+<pre class="r"><code># i.
+# remove Nan&#39;s by removing where ab is 0, divide each hit by ab, logical vector by &gt; 100, subset hit/ab by logic vector, then group by team of non-NaN vals
+tapply((hit[ab != 0 &amp; ab &gt;= 100])/(ab[ab != 0 &amp; ab &gt;= 100]), team[ab != 0 &amp; ab &gt;= 100], max)</code></pre>
+<pre><code>##       ARI       ATL       BAL       BOS       CHA       CHN       CIN       CLE 
+## 0.2928571 0.3090615 0.3150685 0.3461538 0.2923977 0.3054945 0.3099315 0.3119266 
+##       COL       DET       HOU       KCA       LAA       LAN       MIA       MIL 
+## 0.2966102 0.2985075 0.3164794 0.3067227 0.3121019 0.3123288 0.2782462 0.3257840 
+##       MIN       NYA       NYN       OAK       PHI       PIT       SDN       SEA 
+## 0.2880795 0.3333333 0.3288889 0.2960526 0.2702079 0.2996032 0.2796935 0.3037543 
+##       SFN       SLN       TBA       TEX       TOR       WAS 
+## 0.2839196 0.3052434 0.3426573 0.2725173 0.2811245 0.3081285</code></pre>
+<pre class="r"><code># ii.
+# same code but do mean instead of max
+tapply((hit[ab != 0 &amp; ab &gt;= 100])/(ab[ab != 0 &amp; ab &gt;= 100]), team[ab != 0 &amp; ab &gt;= 100], mean)</code></pre>
+<pre><code>##       ARI       ATL       BAL       BOS       CHA       CHN       CIN       CLE 
+## 0.2319472 0.2647849 0.2375582 0.2604034 0.2401772 0.2651402 0.2613342 0.2530944 
+##       COL       DET       HOU       KCA       LAA       LAN       MIA       MIL 
+## 0.2491582 0.2427210 0.2471332 0.2378598 0.2296356 0.2493224 0.2319310 0.2552556 
+##       MIN       NYA       NYN       OAK       PHI       PIT       SDN       SEA 
+## 0.2466636 0.2534004 0.2416465 0.2557503 0.2371084 0.2613901 0.2412313 0.2554139 
+##       SFN       SLN       TBA       TEX       TOR       WAS 
+## 0.2448231 0.2501438 0.2569402 0.2357178 0.2430669 0.2592251</code></pre>
+</div>
+<div id="c.-1" class="section level2">
+<h2>c.</h2>
+<pre class="r"><code># find avg HR 
+res &lt;- tapply(hr, list(pos, league), mean)
+res</code></pre>
+<pre><code>##                      AL         NL
+## catcher      4.46153846  4.7586207
+## centerfield  6.76315789  7.3939394
+## firstbase   11.15217391 12.9142857
+## leftfield    8.80434783  9.6808511
+## pitcher      0.05152225  0.0547619
+## rightfield  11.73170732  7.5348837
+## secondbase   6.25000000  6.2800000
+## shortstop   10.12903226  8.5517241
+## thirdbase    9.02631579  7.9318182</code></pre>
+<pre class="r"><code># calculate largest difference between each pos
+# split into AL and NL
+# get difference between each and get max
+# subset AL for result
+# get index in AL equal to subset AL
+# subset dimnames(res)[[1]][index]
+AL &lt;- res[1:9]
+NL &lt;- res[10:18]
+dimnames(res)[[1]][which(AL == (AL[abs(AL - NL) == max(abs(AL - NL))]))]</code></pre>
+<pre><code>## [1] &quot;rightfield&quot;</code></pre>
+<p>Rightfield has the biggest difference in homeruns in between the two
+leagues.</p>
+</div>
+<div id="d.-1" class="section level2">
+<h2>d.</h2>
+<pre class="r"><code># get number of players for each position for each team
+# apply median to each row of matrix
+apply(tapply(rep(1,length(team)), list(pos, team), sum), 1, median)</code></pre>
+<pre><code>##     catcher centerfield   firstbase   leftfield     pitcher  rightfield 
+##           4           2           3           3          28           3 
+##  secondbase   shortstop   thirdbase 
+##           3           2           3</code></pre>
+</div>
+</div>
+<div id="question-7" class="section level1">
+<h1>Question 7</h1>
+<div id="a.-3" class="section level2">
+<h2>a.</h2>
+<pre class="r"><code>my_row &lt;- function(x)
+{
+  
+  # return matrix of ints representing each row
+  for(col in seq_len(ncol(x)))
+  {
+    # val to input
+    i &lt;- 1
+    
+    for(row in seq_len(nrow(x)))
+    {
+      x[row,col] &lt;- i
+      
+      # update value
+      i &lt;- i + 1
+    }
+  }
+  
+  # output
+  x
+  
+}
+
+# test
+x &lt;- matrix(1:9,3,3)
+row(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    1    1
+## [2,]    2    2    2
+## [3,]    3    3    3</code></pre>
+<pre class="r"><code>my_row(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    1    1
+## [2,]    2    2    2
+## [3,]    3    3    3</code></pre>
+</div>
+<div id="b.-4" class="section level2">
+<h2>b.</h2>
+<pre class="r"><code>my_col &lt;- function(x)
+{
+  
+    # return matrix of ints representing each row
+  for(row in seq_len(nrow(x)))
+  {
+    # val to input
+    i &lt;- 1
+    
+    for(col in seq_len(ncol(x)))
+    {
+      x[row,col] &lt;- i
+      
+      # update value
+      i &lt;- i + 1
+    }
+  }
+  
+  # output
+  x
+  
+}
+
+# test
+x &lt;- matrix(1:9,3,3)
+col(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]    1    2    3
+## [3,]    1    2    3</code></pre>
+<pre class="r"><code>my_col(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]    1    2    3
+## [3,]    1    2    3</code></pre>
+</div>
+<div id="c.-2" class="section level2">
+<h2>c.</h2>
+<pre class="r"><code>my_diag &lt;- function(x, nrow = NA, ncol = NA)
+{
+ 
+  # if input is:
+  # matrix, return vector of diagonal
+  # vector, return matrix with vector along diagonal
+  # scalar, return identity matrix of size scalar
+ 
+  # output val
+  res &lt;- numeric(0)
+  
+  # check if numeric value
+  if(is.numeric(x) &amp; all(x &gt;= 0))
+  {
+    
+    # matrix
+    if(is.matrix(x))
+    {
+      # parse through diagonal, concat to res
+      i &lt;- 1
+      
+      # loop while i not equal to ncol or nrow
+      while(i &lt;= ncol(x) &amp; i &lt;= nrow(x))
+      {
+        res &lt;- c(res, x[i,i])
+        
+        # increment
+        i &lt;- i + 1
+      }
+     
+    }
+   
+    # vector
+    if(!is.matrix(x) &amp; length(x) &gt; 1)
+    {
+      # make matrix of size lengthx x lengthx
+      res &lt;- matrix(0, nrow = length(x), ncol = length(x))
+      
+      # fill matrix with elements of x
+      for (i in seq_len(length(x)))
+      {
+        # fill diagonal
+        res[i,i] &lt;- x[i]
+      }
+    }
+   
+    # scalar
+    if(!is.matrix(x) &amp; length(x) == 1)
+    {
+      
+      # 0 case
+      if(x == 0)
+      {
+        res &lt;- matrix(0, nrow = 0, ncol = 0)
+      }
+      # normal case
+      else
+      {
+        # check if dimensions exist
+        if(!is.na(nrow) | !is.na(ncol))
+        {
+          # check if only 1 exists
+          if((!is.na(nrow) &amp; is.na(ncol)) | (is.na(nrow) &amp; !is.na(ncol)))
+          {
+            len &lt;- numeric(0)
+    
+            # check which exists
+            if(is.na(nrow))
+            {
+              len &lt;- ncol
+              # make res matrix of size 1 x ncol and fill with x
+              res &lt;- matrix(0, nrow = 1, ncol = len)
+              
+              # fill with x
+              res[1] &lt;- x
+            }
+            else
+            {
+              len &lt;- nrow
+              # make res matrix of size nrow x nrow and fill with x
+              res &lt;- matrix(0, nrow = len, ncol = len)
+              
+              # fill with x
+              for(i in seq_len(nrow(res)))
+              {
+                res[i,i] &lt;- x
+              }
+            }
+              
+
+          }
+          # if both exist
+          else
+          {
+            # make matrix size nrow x ncol, fill with x
+            res &lt;- matrix(0, nrow = nrow, ncol = ncol)
+            
+            # fill with x
+            for(i in seq_len(nrow(res)))
+            {
+              res[i,i] &lt;- x
+            }
+          }
+        }
+        else
+        {
+          # return identity matrix of size x
+          res &lt;- matrix(0, x, x)
+         
+          # fill diagonal with 1
+          for(i in seq_len(x))
+          {
+            res[i,i] &lt;- 1
+          }
+        }
+
+      }
+    }
+ 
+    # output
+    res
+    
+  }
+  
+  # if not valid scalar, vector, or matrix
+  else
+  {stop(&quot;invalid input&quot;)}
+
+}
+
+# test
+
+# matrix
+x &lt;- matrix(1:10, 5, 2)
+diag(x)</code></pre>
+<pre><code>## [1] 1 7</code></pre>
+<pre class="r"><code>my_diag(x)</code></pre>
+<pre><code>## [1] 1 7</code></pre>
+<pre class="r"><code># vector
+x &lt;- 1:5
+diag(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    0    0
+## [2,]    0    2    0    0    0
+## [3,]    0    0    3    0    0
+## [4,]    0    0    0    4    0
+## [5,]    0    0    0    0    5</code></pre>
+<pre class="r"><code>my_diag(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    0    0    0    0
+## [2,]    0    2    0    0    0
+## [3,]    0    0    3    0    0
+## [4,]    0    0    0    4    0
+## [5,]    0    0    0    0    5</code></pre>
+<pre class="r"><code># scalar
+x &lt;- 8
+diag(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## [1,]    1    0    0    0    0    0    0    0
+## [2,]    0    1    0    0    0    0    0    0
+## [3,]    0    0    1    0    0    0    0    0
+## [4,]    0    0    0    1    0    0    0    0
+## [5,]    0    0    0    0    1    0    0    0
+## [6,]    0    0    0    0    0    1    0    0
+## [7,]    0    0    0    0    0    0    1    0
+## [8,]    0    0    0    0    0    0    0    1</code></pre>
+<pre class="r"><code>my_diag(x)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8]
+## [1,]    1    0    0    0    0    0    0    0
+## [2,]    0    1    0    0    0    0    0    0
+## [3,]    0    0    1    0    0    0    0    0
+## [4,]    0    0    0    1    0    0    0    0
+## [5,]    0    0    0    0    1    0    0    0
+## [6,]    0    0    0    0    0    1    0    0
+## [7,]    0    0    0    0    0    0    1    0
+## [8,]    0    0    0    0    0    0    0    1</code></pre>
+<pre class="r"><code># 0 scalar
+x &lt;- 0
+diag(x)</code></pre>
+<pre><code>## &lt;0 x 0 matrix&gt;</code></pre>
+<pre class="r"><code>my_diag(x)</code></pre>
+<pre><code>## &lt;0 x 0 matrix&gt;</code></pre>
+<pre class="r"><code># scalar with dims
+x &lt;- 5
+nrow &lt;- 3
+ncol &lt;- 4
+
+# test only nrow
+diag(x, nrow = nrow)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    5    0    0
+## [2,]    0    5    0
+## [3,]    0    0    5</code></pre>
+<pre class="r"><code>my_diag(x, nrow = nrow)</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    5    0    0
+## [2,]    0    5    0
+## [3,]    0    0    5</code></pre>
+<pre class="r"><code># test only ncol
+diag(x, ncol = ncol)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    5    0    0    0</code></pre>
+<pre class="r"><code>my_diag(x, ncol = ncol)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    5    0    0    0</code></pre>
+<pre class="r"><code># test both
+diag(x, nrow = nrow, ncol = ncol)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    5    0    0    0
+## [2,]    0    5    0    0
+## [3,]    0    0    5    0</code></pre>
+<pre class="r"><code>my_diag(x, nrow = nrow, ncol = ncol)</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]    5    0    0    0
+## [2,]    0    5    0    0
+## [3,]    0    0    5    0</code></pre>
+</div>
+</div>
+<div id="question-8" class="section level1">
+<h1>Question 8</h1>
+<pre class="r"><code>load(&quot;votes.RData&quot;)</code></pre>
+<div id="a.-4" class="section level2">
+<h2>a.</h2>
+<pre><code># layout of votes: each row is a voter, votes is a 2d matrix with cols being candidates and rows being voter&#39;s ranking
+
+# algorithm explanation: as long as none of the total votes of each candidate are &gt;= total_votes/2 round down (%/% 2), 
+# have an int track (rank_int) which ranking we are using (i.e. rank 1, 2, etc.)
+# tally all votes of that value for the total votes for each candidate (make 1 row matrix with candidates on cols)
+# if not over total_votes/2, get index of candidate that has least voters
+# get row index voters that voted for candidate
+# distribute their rank_int choices to each candidate
+# repeat until any index in candidate total votes is &gt;= total_votes/2
+
+# bool for any candidate over 50% majority
+
+SET voteWon = FALSE
+
+# total votes num = num of voters
+SET total_votes = num of rows in votes
+
+# make matrix of candidates total votes
+SET candidate_totals = all 0
+SET name of candidate_totals = vector of candidate names
+
+# make tracking integer for rank
+SET rank_int = 1
+
+# make vector of indices of voters who need to be distributed
+SET distribute_list = empty
+
+# initial count of votes, parse through each column, and add 1 count for each vote equal to rank_int
+FOR each candidate
+  FOR all voters (i.e. rows)
+    IF votes[candidate] = rank_int
+      SET candidate_totals[candidate] += 1
+      
+# make result matrix to print out
+SET res = matrix size num of candidates x num of candidates
+SET col names of res = candidate names
+
+# set first row totals
+SET res[1,] = candidate_totals[1,]
+
+# start while loop
+WHILE all candidate_totals &lt; total_votes/2 AND rank_int &lt;= num of candidates
+
+  # get column index of lowest candidate
+  SET indx_elim_candidate = min of candidate_totals
+
+  # set distribute_list to indices of lowest candidate&#39;s voters equal to rank_int
+  SET distribute_list = indices of all voters voting rank_int for lowest candidate
+  
+  # set lowest candidate&#39;s total votes to Inf (so min() works)
+  SET min of candidate_totals = Inf
+
+  # distribute voters
+  # get indices of voters who voted rank_int for lowest candidate
+  FOR distribute_list
+    SET candidate_total[col of distribute_list] += 1
+  
+  
+  # increment rank_int
+  SET rank_int += 1
+  
+  # update result matrix
+  SET res[rank_int,] = candidate_totals
+  </code></pre>
+</div>
+<div id="b.-5" class="section level2">
+<h2>b.</h2>
+<pre class="r"><code>tally_rcv &lt;- function(votes)
+{
+
+  # total votes
+  total_votes &lt;- nrow(votes)
+  
+  # vector of candidate total votes
+  candidate_totals &lt;- rep(0, ncol(votes))
+  
+  # set names of cols
+  names(candidate_totals) &lt;- colnames(votes)
+  
+  # make tracking integer for rank
+  rank_int &lt;- 1
+  
+  # make vector of voters needing to be distributed
+  distribute_list &lt;- numeric(0)
+  
+  # initial count of votes
+  for(cand in seq_len(ncol(votes)))
+  {
+    for(voter in seq_len(nrow(votes)))
+    {
+      if(votes[voter, cand] == rank_int)
+      {
+        candidate_totals[cand] &lt;- candidate_totals[cand] + 1
+      }
+    }
+  }
+  
+  # make result matrix to print out
+  res &lt;- matrix(0, nrow = ncol(votes), ncol = ncol(votes))
+  
+  # set names of cols
+  colnames(res) &lt;- colnames(votes)
+  
+  # set first row of totals
+  res[1,] &lt;- candidate_totals
+  
+  
+  # START RANKED CHOICE ALGORITHM
+  
+  
+  # while NONE that are Inf are above total_votes/2 AND rank_int is below num of cands
+  while(all(candidate_totals[which(candidate_totals != Inf)] &lt; (total_votes/2)) &amp; rank_int &lt; ncol(votes))
+  {
+    
+    # get column index of 1st lowest candidate
+    indx_elim_cand &lt;- which(candidate_totals == min(candidate_totals))[1]
+    
+    # set distribute_list to indices of lowest candidate&#39;s voters = rank_int
+    # set distr_voter, i.e. row of voter
+    distr_voter &lt;- which(votes[, indx_elim_cand] == rank_int)
+    
+
+    # if distr_voter is not empty, add to distribute_list
+    if(length(distr_voter) &gt; 0)
+    {
+      distribute_list &lt;- distr_voter
+    }
+                      
+    # set lowest candidate votes to Inf
+    candidate_totals[indx_elim_cand] &lt;- Inf
+    
+    # distribute voters
+    for(i in seq_len(length(distribute_list)))
+    {
+      # get col index of entry on row &quot;voter&quot; == rank_int+1
+      c &lt;- which(votes[distribute_list[i],] == rank_int+1)
+ 
+      # set candidate_totals at col index @ c += 1
+      candidate_totals[c] &lt;- candidate_totals[c] + 1
+    }
+    
+    # increment rank_int
+    rank_int &lt;- rank_int + 1
+    
+    # update result matrix
+    res[rank_int,] &lt;- candidate_totals
+    
+  }
+  
+  # output
+  res
+
+}</code></pre>
+</div>
+<div id="c.-3" class="section level2">
+<h2>c.</h2>
+<pre class="r"><code>load(&quot;votes.RData&quot;)
+knitr::kable(tally_rcv(votes))</code></pre>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="14%" />
+<col width="13%" />
+<col width="12%" />
+<col width="14%" />
+<col width="16%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="right">Douglass Howser</th>
+<th align="right">Larry Pillner</th>
+<th align="right">Bill Dexhart</th>
+<th align="right">Jeremy Jamm</th>
+<th align="right">Bobby Newport</th>
+<th align="right">Fielding Milton</th>
+<th align="right">Leslie Knope</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1057</td>
+<td align="right">1057</td>
+<td align="right">1059</td>
+<td align="right">3385</td>
+<td align="right">4311</td>
+<td align="right">3711</td>
+<td align="right">3720</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">1274</td>
+<td align="right">1261</td>
+<td align="right">3583</td>
+<td align="right">4511</td>
+<td align="right">3831</td>
+<td align="right">3840</td>
+</tr>
+<tr class="odd">
+<td align="right">Inf</td>
+<td align="right">1418</td>
+<td align="right">Inf</td>
+<td align="right">3757</td>
+<td align="right">4689</td>
+<td align="right">3951</td>
+<td align="right">3960</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">3903</td>
+<td align="right">4830</td>
+<td align="right">4071</td>
+<td align="right">4080</td>
+</tr>
+<tr class="odd">
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">5030</td>
+<td align="right">4213</td>
+<td align="right">4232</td>
+</tr>
+<tr class="even">
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">5150</td>
+<td align="right">Inf</td>
+<td align="right">4352</td>
+</tr>
+<tr class="odd">
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+<td align="right">5270</td>
+<td align="right">Inf</td>
+<td align="right">Inf</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 

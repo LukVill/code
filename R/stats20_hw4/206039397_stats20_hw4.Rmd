@@ -1,0 +1,908 @@
+---
+title: "Stats 20, W23 -- Homework 4"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Question 1
+
+```{r}
+
+my_t <- function(x)
+{
+  
+  # input validate if matrix
+  if(!is.matrix(x))
+  {
+    # change into matrix
+    x <- matrix(x)
+    # NOTE: will be 1 column matrix
+  }
+
+  # make new matrix with reversed row and col amounts, fill matrix by row
+  res <- matrix(as.vector(x), nrow = ncol(x), ncol = nrow(x), byrow = TRUE)
+  
+  # output
+  res
+  
+}
+
+# test result
+test <- matrix(1:6,2,3, byrow = TRUE)
+
+test
+
+my_t(test)
+
+```
+
+# Question 2
+
+## a.
+
+```{r}
+
+my_cor <- function(x, y, use = "everything")
+{
+  
+  # inpute validate, make sure sizes are same
+  if(length(x)!=length(y))
+  {stop("incompatible dimensions")}
+  
+  # check use value
+  # if use = everything, if there exists 1 NA, return NA
+  # if use = "pairwise.complete.obs", skip over NA/NAN/NULL in calculations
+  
+  res <- NA
+  
+  if(use == "everything" && (any(is.na(x)) || any(is.na(y))))
+  {
+    # return NA
+    res <- NA
+  }
+  else
+  {
+    # if pairwise is used OR there are no NA's, continue with program
+    
+    # need to calculate:
+    # mean of x and y (rm na's)
+    # x-xbar and y-ybar
+    # sum of diffx * diffy
+    # diffx ^2 square root * diff y ^2 square root
+
+    # get indices of NA's and skip them 
+    # get numeric bool of indices
+    naInX <- as.numeric(is.na(x))
+    naInY <- as.numeric(is.na(y))
+    
+    # add together, then get indices more than 0
+    nas <- naInX + naInY
+    naIndx <- which(nas > 0)
+    
+    # remove all pairs with at least one NA
+    if(length(naIndx)>0)
+    {
+      x <- x[-naIndx]
+      y <- y[-naIndx] 
+    }  
+    
+    # xbar
+    xbar = mean(x)
+    
+    # ybar
+    ybar = mean(y)
+    
+    # numerator
+    num <- sum((x-xbar)*(y-ybar))
+
+    # denominator
+    denom <- sqrt(sum((x-xbar)^2)) * sqrt(sum((y-ybar)^2))
+
+    # result
+    res <- num/denom
+    
+  }
+  
+  # output
+  res
+  
+}
+
+# test values
+x <- c(1,NA,5,7,10)
+y <- c(7,7,8,15,6)
+
+# cor test
+cor(x,y,use = "pairwise.complete.obs")
+
+# my_cor test
+my_cor(x,y,use = "pairwise.complete.obs")
+
+```
+
+## b.
+
+```{r}
+
+linreg <- function(x, y, use = "everything")
+{
+  # output will be numeric(a,b)
+  
+  
+    if(length(x)!=length(y))
+  {stop("incompatible dimensions")}
+  
+  # check use value
+  # if use = everything, if there exists 1 NA, return NA
+  # if use = "pairwise.complete.obs", skip over NA/NAN/NULL in calculations
+  
+  res <- NA
+  
+  if(use == "everything" && (any(is.na(x)) || any(is.na(y))))
+  {
+    # return NA
+    res <- NA
+  }
+  else
+  {
+    # if pairwise is used OR there are no NA's, continue with program
+
+    # get indices of NA's and skip them 
+    # get numeric bool of indices
+    naInX <- as.numeric(is.na(x))
+    naInY <- as.numeric(is.na(y))
+    
+    # add together, then get indices more than 0
+    nas <- naInX + naInY
+    naIndx <- which(nas > 0)
+    
+    # remove all pairs with at least one NA
+    if(length(naIndx)>0)
+    {
+      x <- x[-naIndx]
+      y <- y[-naIndx] 
+    }
+    
+    # b = r * sd(y)/sd(x)
+    b <- cor(x, y, use) * (sd(y)/sd(x))
+    
+    # a = ybar - b*xbar
+    a <- mean(y)- (b * mean(x))
+    
+    # output
+    res <- c(a,b)
+  }
+  
+  # return output
+  res
+  
+}
+
+# test values
+x <- c(1,NA,5,7,10)
+y <- c(7,7,8,15,6)
+
+# test
+linreg(x,y)
+linreg(x,y, use = "pairwise.complete.obs")
+
+```
+
+## c.
+
+```{r}
+
+# make height and weight vectors
+height <- c(61,62,63,64,66,68)
+weight <- c(104,110,125,141,160,170)
+
+linreg(height,weight)
+
+```
+
+The equation of the regression line is `y = -510.64706 + 10.08824x`.
+
+## d. 
+
+```{r}
+
+linreg_mat <- function(x,y)
+{
+  
+  # input validate length
+  if(length(x)!=length(y))
+  {stop("incompatible dimensions")}
+  
+  # else, continue
+  
+  # make 1 column of length x
+  mat1col <- rep(1, length(x))
+  # make design matrix
+  matA <- cbind(mat1col, x)
+ 
+  # get inverse of X^T X
+  inv <- solve(t(matA)%*%matA)
+  
+  # matrix multiply inv,t(x),y
+  
+  inv %*% t(matA) %*% y
+  
+}
+
+```
+
+## e.
+
+```{r}
+
+linreg_mat(height,weight)
+
+```
+
+The answers from part c and part e are the same.
+
+## f.
+
+The slope coefficient is estimating that every increment of height by 1 inch increases weight by 10 pounds.
+
+
+# Question 3
+
+```{r}
+
+`%m%` <- function(A, B)
+{
+  
+  # input check matrix dim are conformable
+  if(ncol(A) != nrow(B))
+  {
+    stop("incompatible dimensions")
+  }
+  
+  # else continue
+  
+  # make vector of res matrix vals
+  vec <- numeric(0)
+
+  for(col in seq_len(ncol(B)))
+  {
+    for(row in seq_len(nrow(A)))
+    {
+      vec <- c(vec,sum(A[row,]*B[,col]))
+    }
+  }
+  
+  # create result matrix Arow x Bcol
+  matrix(vec, nrow(A), ncol(B))
+  
+}
+
+```
+
+## b. 
+
+```{r}
+
+x <- matrix(6:1, 2, 3, byrow = TRUE)
+y <- matrix(1:9, 3, 3)
+
+# real result
+x %*% y
+
+# test result
+x %m% y
+
+```
+
+# Question 4
+
+## a.
+
+```{r}
+
+`%^%` <- function(A, k)
+{
+  # input validate, k>0
+  if(k < 0)
+  {stop("invalid exponent value")}
+  
+  if(k == 0)
+  {
+    # make identity matrix
+    A <- diag(nrow = nrow(A))
+  }
+  else
+  {
+    for(i in seq_len(k))
+    {
+      A <- A %m% A
+    }
+  }
+
+  # output 
+  A
+  
+}
+
+```
+
+## b.
+
+```{r}
+
+z <- matrix(c(0.2,0.6,0.4,0.7,0.2,0.1,0.1,0.2,0.5), 3, 3)
+
+z %^% 0
+
+z %^% 5
+
+z %^% 50
+
+z %^% 500
+
+```
+
+# Question 5
+
+```{r}
+
+my_which <- function(x, arr.ind = FALSE)
+{
+  
+  # make res vec/matrix
+  res <- integer(0)
+  
+  # arr.ind makes each row contain row and col indices of each index
+  if(is.matrix(x) && arr.ind == TRUE)
+  {
+    
+    res <- matrix(numeric(0), ncol = 2)
+    
+    for(c in seq_len(ncol(x)))
+    {
+      for(r in seq_len(nrow(x)))
+      {
+        if(x[r,c] == TRUE)
+        {
+          res <- rbind(res,c(r,c))
+        }
+      }
+    }
+
+    # name columns
+    colnames(res) <- c("row","col")
+    
+  }
+  else
+  {
+    # else, parse thru vector (of matrix) and get indices
+    for(i in seq_along(as.vector(x)))
+    {
+      if(x[i] ==  TRUE)
+      {
+        res <- c(res, i)
+      }
+    }
+  }
+  
+  # output
+  res
+  
+}
+
+# test
+xvec <- 1:12
+xmat <- matrix(1:12,3,4)
+
+# test xvec
+
+which(xvec%%2==0,arr.ind = FALSE)
+
+my_which(xvec%%2==0,arr.ind = FALSE)
+
+which(xvec%%2==0,arr.ind = TRUE)
+
+my_which(xvec%%2==0,arr.ind = TRUE)
+
+# test xmat
+
+which(xmat%%2==0,arr.ind = FALSE)
+
+my_which(xmat%%2==0,arr.ind = FALSE)
+
+which(xmat%%2==0,arr.ind = TRUE)
+
+my_which(xmat%%2==0,arr.ind = TRUE)
+
+```
+
+# Question 6
+
+## a.
+
+```{r}
+
+load("mlb.RData")
+
+# i.
+
+# on hit data, group by team, apply max
+tapply(hit, team, max)
+
+
+# ii. 
+table(team)
+
+# iii.
+# make logical vector of 1's, group by team, then sum for each team
+tapply(as.numeric(hr > 0), team, sum)
+
+```
+
+## b.
+
+```{r}
+
+# i.
+# remove Nan's by removing where ab is 0, divide each hit by ab, logical vector by > 100, subset hit/ab by logic vector, then group by team of non-NaN vals
+tapply((hit[ab != 0 & ab >= 100])/(ab[ab != 0 & ab >= 100]), team[ab != 0 & ab >= 100], max)
+
+# ii.
+# same code but do mean instead of max
+tapply((hit[ab != 0 & ab >= 100])/(ab[ab != 0 & ab >= 100]), team[ab != 0 & ab >= 100], mean)
+
+```
+
+## c.
+
+```{r}
+
+# find avg HR 
+res <- tapply(hr, list(pos, league), mean)
+res
+
+# calculate largest difference between each pos
+# split into AL and NL
+# get difference between each and get max
+# subset AL for result
+# get index in AL equal to subset AL
+# subset dimnames(res)[[1]][index]
+AL <- res[1:9]
+NL <- res[10:18]
+dimnames(res)[[1]][which(AL == (AL[abs(AL - NL) == max(abs(AL - NL))]))]
+
+```
+
+Rightfield has the biggest difference in homeruns in between the two leagues.
+
+## d.
+```{r}
+
+# get number of players for each position for each team
+# apply median to each row of matrix
+apply(tapply(rep(1,length(team)), list(pos, team), sum), 1, median)
+
+```
+
+# Question 7
+
+## a.
+```{r}
+
+my_row <- function(x)
+{
+  
+  # return matrix of ints representing each row
+  for(col in seq_len(ncol(x)))
+  {
+    # val to input
+    i <- 1
+    
+    for(row in seq_len(nrow(x)))
+    {
+      x[row,col] <- i
+      
+      # update value
+      i <- i + 1
+    }
+  }
+  
+  # output
+  x
+  
+}
+
+# test
+x <- matrix(1:9,3,3)
+row(x)
+my_row(x)
+
+```
+
+## b.
+```{r}
+
+my_col <- function(x)
+{
+  
+    # return matrix of ints representing each row
+  for(row in seq_len(nrow(x)))
+  {
+    # val to input
+    i <- 1
+    
+    for(col in seq_len(ncol(x)))
+    {
+      x[row,col] <- i
+      
+      # update value
+      i <- i + 1
+    }
+  }
+  
+  # output
+  x
+  
+}
+
+# test
+x <- matrix(1:9,3,3)
+col(x)
+my_col(x)
+
+```
+
+## c.
+```{r}
+
+my_diag <- function(x, nrow = NA, ncol = NA)
+{
+ 
+  # if input is:
+  # matrix, return vector of diagonal
+  # vector, return matrix with vector along diagonal
+  # scalar, return identity matrix of size scalar
+ 
+  # output val
+  res <- numeric(0)
+  
+  # check if numeric value
+  if(is.numeric(x) & all(x >= 0))
+  {
+    
+    # matrix
+    if(is.matrix(x))
+    {
+      # parse through diagonal, concat to res
+      i <- 1
+      
+      # loop while i not equal to ncol or nrow
+      while(i <= ncol(x) & i <= nrow(x))
+      {
+        res <- c(res, x[i,i])
+        
+        # increment
+        i <- i + 1
+      }
+     
+    }
+   
+    # vector
+    if(!is.matrix(x) & length(x) > 1)
+    {
+      # make matrix of size lengthx x lengthx
+      res <- matrix(0, nrow = length(x), ncol = length(x))
+      
+      # fill matrix with elements of x
+      for (i in seq_len(length(x)))
+      {
+        # fill diagonal
+        res[i,i] <- x[i]
+      }
+    }
+   
+    # scalar
+    if(!is.matrix(x) & length(x) == 1)
+    {
+      
+      # 0 case
+      if(x == 0)
+      {
+        res <- matrix(0, nrow = 0, ncol = 0)
+      }
+      # normal case
+      else
+      {
+        # check if dimensions exist
+        if(!is.na(nrow) | !is.na(ncol))
+        {
+          # check if only 1 exists
+          if((!is.na(nrow) & is.na(ncol)) | (is.na(nrow) & !is.na(ncol)))
+          {
+            len <- numeric(0)
+    
+            # check which exists
+            if(is.na(nrow))
+            {
+              len <- ncol
+              # make res matrix of size 1 x ncol and fill with x
+              res <- matrix(0, nrow = 1, ncol = len)
+              
+              # fill with x
+              res[1] <- x
+            }
+            else
+            {
+              len <- nrow
+              # make res matrix of size nrow x nrow and fill with x
+              res <- matrix(0, nrow = len, ncol = len)
+              
+              # fill with x
+              for(i in seq_len(nrow(res)))
+              {
+                res[i,i] <- x
+              }
+            }
+              
+
+          }
+          # if both exist
+          else
+          {
+            # make matrix size nrow x ncol, fill with x
+            res <- matrix(0, nrow = nrow, ncol = ncol)
+            
+            # fill with x
+            for(i in seq_len(nrow(res)))
+            {
+              res[i,i] <- x
+            }
+          }
+        }
+        else
+        {
+          # return identity matrix of size x
+          res <- matrix(0, x, x)
+         
+          # fill diagonal with 1
+          for(i in seq_len(x))
+          {
+            res[i,i] <- 1
+          }
+        }
+
+      }
+    }
+ 
+    # output
+    res
+    
+  }
+  
+  # if not valid scalar, vector, or matrix
+  else
+  {stop("invalid input")}
+
+}
+
+# test
+
+# matrix
+x <- matrix(1:10, 5, 2)
+diag(x)
+my_diag(x)
+
+# vector
+x <- 1:5
+diag(x)
+my_diag(x)
+
+# scalar
+x <- 8
+diag(x)
+my_diag(x)
+
+# 0 scalar
+x <- 0
+diag(x)
+my_diag(x)
+
+# scalar with dims
+x <- 5
+nrow <- 3
+ncol <- 4
+
+# test only nrow
+diag(x, nrow = nrow)
+my_diag(x, nrow = nrow)
+        
+# test only ncol
+diag(x, ncol = ncol)
+my_diag(x, ncol = ncol)
+
+# test both
+diag(x, nrow = nrow, ncol = ncol)
+my_diag(x, nrow = nrow, ncol = ncol)
+
+```
+
+# Question 8
+
+```{r}
+load("votes.RData")
+```
+
+## a.
+
+```
+# layout of votes: each row is a voter, votes is a 2d matrix with cols being candidates and rows being voter's ranking
+
+# algorithm explanation: as long as none of the total votes of each candidate are >= total_votes/2 round down (%/% 2), 
+# have an int track (rank_int) which ranking we are using (i.e. rank 1, 2, etc.)
+# tally all votes of that value for the total votes for each candidate (make 1 row matrix with candidates on cols)
+# if not over total_votes/2, get index of candidate that has least voters
+# get row index voters that voted for candidate
+# distribute their rank_int choices to each candidate
+# repeat until any index in candidate total votes is >= total_votes/2
+
+# bool for any candidate over 50% majority
+
+SET voteWon = FALSE
+
+# total votes num = num of voters
+SET total_votes = num of rows in votes
+
+# make matrix of candidates total votes
+SET candidate_totals = all 0
+SET name of candidate_totals = vector of candidate names
+
+# make tracking integer for rank
+SET rank_int = 1
+
+# make vector of indices of voters who need to be distributed
+SET distribute_list = empty
+
+# initial count of votes, parse through each column, and add 1 count for each vote equal to rank_int
+FOR each candidate
+  FOR all voters (i.e. rows)
+    IF votes[candidate] = rank_int
+      SET candidate_totals[candidate] += 1
+      
+# make result matrix to print out
+SET res = matrix size num of candidates x num of candidates
+SET col names of res = candidate names
+
+# set first row totals
+SET res[1,] = candidate_totals[1,]
+
+# start while loop
+WHILE all candidate_totals < total_votes/2 AND rank_int <= num of candidates
+
+  # get column index of lowest candidate
+  SET indx_elim_candidate = min of candidate_totals
+
+  # set distribute_list to indices of lowest candidate's voters equal to rank_int
+  SET distribute_list = indices of all voters voting rank_int for lowest candidate
+  
+  # set lowest candidate's total votes to Inf (so min() works)
+  SET min of candidate_totals = Inf
+
+  # distribute voters
+  # get indices of voters who voted rank_int for lowest candidate
+  FOR distribute_list
+    SET candidate_total[col of distribute_list] += 1
+  
+  
+  # increment rank_int
+  SET rank_int += 1
+  
+  # update result matrix
+  SET res[rank_int,] = candidate_totals
+  
+```
+
+## b.
+
+```{r}
+
+tally_rcv <- function(votes)
+{
+
+  # total votes
+  total_votes <- nrow(votes)
+  
+  # vector of candidate total votes
+  candidate_totals <- rep(0, ncol(votes))
+  
+  # set names of cols
+  names(candidate_totals) <- colnames(votes)
+  
+  # make tracking integer for rank
+  rank_int <- 1
+  
+  # make vector of voters needing to be distributed
+  distribute_list <- numeric(0)
+  
+  # initial count of votes
+  for(cand in seq_len(ncol(votes)))
+  {
+    for(voter in seq_len(nrow(votes)))
+    {
+      if(votes[voter, cand] == rank_int)
+      {
+        candidate_totals[cand] <- candidate_totals[cand] + 1
+      }
+    }
+  }
+  
+  # make result matrix to print out
+  res <- matrix(0, nrow = ncol(votes), ncol = ncol(votes))
+  
+  # set names of cols
+  colnames(res) <- colnames(votes)
+  
+  # set first row of totals
+  res[1,] <- candidate_totals
+  
+  
+  # START RANKED CHOICE ALGORITHM
+  
+  
+  # while NONE that are Inf are above total_votes/2 AND rank_int is below num of cands
+  while(all(candidate_totals[which(candidate_totals != Inf)] < (total_votes/2)) & rank_int < ncol(votes))
+  {
+    
+    # get column index of 1st lowest candidate
+    indx_elim_cand <- which(candidate_totals == min(candidate_totals))[1]
+    
+    # set distribute_list to indices of lowest candidate's voters = rank_int
+    # set distr_voter, i.e. row of voter
+    distr_voter <- which(votes[, indx_elim_cand] == rank_int)
+    
+
+    # if distr_voter is not empty, add to distribute_list
+    if(length(distr_voter) > 0)
+    {
+      distribute_list <- distr_voter
+    }
+                      
+    # set lowest candidate votes to Inf
+    candidate_totals[indx_elim_cand] <- Inf
+    
+    # distribute voters
+    for(i in seq_len(length(distribute_list)))
+    {
+      # get col index of entry on row "voter" == rank_int+1
+      c <- which(votes[distribute_list[i],] == rank_int+1)
+ 
+      # set candidate_totals at col index @ c += 1
+      candidate_totals[c] <- candidate_totals[c] + 1
+    }
+    
+    # increment rank_int
+    rank_int <- rank_int + 1
+    
+    # update result matrix
+    res[rank_int,] <- candidate_totals
+    
+  }
+  
+  # output
+  res
+
+}
+
+```
+
+## c.
+
+```{r}
+load("votes.RData")
+knitr::kable(tally_rcv(votes))
+```
