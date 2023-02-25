@@ -1,0 +1,252 @@
+---
+title: "Stats 20, W23 -- Discussion Week 7"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Problem 1
+
+## a.
+
+```{r}
+
+data(trees)
+
+```
+
+31 observations with 3 variables
+
+## b.
+
+```{r}
+
+get_mean_sd <- function(x, na.rm = FALSE)
+{
+  
+  # output of function
+  res <- numeric(2)
+
+  if(na.rm == FALSE & any(is.na(x)))
+  {
+    res[1] <- NA
+    res[2] <- NA
+  }
+  else
+  {
+    # subset NAs out regardless
+    x <- x[!is.na(x)]
+    
+    res[1] <- mean(x)
+    res[2] <- sd(x)
+    
+  }
+  
+  # output
+  names(res) <- c("mean", "sd")
+  res
+  
+}
+
+d <- 5:3
+get_mean_sd(d)
+
+get_mean_sd(c(d,NA), na.rm = TRUE)
+
+get_mean_sd(c(d,NA), na.rm = FALSE)
+
+```
+
+## c. 
+
+```{r}
+
+sapply(trees, get_mean_sd, simplify = TRUE)
+
+```
+
+## d.
+
+```{r}
+
+trees$Tall <- (trees$Height > (sd(trees$Height) + mean(trees$Height)))
+
+```
+
+## e.
+
+```{r}
+
+trees$ScaledVolume <- (trees$Volume - min(trees$Volume)) / (max(trees$Volume) - min(trees$Volume))
+
+```
+
+## f.
+
+```{r}
+
+trees$Height <- NULL
+trees$Volume <- NULL
+
+```
+
+## g.
+
+```{r}
+
+trees <- trees[, order(colnames(trees))]
+
+```
+
+# Problem 2
+
+```{r}
+
+my_sigmoid <- function(x, fun_name)
+{
+  
+  # output
+  res <- numeric(0)
+  
+  valid_fun_name <- c("logistic","hyperbolic tangent","arctangent")
+
+  # check fun_name to be valid
+  if(!is.numeric(x) | !any(fun_name == valid_fun_name))
+  {stop("invalid input")}
+  else
+  {
+    if(fun_name == "logistic")
+    {
+      res <- 1 / (1 + exp(-x))
+    }
+    if(fun_name == "hyperbolic tangent")
+    {
+      res <- (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+    }
+    if(fun_name == "arctangent")
+    {
+      res <- arctan(x)
+    }
+  }
+  
+  # output 
+  res
+  
+}
+
+```
+
+# Problem 3
+
+```{r}
+
+my_prod <- function(x, na.rm = FALSE)
+{
+  
+  res <- numeric(0)
+  
+  if(na.rm == FALSE & any(is.na(x)))
+  {
+    res <- NA
+  }
+  else
+  {
+    # subset nas out
+    x <- x[!is.na(x)]
+    
+    res <- exp(sum(exp(x)))
+
+  }
+  
+  # output
+  res
+  
+}
+
+```
+
+# Problem 4
+
+```{r}
+
+get_numel <- function(x)
+{
+  
+  # count val
+  count <- 0
+  
+  # subset all null and na and nan out
+  x <- x[!is.na(x) & !(vapply(x, is.null, logical(1)))]
+  
+  if(is.list(x))
+  {
+    for(elem in x)
+    {
+      if(is.list(elem))
+      {
+        elem <- elem[!is.na(elem) & !(vapply(elem, is.null, logical(1)))]
+        
+        if(length(elem) > 0)
+        {
+          count <- count + length(elem)
+        }
+      }
+      else
+      {
+        for(e in elem)
+        {
+          count <- count + 1
+        }
+      }
+    }
+  }
+  else
+  {
+    for(elem in x)
+    {
+      count <- count + 1
+    }
+  }
+  
+  # output
+  count
+  
+}
+
+
+
+ex1 <- matrix(1, nrow = 3, ncol = 5)
+ex2 <- list(ex1, NULL, list(NULL), 3, logical(4))
+get_numel(ex1)
+
+get_numel(ex1[c(NA, TRUE)])
+
+get_numel(ex2)
+
+```
+
+# Problem 5
+
+The storage objects we've talked about in the course are:
+- lists
+- data frames
+- matrices
+- vectors
+- factors
+
+All can use indexing and subsetting. 
+
+A list can normally be used with `list[x]`. To access a list's columns, `list[[col]]`.
+
+Data frames are exactly the same with lists, except they add on 2D aspect where you can access 1 element via `df[x,y]`.
+
+Matrices are the same as data frames without the functionality of lists.
+
+Vectors can only utilize 1D indexing, such as `v[x]`.
+
+Factors can access and subset the same way as a normal vector.

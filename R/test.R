@@ -19,3 +19,16 @@ length(2:5)
 x <- rep(TRUE,100)
 x[-1]
 x[2:length(x)]
+
+with(frame, {
+
+  num[num > 0]
+})
+
+mode(x[[1]][1])
+
+x <- factor(letters)
+
+tapply(x,1:26,max)
+
+library(package = "MASS")
