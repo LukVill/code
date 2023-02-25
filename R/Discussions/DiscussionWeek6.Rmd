@@ -1,0 +1,192 @@
+---
+title: "Stats 20, 23W -- Discussion Week 6"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Problem 1
+
+## a.
+Any comparisons to check if the element is 0 or 1 should be placed in an `any()` function because checking the vector would return a vector of booleans, which will not work for the if statement.
+
+## b. 
+
+Instead of doing `ifelse`, we can logical subset by doing `x[x > 1]`.
+
+## c. 
+
+Again, any element comparisons have to be contained in an `any()` function to only return 1 boolean value, else the if statement will produce an error.
+
+## d.
+
+The `vapply()` function only returns a vector with 1's and 0's. However, to count the nan's, we must subset the `vapply()` to only the indices that are 1. So, the line of code should be:
+`length(vapply(x, is.nan, numeric(1))[x == 1])`
+
+# Problem 2
+```{r}
+x <- factor(c("d", "d", "a", "b", "c"))
+
+# way 1
+
+attributes(x)[[1]]
+
+# way 2
+
+attributes(x)$levels
+```
+
+# Problem 3
+
+## a.
+
+```{r}
+
+is_factor <- function(x)
+{
+  is.factor(x)
+}
+
+```
+
+## b.
+
+```{r}
+
+is_list_of_factors <- function(x)
+{
+  
+  # input check if x is list
+  if(!is.list(x))
+  {stop("input is not list")}
+  
+  # test bool val, default TRUE
+  isAllFactor <- TRUE
+  
+  # else, check each element if it is factor
+  for (i in seq_along(x))
+  {
+    if(!is_factor(x[[i]]))
+    {
+      # set result to FALSE
+      isAllFactor <- FALSE
+    }
+  }
+  
+  # return 
+  isAllFactor
+  
+}
+
+# test vals
+x1 <- list(A = factor(1:5), B = factor(5:10))
+x2 <- list(A = 1:5, B = 5:10)
+
+is_list_of_factors(x1)
+is_list_of_factors(x2)
+
+```
+
+# Problem 4
+
+```{r error=TRUE}
+
+is_attribute <- function(x, at)
+{
+  
+  # input validate at
+  if(!is.character(at) || length(at) != 1)
+  {stop("invalid \"at\" input")}
+  
+  # else, continue code
+  
+  # result boolean default FALSE
+  res <- FALSE
+  
+  # if at is attribute, TRUE
+  
+  # make vec of names
+  vec <- names(attributes(x))
+  
+  for (i in seq_along(attributes(x)))
+  {
+    if(vec[i] == at)
+    {
+      # set res to TRUE
+      res <- TRUE
+    }
+  }
+
+  # return bool
+  res
+  
+}
+
+# test code
+is_attribute(matrix(),"dim")
+is_attribute(matrix(),"class")
+is_attribute(data.frame(),"class")
+is_attribute(numeric(),"")
+is_attribute(data.frame(),3)
+is_attribute(list(),c("a","b"))
+is_attribute(sum,"function")
+
+```
+
+# Problem 5
+
+```{r error=TRUE}
+
+get_name_of_min <- function(x)
+{
+  
+  # input validate x has names
+  if(is.null(names(x)))
+  {stop("input vector has no names")}
+
+  # get index of 1st minimum
+  indx <- which(x == min(x))[1]
+  
+  # use index for names list
+  names(x)[indx]
+  
+}
+
+# make test val
+z <- c(1:7,1)
+names(z) <- letters[1:8]
+
+get_name_of_min(z)
+
+get_name_of_min(z[-seq_len(4)])
+
+get_name_of_min(z[c(6,4,2,3)])
+
+get_name_of_min(names(z))
+
+get_name_of_min(as.character(z))
+
+```
+
+# Problem 6
+
+```{r}
+
+# 1: checks diagonal, so for matrix with data but no nrow/ncol, it is 1 col matrix
+1 == diag(matrix(1:9))
+
+# 2: diag makes identity matrix with nrows, so 
+all(diag(5) == diag(nrow = 5))
+
+# 3: diag makes identity matrix of nxn
+nrow(diag(5)) == 5
+
+# 4: diag treats this vector as a "data" vector, making identity matrix with this data along the diagonal
+all(diag(diag(1:5)) == 1:5)
+
+```
