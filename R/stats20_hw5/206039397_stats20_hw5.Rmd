@@ -1,0 +1,129 @@
+---
+title: "Stats 20, W23 -- Homework 5"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Question 1
+
+```{r}
+
+char <- c("4", "2", "1", "0")
+
+num <- 0:3
+
+charnum <- data.frame(char, num, stringsAsFactors = TRUE)
+
+```
+
+## a. 
+
+```{r}
+
+as.numeric(char)
+as.numeric(charnum$char)
+
+typeof(char)
+typeof(charnum$char)
+
+char
+charnum$char
+
+as.numeric(factor(c("10","5","1"), ordered = TRUE))
+
+```
+
+Because `char` is itself just a character vector, the type casting can take the raw values of the strings and turn them into numbers. However, `charnum$char` returns the numbers as factored data. This turns the column into a factor, which is casted into their ordering indices by the factor order.
+
+## b.
+
+```{r}
+as.numeric(as.character(charnum$char))
+```
+
+# Question 2
+
+```{r}
+simple_list <- list("vector" = 1:10, "matrix" = matrix(6:1, nrow = 3, ncol = 2))
+
+simple_list$NULL <- NULL
+```
+
+## a.
+
+1. NULL is a keyword in R. So, making any object or function just named NULL will not work, for it is a reserved word. 
+
+2. Even if it did successfully create a column named NULL, the value of that column is NULL, so appending a value to a nonexistent column will definitely throw out an error of a nonexistent initialized object.
+
+## b.
+
+```{r}
+
+simple_list$null <- list(NULL)
+
+length(simple_list) == 3
+
+```
+
+## c. 
+
+```{r}
+
+simple_list$vector <- list(NULL)
+
+```
+
+# Question 3
+
+```{r}
+
+my_scale <- function(x)
+{
+  
+  a <- 0
+  b <- 1
+  
+  # check if there exists attributes to x
+  # if there exists index for both, a and b exist 
+  if(length(which(names(attributes(x)) == "a")) != 0 & length(which(names(attributes(x)) == "b")) != 0)
+  {
+    a <- attributes(x)$a
+    b <- attributes(x)$b
+  }
+  
+  # else, just continue the algorithm
+  a + (((x - min(x)) * (b - a)) / (max(x) - min(x)))
+  
+}
+
+# test
+x <- 1:20
+
+# test without a and b
+my_scale(x)
+my_scale(my_scale(x))
+
+# add a and b
+attributes(x)$a <- 5
+attributes(x)$b <- 2
+
+# test
+my_scale(x)
+my_scale(my_scale(x))
+
+```
+
+# Question 4
+
+## a. 
+
+
+
+
+
