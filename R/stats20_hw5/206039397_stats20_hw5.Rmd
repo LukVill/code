@@ -49,7 +49,7 @@ as.numeric(as.character(charnum$char))
 
 # Question 2
 
-```{r}
+```{r error = TRUE}
 simple_list <- list("vector" = 1:10, "matrix" = matrix(6:1, nrow = 3, ncol = 2))
 
 simple_list$NULL <- NULL
@@ -65,7 +65,9 @@ simple_list$NULL <- NULL
 
 ```{r}
 
-simple_list$null <- list(NULL)
+simple_list <- list("vector" = 1:10, "matrix" = matrix(6:1, nrow = 3, ncol = 2))
+
+simple_list$null_val <- list(NULL)
 
 length(simple_list) == 3
 
@@ -76,6 +78,8 @@ length(simple_list) == 3
 ```{r}
 
 simple_list$vector <- list(NULL)
+
+simple_list$vector
 
 ```
 
@@ -123,7 +127,282 @@ my_scale(my_scale(x))
 
 ## a. 
 
+The purpose of the given function, `my_eigen`, is to acquire all possible eigenvalues of a any given matrix with additional attributes. 
+
+- Assume all input matrices will always output eigenvalues in the real numbers (i.e. no need to input validate)
+- Assume input matrix is diagonalizable. 
+  - This means, the following theorem can be used to find a matrix of eigenvalues: `Q^-1 * A * Q = D`, where `Q^-1` and `Q` are the inverse transformation matrix and regular transformation matrix, respectively, A is the original matrix, and D is the diagonal matrix of eigenvalues. 
+- The given matrix should have an attribute that's named "Q", which provides the transformation matrix. If not, send out an error.
+
+```{r}
+
+my_eigen <- function(x)
+{
+  
+  # if 0 length, does not exist
+  if(length(which(names(attributes(x)) == "Q")) == 0)
+  {stop("invalid input, matrix needs Q attribute")}
+  
+  # otherwise, continue
+  # inverse * matrix * Q = D, diagonal are eigenvalues
+  diag(solve(x$Q) %*% x %*% Q)
+
+}
+
+```
+
+## b.
+
+The following code will parse through each row of a matrix, outputting a vector following row order.
+
+Error code:
+```{r}
+
+vector_by_row <- function(x)
+{
+
+  # output
+  res <- numeric(0)
+  
+  for(row in seq_len(ncol(x)))
+  {
+    for(col in seq_along(ncol(x)))
+    {
+      res <- c(res, x[row][col])
+    }
+  }
+  
+  # output
+  res
+  
+}
+
+```
+
+Fixed code:
+```{r}
+
+vector_by_row <- function(x)
+{
+
+  # output
+  res <- numeric(0)
+  
+  for(row in seq_len(nrow(x)))
+  {
+    for(col in seq_len(ncol(x)))
+    {
+      res <- c(res, x[row,col])
+    }
+  }
+  
+  # output
+  res
+  
+}
+
+```
+
+Error 1:
+`ncol()` is used as the value in the first for loop's paring condition. The correct answer would utilize `nrow()`, since the algorithm needs to parse all columns of *each* row.
+
+Error 2:
+`seq_along()` is used for the parsing condition for the second look. The correct answer would be `seq_len()` because the output of `ncol()` is the number of columns. `seq_along()` would only loop the for loop once, which is an incomplete parsing.
+
+Error 3:
+To extract from a matrix, the correct R syntax would be `x[row, col]`. The format `x[row][col]` is from another language, such as C++.
+
+# Question 5
+
+```{r}
+
+my_unlist <- function(x)
+{
+  
+  # output
+  res <- NULL
+  # if first elem is a factor, make empty factor for res
+  if(is.factor(x[[1]]))
+  {
+    res <- factor()
+  }
+    
+  # parse through all components of list
+  for(i in seq_len(length(x)))
+  {
+    # if list components have lists, apply function recursively
+    if(is.list(x[[i]]))
+    {
+      lapply(x[[i]], my_unlist)
+    }
+    else
+    {
+      #concat component to res
+      res <- c(res, x[[i]])
+    }
+  }
+
+  # output
+  res
+}
 
 
+# test
+unlist(list(c(2, 1, 1), c(3, 2, 1), 2))
+my_unlist(list(c(2, 1, 1), c(3, 2, 1), 2))
+
+# test
+unlist(list(factor(c("a", "a", "b", "c")),
+factor(c("b", "c", "e")),
+factor(c("a", "d", "b"))))
+my_unlist(list(factor(c("a", "a", "b", "c")),
+factor(c("b", "c", "e")),
+factor(c("a", "d", "b"))))
+
+# test
+unlist(list(factor(c("a", "b")), c(1, 2)))
+my_unlist(list(factor(c("a", "b")), c(1, 2)))
+
+# test
+unlist(list(factor(c("a", "b")), factor(c("b", "c")), c("a", "b")))
+my_unlist(list(factor(c("a", "b")), factor(c("b", "c")), c("a", "b")))
+c(c(x[[1]],x[[2]]),x[[3]])
+
+```
+
+## b. 
+
+```{r}
+stat_mode <- function(x, first = FALSE)
+{
+
+  # result
+  res <- NULL
+  
+  # make unlisted vector, find mode
+  x <- unlist(x)
+  
+  # make vector of unique values
+  unique_vec <- unique(x)
+  
+  # make corresponding vector rep count of each unique entry
+  count_vec <- numeric(length(unique_vec))
+  
+  # fill all 0's
+  for(num in count_vec)
+  {
+    num <- 0
+  }
+  
+  # find mode
+  for(entry_indx in seq_along(unique_vec))
+  {
+    for(i in seq_along(x))
+    {
+      # if parsed val == entry, count ++
+      if(x[i] == unique_vec[entry_indx])
+      {
+        count_vec[entry_indx] <- count_vec[entry_indx] + 1
+      }
+    }
+  }
+  
+  # consider first val
+  if(first == TRUE)
+  {
+    res <- unique_vec[1]
+  }
+  else
+  {
+    # return index with most count
+    res <- unique_vec[which(count_vec == max(count_vec))]
+  }
+  
+  # output
+  res
+
+}
+
+# test
+stat_mode(c(FALSE, FALSE, TRUE, TRUE, FALSE))
+
+# test
+stat_mode(list(c(2, 1, 1), c(3, 2, 1), 2))
+
+# test
+stat_mode(list(c(2, 1, 1), c(3, 2, 1), 2), first = TRUE)
+
+# test
+stat_mode(list(factor(c("control", "treatment1", "control")),
+factor(c("control", "treatment2"))
+)
+)
+
+```
+
+## c.
+
+```{r}
+
+df_summary <- function(x)
+{
+  
+  # output
+  res <- list()
+  
+  # n_obs = nrow
+  res$n_obs <- nrow(x)
+  
+  # n_var = ncol
+  res$n_var <- ncol(x)
+  
+  # var_names = colnames
+  res$var_names <- colnames(x)
+  
+  # for each column
+  for(i in seq_len(length(colnames(x))))
+  {
+    # create new column data sublist
+    
+    # class
+    res$column_data$
+      class <- mode(x[[i]])
+    
+    if(res$nm$class == "numeric")
+    {
+      # min
+      res$nm$min <- min(x[[i]])
+      
+      # mean
+      res$nm$mean <- mean(x[[i]])
+      
+      # max
+      res$nm$max <- max(x[[i]])
+      
+      # na count
+      res$nm$na_count <- 0
+      for(j in seq_len(length(x[[i]])))
+      {
+        if(is.na(x[[i]][j]))
+        {
+          res$nm$na_count <- res$nm$na_count + 1
+        }
+      }
+      
+    }
+    
+
+  }
+  
+  # output
+  res
+  
+}
+
+# test
+df <- data.frame(c(88,84,93,NA),c(95,90,99,60),c(NA,NA,88,23),c("Lecture 1","Lecture 1","Lecture 1","Lecture 2"))
+colnames(df) <- c("Homework_One", "Homework_Two", "Homework_Three", "Lecture")
+str(df_summary(df))
 
 
+```
