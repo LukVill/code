@@ -11,7 +11,7 @@
 
 <meta name="author" content="Luke Villanueva – 206039397" />
 
-<meta name="date" content="2023-02-27" />
+<meta name="date" content="2023-02-28" />
 
 <title>Stats 20, W23 – Homework 5</title>
 
@@ -1575,7 +1575,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Stats 20, W23 – Homework 5</h1>
 <h4 class="author">Luke Villanueva – 206039397</h4>
-<h4 class="date">02/27/23</h4>
+<h4 class="date">02/28/23</h4>
 
 </div>
 
@@ -1715,8 +1715,9 @@ my_scale(x)</code></pre>
 <h1>Question 4</h1>
 <div id="a.-2" class="section level2">
 <h2>a.</h2>
-<p>The purpose of the given function is to acquire all possible
-eigenvalues of a any given matrix with additional attributes.</p>
+<p>The purpose of the given function, <code>my_eigen</code>, is to
+acquire all possible eigenvalues of a any given matrix with additional
+attributes.</p>
 <ul>
 <li>Assume all input matrices will always output eigenvalues in the real
 numbers (i.e. no need to input validate)</li>
@@ -1728,7 +1729,764 @@ eigenvalues: <code>Q^-1 * A * Q = D</code>, where <code>Q^-1</code> and
 transformation matrix, respectively, A is the original matrix, and D is
 the diagonal matrix of eigenvalues.</li>
 </ul></li>
+<li>The given matrix should have an attribute that’s named “Q”, which
+provides the transformation matrix. If not, send out an error.</li>
 </ul>
+<pre class="r"><code>my_eigen &lt;- function(x)
+{
+  
+  # if 0 length, does not exist
+  if(length(which(names(attributes(x)) == &quot;Q&quot;)) == 0)
+  {stop(&quot;invalid input, matrix needs Q attribute&quot;)}
+  
+  # otherwise, continue
+  # inverse * matrix * Q = D, diagonal are eigenvalues
+  diag(solve(x$Q) %*% x %*% Q)
+
+}</code></pre>
+</div>
+<div id="b.-2" class="section level2">
+<h2>b.</h2>
+<p>The following code will parse through each row of a matrix,
+outputting a vector following row order.</p>
+<p>Error code:</p>
+<pre class="r"><code>vector_by_row &lt;- function(x)
+{
+
+  # output
+  res &lt;- numeric(0)
+  
+  for(row in seq_len(ncol(x)))
+  {
+    for(col in seq_along(ncol(x)))
+    {
+      res &lt;- c(res, x[row][col])
+    }
+  }
+  
+  # output
+  res
+  
+}</code></pre>
+<p>Fixed code:</p>
+<pre class="r"><code>vector_by_row &lt;- function(x)
+{
+
+  # output
+  res &lt;- numeric(0)
+  
+  for(row in seq_len(nrow(x)))
+  {
+    for(col in seq_len(ncol(x)))
+    {
+      res &lt;- c(res, x[row,col])
+    }
+  }
+  
+  # output
+  res
+  
+}</code></pre>
+<p>Error 1: <code>ncol()</code> is used as the value in the first for
+loop’s paring condition. The correct answer would utilize
+<code>nrow()</code>, since the algorithm needs to parse all columns of
+<em>each</em> row.</p>
+<p>Error 2: <code>seq_along()</code> is used for the parsing condition
+for the second look. The correct answer would be <code>seq_len()</code>
+because the output of <code>ncol()</code> is the number of columns.
+<code>seq_along()</code> would only loop the for loop once, which is an
+incomplete parsing.</p>
+<p>Error 3: To extract from a matrix, the correct R syntax would be
+<code>x[row, col]</code>. The format <code>x[row][col]</code> is from
+another language, such as C++.</p>
+</div>
+</div>
+<div id="question-5" class="section level1">
+<h1>Question 5</h1>
+<pre class="r"><code>my_unlist &lt;- function(x)
+{
+  
+  # output
+  res &lt;- NULL
+  # if first elem is a factor, make empty factor for res
+  if(is.factor(x[[1]]))
+  {
+    res &lt;- factor()
+  }
+    
+  # parse through all components of list
+  for(i in seq_len(length(x)))
+  {
+    # if list components have lists, apply function recursively
+    if(is.list(x[[i]]))
+    {
+      lapply(x[[i]], my_unlist)
+    }
+    else
+    {
+      #concat component to res
+      res &lt;- c(res, x[[i]])
+    }
+  }
+
+  # output
+  res
+}
+
+
+# test
+unlist(list(c(2, 1, 1), c(3, 2, 1), 2))</code></pre>
+<pre><code>## [1] 2 1 1 3 2 1 2</code></pre>
+<pre class="r"><code>my_unlist(list(c(2, 1, 1), c(3, 2, 1), 2))</code></pre>
+<pre><code>## [1] 2 1 1 3 2 1 2</code></pre>
+<pre class="r"><code># test
+unlist(list(factor(c(&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;)),
+factor(c(&quot;b&quot;, &quot;c&quot;, &quot;e&quot;)),
+factor(c(&quot;a&quot;, &quot;d&quot;, &quot;b&quot;))))</code></pre>
+<pre><code>##  [1] a a b c b c e a d b
+## Levels: a b c e d</code></pre>
+<pre class="r"><code>my_unlist(list(factor(c(&quot;a&quot;, &quot;a&quot;, &quot;b&quot;, &quot;c&quot;)),
+factor(c(&quot;b&quot;, &quot;c&quot;, &quot;e&quot;)),
+factor(c(&quot;a&quot;, &quot;d&quot;, &quot;b&quot;))))</code></pre>
+<pre><code>##  [1] a a b c b c e a d b
+## Levels: a b c e d</code></pre>
+<pre class="r"><code># test
+unlist(list(factor(c(&quot;a&quot;, &quot;b&quot;)), c(1, 2)))</code></pre>
+<pre><code>## [1] 1 2 1 2</code></pre>
+<pre class="r"><code>my_unlist(list(factor(c(&quot;a&quot;, &quot;b&quot;)), c(1, 2)))</code></pre>
+<pre><code>## [1] 1 2 1 2</code></pre>
+<pre class="r"><code># test
+unlist(list(factor(c(&quot;a&quot;, &quot;b&quot;)), factor(c(&quot;b&quot;, &quot;c&quot;)), c(&quot;a&quot;, &quot;b&quot;)))</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;1&quot; &quot;2&quot; &quot;a&quot; &quot;b&quot;</code></pre>
+<pre class="r"><code>my_unlist(list(factor(c(&quot;a&quot;, &quot;b&quot;)), factor(c(&quot;b&quot;, &quot;c&quot;)), c(&quot;a&quot;, &quot;b&quot;)))</code></pre>
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;2&quot; &quot;3&quot; &quot;a&quot; &quot;b&quot;</code></pre>
+<div id="b.-3" class="section level2">
+<h2>b.</h2>
+<pre class="r"><code>stat_mode &lt;- function(x, first = FALSE)
+{
+
+  # result
+  res &lt;- NULL
+  
+  # make unlisted vector, find mode
+  x &lt;- unlist(x)
+  
+  # make vector of unique values
+  unique_vec &lt;- unique(x)
+  
+  # make corresponding vector rep count of each unique entry
+  count_vec &lt;- numeric(length(unique_vec))
+  
+  # fill all 0&#39;s
+  for(num in count_vec)
+  {
+    num &lt;- 0
+  }
+  
+  # find mode
+  for(entry_indx in seq_along(unique_vec))
+  {
+    for(i in seq_along(x))
+    {
+      # check if either NA, then if both are NA
+      if(is.na(x[i]) &amp; is.na(unique_vec[entry_indx]))
+      {
+        count_vec[entry_indx] &lt;- count_vec[entry_indx] + 1
+      }
+      if(!is.na(x[i]) &amp; !is.na(unique_vec[entry_indx]))
+      {
+        # if parsed val == entry, count ++
+        if(x[i] == unique_vec[entry_indx])
+        {
+          count_vec[entry_indx] &lt;- count_vec[entry_indx] + 1
+        }
+      }
+
+    }
+  }
+  
+  # consider first val
+  if(first == TRUE)
+  {
+    res &lt;- unique_vec[1]
+  }
+  else
+  {
+    # return index with most count
+    res &lt;- unique_vec[which(count_vec == max(count_vec))]
+  }
+  
+  # output
+  res
+
+}
+
+# test
+stat_mode(c(FALSE, FALSE, TRUE, TRUE, FALSE))</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code># test
+stat_mode(list(c(2, 1, 1), c(3, 2, 1), 2))</code></pre>
+<pre><code>## [1] 2 1</code></pre>
+<pre class="r"><code># test
+stat_mode(list(c(2, 1, 1), c(3, 2, 1), 2), first = TRUE)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<pre class="r"><code># test
+stat_mode(list(factor(c(&quot;control&quot;, &quot;treatment1&quot;, &quot;control&quot;)),
+factor(c(&quot;control&quot;, &quot;treatment2&quot;))
+)
+)</code></pre>
+<pre><code>## [1] control
+## Levels: control treatment1 treatment2</code></pre>
+</div>
+<div id="c.-1" class="section level2">
+<h2>c.</h2>
+<pre class="r"><code>df_summary &lt;- function(x)
+{
+  
+  # output
+  res &lt;- list()
+  
+  # n_obs = nrow
+  res$n_obs &lt;- nrow(x)
+  
+  # n_var = ncol
+  res$n_var &lt;- ncol(x)
+  
+  # var_names = colnames
+  res$var_names &lt;- colnames(x)
+  
+  # for each column, make sublist
+  for(i in seq_len(length(colnames(x))))
+  {
+    
+    # list of each column
+    res2 &lt;- list()
+    
+    # class
+    res2$class &lt;- mode(x[[i]])
+    
+    if(res2$class == &quot;numeric&quot;)
+    {
+      # min
+      res2$min &lt;- min(x[[i]], na.rm = TRUE)
+      
+      # mean
+      res2$mean &lt;- mean(x[[i]], na.rm = TRUE)
+      
+      # max
+      res2$max &lt;- max(x[[i]], na.rm = TRUE)
+      
+      # na count
+      res2$na_count &lt;- 0
+      for(j in seq_len(length(x[[i]])))
+      {
+        if(is.na(x[[i]][j]))
+        {
+          res2$na_count &lt;- res2$na_count + 1
+        }
+      }
+      # end numeric if
+    }
+    
+    # character if
+    if(res2$class == &quot;character&quot; | res2$class == &quot;list&quot;)
+    {
+      # modes
+      res2$modes &lt;- stat_mode(x[[i]])
+      #NOTE: can return length &gt; 1
+      
+      # mode_count
+      res2$mode_count &lt;- numeric(length(res2$modes))
+     
+      # for all elems in column
+      for(j in seq_len(length(x[[i]])))
+      {
+        # if element equal to elem, get index of elem in modes, use same index in mode_count, increment by 1
+        for(modeVal in res2$modes)
+        {
+
+          # check if NA
+          if(is.na(x[[i]][j]) &amp; is.na(modeVal))
+          {
+            res2$mode_count[is.na(res2$modes)] &lt;- res2$mode_count[is.na(res2$modes)] + 1
+          }
+          # only if both not NA
+          if(!is.na(x[[i]][j]) &amp; !is.na(modeVal))
+          {
+            if(x[[i]][j] == modeVal)
+            {
+              res2$mode_count[which(res2$modes == modeVal)] &lt;- res2$mode_count[which(res2$modes == modeVal)] + 1
+            }
+          }    
+
+        }
+      }
+      
+    }
+    
+    # sublist 
+    
+    # concat res2 to corresponding column data
+    res$column_data[[i]] &lt;- res2
+    # name column data
+    names(res$column_data)[i] &lt;- colnames(x)[i] 
+
+  }
+  
+  # output
+  res
+  
+}
+
+# test
+df &lt;- data.frame(c(88,84,93,NA),c(95,90,99,60),c(NA,NA,88,23),c(&quot;Lecture 1&quot;,&quot;Lecture 1&quot;,&quot;Lecture 1&quot;,&quot;Lecture 2&quot;))
+
+colnames(df) &lt;- c(&quot;Homework_One&quot;, &quot;Homework_Two&quot;, &quot;Homework_Three&quot;, &quot;Lecture&quot;)
+
+str(df_summary(df))</code></pre>
+<pre><code>## List of 4
+##  $ n_obs      : int 4
+##  $ n_var      : int 4
+##  $ var_names  : chr [1:4] &quot;Homework_One&quot; &quot;Homework_Two&quot; &quot;Homework_Three&quot; &quot;Lecture&quot;
+##  $ column_data:List of 4
+##   ..$ Homework_One  :List of 5
+##   .. ..$ class   : chr &quot;numeric&quot;
+##   .. ..$ min     : num 84
+##   .. ..$ mean    : num 88.3
+##   .. ..$ max     : num 93
+##   .. ..$ na_count: num 1
+##   ..$ Homework_Two  :List of 5
+##   .. ..$ class   : chr &quot;numeric&quot;
+##   .. ..$ min     : num 60
+##   .. ..$ mean    : num 86
+##   .. ..$ max     : num 99
+##   .. ..$ na_count: num 0
+##   ..$ Homework_Three:List of 5
+##   .. ..$ class   : chr &quot;numeric&quot;
+##   .. ..$ min     : num 23
+##   .. ..$ mean    : num 55.5
+##   .. ..$ max     : num 88
+##   .. ..$ na_count: num 2
+##   ..$ Lecture       :List of 3
+##   .. ..$ class     : chr &quot;character&quot;
+##   .. ..$ modes     : chr &quot;Lecture 1&quot;
+##   .. ..$ mode_count: num 3</code></pre>
+</div>
+<div id="d." class="section level2">
+<h2>d.</h2>
+<pre class="r"><code>load(&quot;starwars.RData&quot;)
+
+star_sum &lt;- df_summary(starwars)
+star_sum</code></pre>
+<pre><code>## $n_obs
+## [1] 87
+## 
+## $n_var
+## [1] 13
+## 
+## $var_names
+##  [1] &quot;name&quot;       &quot;height&quot;     &quot;mass&quot;       &quot;hair_color&quot; &quot;skin_color&quot;
+##  [6] &quot;eye_color&quot;  &quot;birth_year&quot; &quot;gender&quot;     &quot;homeworld&quot;  &quot;species&quot;   
+## [11] &quot;films&quot;      &quot;vehicles&quot;   &quot;starships&quot; 
+## 
+## $column_data
+## $column_data$name
+## $column_data$name$class
+## [1] &quot;character&quot;
+## 
+## $column_data$name$modes
+##  [1] &quot;Luke Skywalker&quot;        &quot;C-3PO&quot;                 &quot;R2-D2&quot;                
+##  [4] &quot;Darth Vader&quot;           &quot;Leia Organa&quot;           &quot;Owen Lars&quot;            
+##  [7] &quot;Beru Whitesun lars&quot;    &quot;R5-D4&quot;                 &quot;Biggs Darklighter&quot;    
+## [10] &quot;Obi-Wan Kenobi&quot;        &quot;Anakin Skywalker&quot;      &quot;Wilhuff Tarkin&quot;       
+## [13] &quot;Chewbacca&quot;             &quot;Han Solo&quot;              &quot;Greedo&quot;               
+## [16] &quot;Jabba Desilijic Tiure&quot; &quot;Wedge Antilles&quot;        &quot;Jek Tono Porkins&quot;     
+## [19] &quot;Yoda&quot;                  &quot;Palpatine&quot;             &quot;Boba Fett&quot;            
+## [22] &quot;IG-88&quot;                 &quot;Bossk&quot;                 &quot;Lando Calrissian&quot;     
+## [25] &quot;Lobot&quot;                 &quot;Ackbar&quot;                &quot;Mon Mothma&quot;           
+## [28] &quot;Arvel Crynyd&quot;          &quot;Wicket Systri Warrick&quot; &quot;Nien Nunb&quot;            
+## [31] &quot;Qui-Gon Jinn&quot;          &quot;Nute Gunray&quot;           &quot;Finis Valorum&quot;        
+## [34] &quot;Jar Jar Binks&quot;         &quot;Roos Tarpals&quot;          &quot;Rugor Nass&quot;           
+## [37] &quot;Ric Olié&quot;              &quot;Watto&quot;                 &quot;Sebulba&quot;              
+## [40] &quot;Quarsh Panaka&quot;         &quot;Shmi Skywalker&quot;        &quot;Darth Maul&quot;           
+## [43] &quot;Bib Fortuna&quot;           &quot;Ayla Secura&quot;           &quot;Dud Bolt&quot;             
+## [46] &quot;Gasgano&quot;               &quot;Ben Quadinaros&quot;        &quot;Mace Windu&quot;           
+## [49] &quot;Ki-Adi-Mundi&quot;          &quot;Kit Fisto&quot;             &quot;Eeth Koth&quot;            
+## [52] &quot;Adi Gallia&quot;            &quot;Saesee Tiin&quot;           &quot;Yarael Poof&quot;          
+## [55] &quot;Plo Koon&quot;              &quot;Mas Amedda&quot;            &quot;Gregar Typho&quot;         
+## [58] &quot;Cordé&quot;                 &quot;Cliegg Lars&quot;           &quot;Poggle the Lesser&quot;    
+## [61] &quot;Luminara Unduli&quot;       &quot;Barriss Offee&quot;         &quot;Dormé&quot;                
+## [64] &quot;Dooku&quot;                 &quot;Bail Prestor Organa&quot;   &quot;Jango Fett&quot;           
+## [67] &quot;Zam Wesell&quot;            &quot;Dexter Jettster&quot;       &quot;Lama Su&quot;              
+## [70] &quot;Taun We&quot;               &quot;Jocasta Nu&quot;            &quot;Ratts Tyerell&quot;        
+## [73] &quot;R4-P17&quot;                &quot;Wat Tambor&quot;            &quot;San Hill&quot;             
+## [76] &quot;Shaak Ti&quot;              &quot;Grievous&quot;              &quot;Tarfful&quot;              
+## [79] &quot;Raymus Antilles&quot;       &quot;Sly Moore&quot;             &quot;Tion Medon&quot;           
+## [82] &quot;Finn&quot;                  &quot;Rey&quot;                   &quot;Poe Dameron&quot;          
+## [85] &quot;BB8&quot;                   &quot;Captain Phasma&quot;        &quot;Padmé Amidala&quot;        
+## 
+## $column_data$name$mode_count
+##  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [39] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [77] 1 1 1 1 1 1 1 1 1 1 1
+## 
+## 
+## $column_data$height
+## $column_data$height$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$height$min
+## [1] 66
+## 
+## $column_data$height$mean
+## [1] 174.358
+## 
+## $column_data$height$max
+## [1] 264
+## 
+## $column_data$height$na_count
+## [1] 6
+## 
+## 
+## $column_data$mass
+## $column_data$mass$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$mass$min
+## [1] 15
+## 
+## $column_data$mass$mean
+## [1] 97.31186
+## 
+## $column_data$mass$max
+## [1] 1358
+## 
+## $column_data$mass$na_count
+## [1] 28
+## 
+## 
+## $column_data$hair_color
+## $column_data$hair_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$hair_color$modes
+## [1] &quot;none&quot;
+## 
+## $column_data$hair_color$mode_count
+## [1] 37
+## 
+## 
+## $column_data$skin_color
+## $column_data$skin_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$skin_color$modes
+## [1] &quot;fair&quot;
+## 
+## $column_data$skin_color$mode_count
+## [1] 17
+## 
+## 
+## $column_data$eye_color
+## $column_data$eye_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$eye_color$modes
+## [1] &quot;brown&quot;
+## 
+## $column_data$eye_color$mode_count
+## [1] 21
+## 
+## 
+## $column_data$birth_year
+## $column_data$birth_year$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$birth_year$min
+## [1] 8
+## 
+## $column_data$birth_year$mean
+## [1] 87.56512
+## 
+## $column_data$birth_year$max
+## [1] 896
+## 
+## $column_data$birth_year$na_count
+## [1] 44
+## 
+## 
+## $column_data$gender
+## $column_data$gender$class
+## [1] &quot;character&quot;
+## 
+## $column_data$gender$modes
+## [1] &quot;male&quot;
+## 
+## $column_data$gender$mode_count
+## [1] 62
+## 
+## 
+## $column_data$homeworld
+## $column_data$homeworld$class
+## [1] &quot;character&quot;
+## 
+## $column_data$homeworld$modes
+## [1] &quot;Naboo&quot;
+## 
+## $column_data$homeworld$mode_count
+## [1] 11
+## 
+## 
+## $column_data$species
+## $column_data$species$class
+## [1] &quot;character&quot;
+## 
+## $column_data$species$modes
+## [1] &quot;Human&quot;
+## 
+## $column_data$species$mode_count
+## [1] 35
+## 
+## 
+## $column_data$films
+## $column_data$films$class
+## [1] &quot;list&quot;
+## 
+## $column_data$films$modes
+## [1] &quot;Attack of the Clones&quot;
+## 
+## $column_data$films$mode_count
+## [1] 13
+## 
+## 
+## $column_data$vehicles
+## $column_data$vehicles$class
+## [1] &quot;list&quot;
+## 
+## $column_data$vehicles$modes
+## [1] &quot;Snowspeeder&quot;           &quot;Imperial Speeder Bike&quot; &quot;Tribubble bongo&quot;      
+## 
+## $column_data$vehicles$mode_count
+## [1] 1 1 2
+## 
+## 
+## $column_data$starships
+## $column_data$starships$class
+## [1] &quot;list&quot;
+## 
+## $column_data$starships$modes
+## [1] &quot;X-wing&quot;            &quot;Millennium Falcon&quot;
+## 
+## $column_data$starships$mode_count
+## [1] 3 2</code></pre>
+</div>
+<div id="e." class="section level2">
+<h2>e.</h2>
+<pre class="r"><code>star_sum</code></pre>
+<pre><code>## $n_obs
+## [1] 87
+## 
+## $n_var
+## [1] 13
+## 
+## $var_names
+##  [1] &quot;name&quot;       &quot;height&quot;     &quot;mass&quot;       &quot;hair_color&quot; &quot;skin_color&quot;
+##  [6] &quot;eye_color&quot;  &quot;birth_year&quot; &quot;gender&quot;     &quot;homeworld&quot;  &quot;species&quot;   
+## [11] &quot;films&quot;      &quot;vehicles&quot;   &quot;starships&quot; 
+## 
+## $column_data
+## $column_data$name
+## $column_data$name$class
+## [1] &quot;character&quot;
+## 
+## $column_data$name$modes
+##  [1] &quot;Luke Skywalker&quot;        &quot;C-3PO&quot;                 &quot;R2-D2&quot;                
+##  [4] &quot;Darth Vader&quot;           &quot;Leia Organa&quot;           &quot;Owen Lars&quot;            
+##  [7] &quot;Beru Whitesun lars&quot;    &quot;R5-D4&quot;                 &quot;Biggs Darklighter&quot;    
+## [10] &quot;Obi-Wan Kenobi&quot;        &quot;Anakin Skywalker&quot;      &quot;Wilhuff Tarkin&quot;       
+## [13] &quot;Chewbacca&quot;             &quot;Han Solo&quot;              &quot;Greedo&quot;               
+## [16] &quot;Jabba Desilijic Tiure&quot; &quot;Wedge Antilles&quot;        &quot;Jek Tono Porkins&quot;     
+## [19] &quot;Yoda&quot;                  &quot;Palpatine&quot;             &quot;Boba Fett&quot;            
+## [22] &quot;IG-88&quot;                 &quot;Bossk&quot;                 &quot;Lando Calrissian&quot;     
+## [25] &quot;Lobot&quot;                 &quot;Ackbar&quot;                &quot;Mon Mothma&quot;           
+## [28] &quot;Arvel Crynyd&quot;          &quot;Wicket Systri Warrick&quot; &quot;Nien Nunb&quot;            
+## [31] &quot;Qui-Gon Jinn&quot;          &quot;Nute Gunray&quot;           &quot;Finis Valorum&quot;        
+## [34] &quot;Jar Jar Binks&quot;         &quot;Roos Tarpals&quot;          &quot;Rugor Nass&quot;           
+## [37] &quot;Ric Olié&quot;              &quot;Watto&quot;                 &quot;Sebulba&quot;              
+## [40] &quot;Quarsh Panaka&quot;         &quot;Shmi Skywalker&quot;        &quot;Darth Maul&quot;           
+## [43] &quot;Bib Fortuna&quot;           &quot;Ayla Secura&quot;           &quot;Dud Bolt&quot;             
+## [46] &quot;Gasgano&quot;               &quot;Ben Quadinaros&quot;        &quot;Mace Windu&quot;           
+## [49] &quot;Ki-Adi-Mundi&quot;          &quot;Kit Fisto&quot;             &quot;Eeth Koth&quot;            
+## [52] &quot;Adi Gallia&quot;            &quot;Saesee Tiin&quot;           &quot;Yarael Poof&quot;          
+## [55] &quot;Plo Koon&quot;              &quot;Mas Amedda&quot;            &quot;Gregar Typho&quot;         
+## [58] &quot;Cordé&quot;                 &quot;Cliegg Lars&quot;           &quot;Poggle the Lesser&quot;    
+## [61] &quot;Luminara Unduli&quot;       &quot;Barriss Offee&quot;         &quot;Dormé&quot;                
+## [64] &quot;Dooku&quot;                 &quot;Bail Prestor Organa&quot;   &quot;Jango Fett&quot;           
+## [67] &quot;Zam Wesell&quot;            &quot;Dexter Jettster&quot;       &quot;Lama Su&quot;              
+## [70] &quot;Taun We&quot;               &quot;Jocasta Nu&quot;            &quot;Ratts Tyerell&quot;        
+## [73] &quot;R4-P17&quot;                &quot;Wat Tambor&quot;            &quot;San Hill&quot;             
+## [76] &quot;Shaak Ti&quot;              &quot;Grievous&quot;              &quot;Tarfful&quot;              
+## [79] &quot;Raymus Antilles&quot;       &quot;Sly Moore&quot;             &quot;Tion Medon&quot;           
+## [82] &quot;Finn&quot;                  &quot;Rey&quot;                   &quot;Poe Dameron&quot;          
+## [85] &quot;BB8&quot;                   &quot;Captain Phasma&quot;        &quot;Padmé Amidala&quot;        
+## 
+## $column_data$name$mode_count
+##  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [39] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+## [77] 1 1 1 1 1 1 1 1 1 1 1
+## 
+## 
+## $column_data$height
+## $column_data$height$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$height$min
+## [1] 66
+## 
+## $column_data$height$mean
+## [1] 174.358
+## 
+## $column_data$height$max
+## [1] 264
+## 
+## $column_data$height$na_count
+## [1] 6
+## 
+## 
+## $column_data$mass
+## $column_data$mass$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$mass$min
+## [1] 15
+## 
+## $column_data$mass$mean
+## [1] 97.31186
+## 
+## $column_data$mass$max
+## [1] 1358
+## 
+## $column_data$mass$na_count
+## [1] 28
+## 
+## 
+## $column_data$hair_color
+## $column_data$hair_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$hair_color$modes
+## [1] &quot;none&quot;
+## 
+## $column_data$hair_color$mode_count
+## [1] 37
+## 
+## 
+## $column_data$skin_color
+## $column_data$skin_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$skin_color$modes
+## [1] &quot;fair&quot;
+## 
+## $column_data$skin_color$mode_count
+## [1] 17
+## 
+## 
+## $column_data$eye_color
+## $column_data$eye_color$class
+## [1] &quot;character&quot;
+## 
+## $column_data$eye_color$modes
+## [1] &quot;brown&quot;
+## 
+## $column_data$eye_color$mode_count
+## [1] 21
+## 
+## 
+## $column_data$birth_year
+## $column_data$birth_year$class
+## [1] &quot;numeric&quot;
+## 
+## $column_data$birth_year$min
+## [1] 8
+## 
+## $column_data$birth_year$mean
+## [1] 87.56512
+## 
+## $column_data$birth_year$max
+## [1] 896
+## 
+## $column_data$birth_year$na_count
+## [1] 44
+## 
+## 
+## $column_data$gender
+## $column_data$gender$class
+## [1] &quot;character&quot;
+## 
+## $column_data$gender$modes
+## [1] &quot;male&quot;
+## 
+## $column_data$gender$mode_count
+## [1] 62
+## 
+## 
+## $column_data$homeworld
+## $column_data$homeworld$class
+## [1] &quot;character&quot;
+## 
+## $column_data$homeworld$modes
+## [1] &quot;Naboo&quot;
+## 
+## $column_data$homeworld$mode_count
+## [1] 11
+## 
+## 
+## $column_data$species
+## $column_data$species$class
+## [1] &quot;character&quot;
+## 
+## $column_data$species$modes
+## [1] &quot;Human&quot;
+## 
+## $column_data$species$mode_count
+## [1] 35
+## 
+## 
+## $column_data$films
+## $column_data$films$class
+## [1] &quot;list&quot;
+## 
+## $column_data$films$modes
+## [1] &quot;Attack of the Clones&quot;
+## 
+## $column_data$films$mode_count
+## [1] 13
+## 
+## 
+## $column_data$vehicles
+## $column_data$vehicles$class
+## [1] &quot;list&quot;
+## 
+## $column_data$vehicles$modes
+## [1] &quot;Snowspeeder&quot;           &quot;Imperial Speeder Bike&quot; &quot;Tribubble bongo&quot;      
+## 
+## $column_data$vehicles$mode_count
+## [1] 1 1 2
+## 
+## 
+## $column_data$starships
+## $column_data$starships$class
+## [1] &quot;list&quot;
+## 
+## $column_data$starships$modes
+## [1] &quot;X-wing&quot;            &quot;Millennium Falcon&quot;
+## 
+## $column_data$starships$mode_count
+## [1] 3 2</code></pre>
+<p>The most common starships used were the X-Wing and the Millenium
+Falcon, with 3 characters using the X-Win and 2 characters using the
+Millennium Falcon.</p>
 </div>
 </div>
 
