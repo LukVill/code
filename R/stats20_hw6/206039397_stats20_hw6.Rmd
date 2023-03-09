@@ -1,0 +1,55 @@
+---
+title: "Stats 20, W23 -- Homework 6"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Question 1
+
+## a.
+
+```{r}
+
+# inputs in single character format or in multiple character format
+reading_ease <- function(x)
+{
+  
+  # null check
+  if(length(x) == 0)
+  {stop("invalid input")}
+  
+  # regardless of char vec length, parse through each elem and split elem into strings based on sentences
+  x <- strsplit(x, split = "[.!?:;]")
+  
+  # calculate total sentences
+  total_sentences <- length(x)
+  
+  # calculate total words: split words by spaces
+  words <- strsplit(x, split = " ")
+  # keep nonzero words
+  words <- words[nchar(total_words) > 0]
+  # calc total words
+  total_words <- length(words)
+
+  # calculate total syllables
+  # short word rule: if word is 3 letters or less, count it as a syllable
+  total_syllables <- 0
+  for(word in words)
+  {
+    if(length(word) <= 3)
+    {
+      total_syllables <- total_syllables + 1
+    }
+  }
+  
+  
+  
+}
+
+```
