@@ -266,13 +266,13 @@ my_unlist(list(factor(c("a", "b")), c(1, 2)))
 # test
 unlist(list(factor(c("a", "b")), factor(c("b", "c")), c("a", "b")))
 my_unlist(list(factor(c("a", "b")), factor(c("b", "c")), c("a", "b")))
-c(c(x[[1]],x[[2]]),x[[3]])
 
 ```
 
 ## b. 
 
 ```{r}
+
 stat_mode <- function(x, first = FALSE)
 {
 
@@ -299,11 +299,20 @@ stat_mode <- function(x, first = FALSE)
   {
     for(i in seq_along(x))
     {
-      # if parsed val == entry, count ++
-      if(x[i] == unique_vec[entry_indx])
+      # check if either NA, then if both are NA
+      if(is.na(x[i]) & is.na(unique_vec[entry_indx]))
       {
         count_vec[entry_indx] <- count_vec[entry_indx] + 1
       }
+      if(!is.na(x[i]) & !is.na(unique_vec[entry_indx]))
+      {
+        # if parsed val == entry, count ++
+        if(x[i] == unique_vec[entry_indx])
+        {
+          count_vec[entry_indx] <- count_vec[entry_indx] + 1
+        }
+      }
+
     }
   }
   
@@ -359,38 +368,81 @@ df_summary <- function(x)
   # var_names = colnames
   res$var_names <- colnames(x)
   
-  # for each column
+  # for each column, make sublist
   for(i in seq_len(length(colnames(x))))
   {
-    # create new column data sublist
+    
+    # list of each column
+    res2 <- list()
     
     # class
-    res$column_data$
-      class <- mode(x[[i]])
+    res2$class <- mode(x[[i]])
     
-    if(res$nm$class == "numeric")
+    if(res2$class == "numeric")
     {
       # min
-      res$nm$min <- min(x[[i]])
+      res2$min <- min(x[[i]], na.rm = TRUE)
       
       # mean
-      res$nm$mean <- mean(x[[i]])
+      res2$mean <- mean(x[[i]], na.rm = TRUE)
       
       # max
-      res$nm$max <- max(x[[i]])
+      res2$max <- max(x[[i]], na.rm = TRUE)
       
       # na count
-      res$nm$na_count <- 0
+      res2$na_count <- 0
       for(j in seq_len(length(x[[i]])))
       {
         if(is.na(x[[i]][j]))
         {
-          res$nm$na_count <- res$nm$na_count + 1
+          res2$na_count <- res2$na_count + 1
+        }
+      }
+      # end numeric if
+    }
+    
+    # character if
+    if(res2$class == "character" | res2$class == "list")
+    {
+      # modes
+      res2$modes <- stat_mode(x[[i]])
+      #NOTE: can return length > 1
+      
+      # mode_count
+      res2$mode_count <- numeric(length(res2$modes))
+     
+      # for all elems in column
+      for(j in seq_len(length(x[[i]])))
+      {
+        # if element equal to elem, get index of elem in modes, use same index in mode_count, increment by 1
+        for(modeVal in res2$modes)
+        {
+
+          # check if NA
+          if(is.na(x[[i]][j]) & is.na(modeVal))
+          {
+            res2$mode_count[is.na(res2$modes)] <- res2$mode_count[is.na(res2$modes)] + 1
+          }
+          # only if both not NA
+          if(!is.na(x[[i]][j]) & !is.na(modeVal))
+          {
+            if(x[[i]][j] == modeVal)
+            {
+              res2$mode_count[which(res2$modes == modeVal)] <- res2$mode_count[which(res2$modes == modeVal)] + 1
+            }
+          }    
+
         }
       }
       
     }
     
+    # sublist 
+    
+    # concat res2 to corresponding column data
+    res$column_data[[i]] <- res2
+    # name column data
+    names(res$column_data)[i] <- colnames(x)[i] 
 
   }
   
@@ -401,8 +453,31 @@ df_summary <- function(x)
 
 # test
 df <- data.frame(c(88,84,93,NA),c(95,90,99,60),c(NA,NA,88,23),c("Lecture 1","Lecture 1","Lecture 1","Lecture 2"))
+
 colnames(df) <- c("Homework_One", "Homework_Two", "Homework_Three", "Lecture")
+
 str(df_summary(df))
 
 
 ```
+
+## d.
+
+```{r}
+
+load("starwars.RData")
+
+star_sum <- df_summary(starwars)
+star_sum
+
+```
+
+## e.
+
+```{r}
+
+star_sum
+
+```
+
+The most common starships used were the X-Wing and the Millenium Falcon, with 3 characters using the X-Win and 2 characters using the Millennium Falcon.
