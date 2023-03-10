@@ -457,7 +457,7 @@ df <- data.frame(c(88,84,93,NA),c(95,90,99,60),c(NA,NA,88,23),c("Lecture 1","Lec
 colnames(df) <- c("Homework_One", "Homework_Two", "Homework_Three", "Lecture")
 
 str(df_summary(df))
-
+mode(df)
 
 ```
 
