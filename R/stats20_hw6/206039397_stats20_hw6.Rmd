@@ -25,15 +25,15 @@ reading_ease <- function(x)
   {stop("invalid input")}
   
   # regardless of char vec length, parse through each elem and split elem into strings based on sentences
-  x <- strsplit(x, split = "[.!?:;]")
+  x <- unlist(strsplit(x, split = "[.!?:;]"))
   
   # calculate total sentences
   total_sentences <- length(x)
   
   # calculate total words: split words by spaces
-  words <- strsplit(x, split = " ")
+  words <- unlist(strsplit(x, split = " "))
   # keep nonzero words
-  words <- words[nchar(total_words) > 0]
+  words <- words[nchar(words) > 0]
   # calc total words
   total_words <- length(words)
 
@@ -42,13 +42,181 @@ reading_ease <- function(x)
   total_syllables <- 0
   for(word in words)
   {
-    if(length(word) <= 3)
+  
+    # split word into letters
+    word_letters <- unlist(strsplit(word, split = ""))
+    
+    # short words
+    if(length(word_letters) <= 3)
     {
       total_syllables <- total_syllables + 1
     }
+    # check ending is in list
+    # get word, get tail, go 2 in, check if es or ed
+    else
+    {
+      
+      # remove special endings
+      word_tail <- tail(word_letters, n = 2)
+      
+      if (all(word_tail == c("e","s")) | all(word_tail == c("e","d")) | (word_tail[2] == "e" & word_tail[1] != "l")) 
+      {
+        if (word_tail[2] == "e") 
+        {
+          # remove e
+          word_letters <- word_letters[-length(word_letters)]
+        } 
+        else 
+        {
+          word_letters <- head(word_letters, n = -2)
+        }
+      } 
+      # if passes over, not special ending
+
+      # is vowel check
+      word_vowels <- word_letters %in% c("a","e","i","o","u","y")
+      
+      # increment syllable counter
+      total_syllables <- total_syllables + sum(word_vowels) - sum(diff(which(word_vowels)) == 1)
+      
+    }
+
   }
   
+  # output formula
+  206.835 - (1.015 * (total_words / total_sentences)) - (84.6 * (total_syllables / total_words))
+
+}
+
+
+```
+
+## b.
+
+```{r}
+waffles_vec <- c("We need to remember what's important in life: friends, waffles, work.", "Or waffles, friends, work.", "Doesn't matter, but work is third.")
+reading_ease(waffles_vec)
+```
+
+# Question 2
+
+```{r}
+
+my_nchar <- function(x)
+{
   
+  # output is num vec
+  res <- numeric(0)
+  
+  # x is char vec, so calculate char len for each elem
+  for(elem in x)
+  {
+    res <- c(res,length(unlist(strsplit(elem, split = ""))))
+  }
+  
+  #output
+  res
+  
+}
+
+my_nchar(c("hello","world"))
+
+```
+
+# Question 3
+
+```{r}
+
+my_strrep <- function(x, times)
+{
+  
+  # output
+  res <- ""
+  
+  for(i in seq_len(times))
+  {
+    res <- paste(res,x, sep = "")
+  }
+  
+  res
+  
+}
+
+my_strrep(c("hi","bye"),10)
+
+```
+
+# Question 4
+
+```{r}
+
+`%is_in%` <- function(x, table)
+{
+  
+  # output
+  res <- FALSE
+  
+  # for all elems in table, if x is equal, then return true
+  table_vec <- unlist(as.list(table))
+  for(elem in table_vec)
+  {
+    if(x == elem)
+    {
+      res <- TRUE
+    }
+  }
+  
+  # output
+  res
+  
+}
+
+```
+
+# Question 5
+
+```{r}
+
+gregexpr(89432,c(4325121,435985098121))
+
+my_gregexpr <- function(pattern, text)
+{
+  # for each element in text, parse to find pattern
+  res <- list()
+
+  for(txt in text)
+  {
+    # result
+    index_text <- -1
+    length_pattern <- -1
+    type <- "chars"
+    bool <- TRUE
+    
+    # separate characters in txt
+    para <- unlist(strsplit(as.character(txt), split = ""))
+   
+    # if found, return starting index, return length of string pattern
+    # initial for loop to find starting elem
+    for(i in seq_along(para))
+    {
+      
+      # if parse equals first index of pattern, check rest
+      if(para[i] == pattern[1])
+      {
+        # if length of para - i is less than pattern length, dont subset
+        if((length(para) - i) >= length(pattern))
+        {
+          # theres room to subset
+          sbset <- para[i:(i+length(pattern))]
+        }
+      }
+      
+    }
+      
+      
+    # append list to res
+  }
+
   
 }
 
