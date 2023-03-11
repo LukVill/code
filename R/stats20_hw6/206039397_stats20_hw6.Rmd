@@ -39,6 +39,7 @@ reading_ease <- function(x)
 
   # calculate total syllables
   # short word rule: if word is 3 letters or less, count it as a syllable
+  
   total_syllables <- 0
   for(word in words)
   {
@@ -177,47 +178,73 @@ my_strrep(c("hi","bye"),10)
 
 ```{r}
 
-gregexpr(89432,c(4325121,435985098121))
+gregexpr("hello","iamhello")
 
 my_gregexpr <- function(pattern, text)
 {
   # for each element in text, parse to find pattern
   res <- list()
 
-  for(txt in text)
-  {
+  for(i_txt in seq_along(text))
+  { 
     # result
     index_text <- -1
     length_pattern <- -1
     type <- "chars"
     bool <- TRUE
     
+    # bool for found
+    index_found <- FALSE
+    
     # separate characters in txt
-    para <- unlist(strsplit(as.character(txt), split = ""))
+    para <- unlist(strsplit(as.character(text[i_txt]), split = ""))
    
     # if found, return starting index, return length of string pattern
     # initial for loop to find starting elem
     for(i in seq_along(para))
     {
+      # pattern split
+      pat <- unlist(strsplit(as.character(pattern), split = ""))
       
       # if parse equals first index of pattern, check rest
-      if(para[i] == pattern[1])
+      if(para[i] == pat[1])
       {
-        # if length of para - i is less than pattern length, dont subset
-        if((length(para) - i) >= length(pattern))
+        # if length of para - i is less than pattern length, don't subset
+        if((length(para) - i + 1) >= length(pat))
         {
           # theres room to subset
-          sbset <- para[i:(i+length(pattern))]
+          sbset <- para[i:(i+length(pat)-1)]
+          
+          # if subset equals pattern, add index to res
+          if(all(sbset == pat))
+          {
+            # if index not found, empty out index_text
+            if(index_found == FALSE)
+            {
+              index_found <- TRUE
+              length_pattern <- length(pat)
+              index_text <- NULL
+            }
+            
+            # concat index_text with index
+            index_text <- c(index_text,i)
+            
+          }
         }
       }
       
     }
-      
-      
-    # append list to res
-  }
 
+    # add list to res
+    res[[i]] <- c(index_text, length_pattern, type, bool)
+    
+  }
+  
+  # output
+  res
   
 }
+
+my_gregexpr(21,c(4322121,435985098121))
 
 ```
