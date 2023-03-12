@@ -1,0 +1,55 @@
+---
+title: "Stats 20, W23 -- Discussion Week 9"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
+# Question 1
+
+```{r error = TRUE}
+
+# x is numeric vector, total is length 1 num
+split_bill <- function(x, total)
+{
+  
+  # valid total check
+  if(total < sum(x))
+  {stop("invalid input")}
+
+  
+  # num result
+  res <- character(0)
+  
+  # calc each res entry
+  for(i in seq_along(x))
+  {
+    res[i] <- unlist(strsplit(paste("$",format(((x[i] / sum(x)) * total), digits = 4, nsmall = 2), sep = ""), split = " "))
+  }
+  
+  # change names of result
+  names(res) <- names(x)
+
+  # print totals with $ in front of total
+  res
+  
+}
+
+x1 <- c("Person A" = 12.50, "Person B" = 17.50, "Person C" = 20.00)
+
+split_bill(x1, 50)
+
+split_bill(x1, 60)
+
+split_bill(c(x1, "Person D" = 12.50), 70)
+
+split_bill(c(x1, "Person D" = 12.50, "Person E" = 9.99), 100)
+
+split_bill(x1, 5)
+
+```

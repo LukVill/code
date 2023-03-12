@@ -178,8 +178,6 @@ my_strrep(c("hi","bye"),10)
 
 ```{r}
 
-gregexpr("hello","iamhello")
-
 my_gregexpr <- function(pattern, text)
 {
   # for each element in text, parse to find pattern
@@ -205,7 +203,7 @@ my_gregexpr <- function(pattern, text)
     {
       # pattern split
       pat <- unlist(strsplit(as.character(pattern), split = ""))
-      
+    
       # if parse equals first index of pattern, check rest
       if(para[i] == pat[1])
       {
@@ -233,11 +231,16 @@ my_gregexpr <- function(pattern, text)
         }
       }
       
+      # if i is at end OR found is true
+      if(i == seq_along(para)[length(seq_along(para))] | index_found == TRUE)
+      {
+        # add list to res
+        res[[i_txt]] <- c(index_text, length_pattern, type, bool)
+        
+        # change found to false
+        index_found <- FALSE
+      }
     }
-
-    # add list to res
-    res[[i]] <- c(index_text, length_pattern, type, bool)
-    
   }
   
   # output
@@ -245,6 +248,9 @@ my_gregexpr <- function(pattern, text)
   
 }
 
-my_gregexpr(21,c(4322121,435985098121))
+
+# test
+gregexpr(21,c(1564921654,48973512648))
+my_gregexpr(21,c(1564921654,48973512648))
 
 ```
