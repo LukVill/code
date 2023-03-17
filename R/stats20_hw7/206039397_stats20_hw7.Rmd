@@ -1,0 +1,12 @@
+---
+title: "Stats 20, W23 -- Homework 7"
+author: "Luke Villanueva -- 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  html_document:
+    toc: yes            # creates table of contents
+    toc_depth: 4        # toc will include headers <= ####
+    toc_float: yes      # toc always on left of page
+    code_folding: show  # allows hiding of code
+---
+
