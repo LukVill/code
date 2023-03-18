@@ -10,3 +10,36 @@ output:
     code_folding: show  # allows hiding of code
 ---
 
+# Question 1
+
+## a. 
+
+```{r}
+
+births <- read.csv("births.csv", header = TRUE)
+
+births[1:10,]
+
+```
+
+## b.
+
+```{r}
+
+with(births, length(Habit[Habit != "NonSmoker" & Habit != "Smoker"]))
+
+with(births, attributes(factor(Habit)))
+
+```
+
+There are 6 observations. The category is called "".
+
+## c.
+
+```{r}
+
+barplot(births$Habit, col = c("red","green", "white"))
+
+colors()
+
+```
