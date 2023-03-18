@@ -16,7 +16,7 @@ output:
 
 ```{r}
 
-births <- read.csv("births.csv", header = TRUE)
+births <- read.csv("births.csv", header = TRUE, stringsAsFactors = TRUE)
 
 births[1:10,]
 
@@ -28,7 +28,7 @@ births[1:10,]
 
 with(births, length(Habit[Habit != "NonSmoker" & Habit != "Smoker"]))
 
-with(births, attributes(factor(Habit)))
+with(births, attributes(Habit))
 
 ```
 
