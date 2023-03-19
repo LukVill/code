@@ -38,8 +38,14 @@ There are 6 observations. The category is called "".
 
 ```{r}
 
-barplot(births$Habit, col = c("red","green", "white"))
+barplot(table(births$Habit), col = c("white","green", "red"))
 
-colors()
+```
+
+## d.
+
+```{r}
+
+droplevels()
 
 ```
