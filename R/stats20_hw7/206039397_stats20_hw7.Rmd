@@ -45,7 +45,37 @@ barplot(table(births$Habit), col = c("white","green", "red"))
 ## d.
 
 ```{r}
+# get row indices based on habits not == ""
+# subset entire data frame to known Habits
+# use drop levels to drop unused factors in Habit
 
-droplevels()
+known_habit_births <- births[which(births$Habit == "Smoker" | births$Habit == "NonSmoker"),]
+
+known_habit_births$Habit <- droplevels(known_habit_births$Habit)
+
+# easier name
+new_births <- known_habit_births
+
+```
+
+## e.
+
+```{r}
+
+boxplot(new_births$weight ~ new_births$Habit)
+
+```
+
+# Question 2
+
+```{r}
+
+# plot nonsmoker hist
+plot(hist(new_births$weight[new_births$Habit == "NonSmoker"], freq = FALSE), density = 40, col = "green")
+
+# plot smoker hist
+plot(hist(new_births$weight[new_births$Habit == "Smoker"], freq = FALSE), density = 40, col = "red")
+
+
 
 ```
