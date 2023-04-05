@@ -1,0 +1,84 @@
+---
+title: "Stats101A, Spring 2023 - Homework 1"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output: 
+  pdf_document: default
+---
+
+```{r setup files}
+
+library(tidyverse)
+library(readr)
+
+taxi <- read.csv(file = "C:/Users/lavil/Downloads/chicagotaxiraw.csv", header = TRUE)
+
+glimpse(taxi)
+
+colnames(taxi)
+
+```
+
+# Problem 1
+
+```{r}
+
+# select columns
+taxi <- select(taxi, c(Trip.ID, Taxi.ID, Trip.Start.Timestamp, Trip.End.Timestamp, Trip.Seconds, Trip.Miles, Fare, Tips, Tolls, Extras, Trip.Total, Payment.Type, Company))
+
+colnames(taxi) <-tolower(colnames(taxi))
+
+# double check change made
+colnames(taxi)
+
+```
+
+# Problem 2
+
+```{r}
+
+# sort by dates
+arrange(taxi, trip.start.timestamp)[1,]
+arrange(taxi, desc(trip.end.timestamp))[1,]
+
+```
+The date of the first pickup is January 1, 2013. The date of the last dropoff is May 31, 2017.
+
+# Problem 3
+
+```{r}
+
+# mutate taxi with a column of trip.date
+taxi <- mutate(taxi, trip.date = substr(trip.start.timestamp, 1, 10))
+
+# group by same date, then get max and min
+tibble_trip_dates <- group_by(taxi, trip.date) %>% count()
+arrange(tibble_trip_dates, desc(n))
+arrange(tibble_trip_dates, n)
+
+```
+The day with the most trips is March 15, 2014, with 132 trips. The day with the least trips is December 25, 2016, with 6 trips.
+
+# Problem 4
+
+```{r}
+
+# get tips as number
+tips <- parse_number(taxi$tips)
+
+# summary to get basic summary of distribution
+summary(tips)
+
+```
+The typical tip amount would be $0.00 because the median is $0.00, which means that at least half of all taxi trips did not tip.
+In this case, it is better to use the median than the mean to describe the "typical" tip because most passengers did not tip. This would logically mean that the typical tip is nothing. The mean is a bit inaccurate because it would say the typical tip is $1.16, but since at least half of the passengers didn't tip, this wouldn't make sense.
+
+# Problem 5
+
+By looking at the summary of some of the numerical variables of the data, there are some really high outliers in tips and trip time. 
+
+```{r}
+summary(taxi)
+```
+
+From this summary, there are some weird data points that show a trip being 86,000 seconds long. This is suspicious data.
