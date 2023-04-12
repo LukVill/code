@@ -1,0 +1,85 @@
+---
+title: "Stats101A, Spring 2023 - Homework 1"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output: 
+  pdf_document: default
+---
+
+# Problem 1
+
+## a. 
+
+confidence interval = [mean - margin of error, mean + margin of error]
+
+margin of error = t crit val of confidence * standard of error
+
+standard of error = standard deviation / sqrt(n)
+
+And so, to find the interval, 
+
+```{r}
+
+# standard error
+SE <- 24757 / sqrt(30)
+
+# margin of error
+MOE <- abs(qt(0.05, df = 29)) * SE
+
+# vector of the 95% confidence interval
+c(23606 - MOE, 23606 + MOE)
+
+```
+
+So, the 95% confidence interval is (15925.96, 31286.04). 
+
+## b. 
+
+Because only the sample standard deviation was known, the t value was taken instead of the the z value.
+
+## c. 
+
+Yes, this is because the samples come from the same population and the sample size is the same too. The definition of the confidence interval means that 95% of all samples' means will fall within that interval. And so, this implies that the second average's mean will have a 95% chance of landing in the found confidence interval.
+
+## d. 
+
+Two tailed test:
+
+Null hypothesis: The mean income in the US in the year 2000 is $25,000.
+
+Alternative hypothesis: The mean income in the US in the year 2000 is not $25,000.
+
+Doing a t-test, we need to calculate the t score, get the critical value for 5% significance, and reject or fail to reject null hypothesis:
+
+```{r}
+
+# t score
+t_score <- abs((25000 - 23606) / (24757 / sqrt(30)))
+
+# t crit val 5% sig, two tailed, divide by 2
+crit <- abs(qt(0.025, df = 29))
+
+# should we reject null hypothesis?
+t_score > crit
+
+```
+
+The sample data does not provide enough information to disprove the claim that the mean is $25,000.
+
+## e.
+
+```{r}
+
+# brute force, find the t score
+# checking if t_score can be rejected
+t_score > abs(qt(0.38, df = 29))
+
+# since two tailed test, multiply by 2
+2*0.38
+
+```
+This means the smallest significance value would be 76% significance, which is really big and does not help with pointing out any statistically significant results.
+
+# 2. 
+
+
