@@ -55,9 +55,11 @@ Doing a t-test, we need to calculate the t score, get the critical value for 5% 
 
 # t score
 t_score <- abs((25000 - 23606) / (24757 / sqrt(30)))
+t_score
 
 # t crit val 5% sig, two tailed, divide by 2
 crit <- abs(qt(0.025, df = 29))
+crit 
 
 # should we reject null hypothesis?
 t_score > crit
