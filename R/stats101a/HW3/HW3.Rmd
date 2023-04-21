@@ -1,0 +1,327 @@
+---
+title: "Stats101A, Spring 2023 - Homework 3"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output: 
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+```{r message=FALSE}
+# libraries used
+library(tidyverse)
+```
+
+# Problem 1
+
+## A.
+
+### a.
+
+```{r}
+
+linear <- function(beta_0, beta_1, sigma, x, random.seed)
+{
+  # set seed
+  set.seed(random.seed)
+  
+  # make result
+  res <- numeric(0)
+  
+  # append result
+  for(val in x)
+  {
+    res <- c(res, (beta_0 + beta_1 * val + rnorm(1, 0, sigma)))
+  }
+  
+  # output
+  res
+}
+
+```
+### b. 
+
+```{r}
+
+x <- rep(seq(1,10, by = 0.1), 4)
+
+y <- linear(1, 3, 3, x, 123)
+
+plot(x, y)
+
+```
+
+## B.
+
+```{r}
+
+cor(x,y)
+
+```
+The correlation coefficient is 0.9397.
+
+## C.
+
+```{r}
+
+y <- linear(1, 3, 1, x, 123)
+
+plot(x, y)
+
+cor(x,y)
+
+```
+
+The correlation coefficient is 0.99.
+
+
+# Problem 2
+
+```{r}
+
+# initial loading of data
+arms <- read.csv(file = "armspans2022_gender.csv", header = TRUE)
+
+# view csv
+glimpse(arms)
+
+# na check
+any(is.na(arms$armspan))
+
+# index to those missing armspan measurement
+arms[is.na(arms$armspan),]
+
+# update arms to exclude NA observation
+arms <- arms[!is.na(arms$armspan),]
+
+```
+
+## a.
+
+```{r}
+
+plot(arms$height, arms$armspan, ylab = "Armspan (in)", xlab = "Height (in)", main = "Relationship between Height and Armspan")
+
+# get correlation
+cor(arms$height, arms$armspan)
+
+```
+There seems to only be one outlier, which is near the 60 inch mark in the height data. However, the relationship seems to be following the trending pattern of the rest of the data. And so, this may simply be an outlier in terms of height, but it is not abnormal behavior to the rest of the data in terms of the relationship between armspan and height.
+
+In addition, the correlation coefficient is 0.92, which implies there is a strong positive linear relationship between armspan and height. 
+
+## b. 
+
+```{r}
+
+lin <- lm(arms$armspan ~ arms$height)
+
+coeff <- lin$coefficients
+
+# coefficients
+coeff[1]
+coeff[2]
+
+```
+The equation for the line of best fit is: $-29.6353 + 1.424591x$
+
+```{r}
+
+ggplot(data = arms) + geom_point(mapping = aes(x = height, y = armspan)) + geom_abline(intercept = coeff[1], slope = coeff[2])
+
+```
+
+## c.
+
+$-29.6353 + 1.424591(64) \implies -29.6353 + 91.173824 = 61.5385$
+
+My height is 64 inches, so the predicted armspan based on the linear model will be 61.5385 inches.
+
+Since my armspan is about 63.5 inches, the residual is 1.9615.
+
+## d.
+
+Phelps's armspan is not unusual if we base our conclusion off of the data we are given. This is because if we predict Phelps's armspan using the model we made in part c, then we get that Phelps's predicted armspan is around 78.633.
+
+$-29.6353 + 1.424591(76) \implies -29.6353 + 108.268916 = 78.6336$
+
+And since his actual armspan is reported to be around 79 inches, the residual is not abnormally big. And so, based off our data, Phelps's armspan is not unusual.
+
+## e.
+
+```{r}
+
+ggplot() + geom_point(mapping = aes(x = as.numeric(names(lin$residuals)), y = lin$residuals)) + labs(title = "Residual Plot", x = "Indexing of Data Points", y = "Residual Amount")
+
+```
+
+Since the residual plot is sporadic and seems to hold no pattern, this implies that the linear model placed onto the data is a valid model for the data. 
+
+# Problem 3
+
+## a. 
+
+```{r}
+
+# quadratic data
+quadratic <- function(a, b, c, sigma, x, random.seed)
+{
+  # set seed
+  set.seed(random.seed)
+  
+  # make result
+  res <- numeric(0)
+  
+  # append result
+  for(val in x)
+  {
+    res <- c(res, (a + (b * val) + (c * (val**2)) + rnorm(1, 0, sigma)))
+  }
+  
+  # output
+  res
+}
+
+# recreate x
+x <- rep(seq(1,10, by = 0.1), 4)
+
+# choose a = 1, b = 3, c = 3, sigma = 3, seed = 123
+y <- quadratic(1, 3, 3, 3, x, 123)
+
+```
+The inputs for the data are: a = 1, b = 3, c = 3, sigma = 3, x = the last x input, random.seed = 123
+
+## b.
+
+```{r}
+
+# get linear model
+lin <- lm(y~x)
+
+# make residual plot
+ggplot() + geom_point(mapping = aes(x = x, y = lin$residuals))
+
+```
+
+The residuals are plotted in a quadratic pattern.
+
+## c. 
+
+If the residual plot show cases a non-linear pattern, then that implies there is a nonlinear pattern in the data as well. This is because there is a non-linear pattern in the differences between the points and the fitted line. So, the non-linear residual plot tells there is a non-linear trend in the data.
+
+## d.
+
+```{r}
+
+notConstLinear <- function(a, b, sigma, random.seed)
+{
+  # set seed
+  set.seed(random.seed)
+  
+  # make result
+  res <- numeric(0)
+  
+  # append result
+  for(val in x)
+  {
+    res <- c(res, (a + b * val + rnorm(1, 0, (sigma * val^2))))
+  }
+  
+  # output
+  res
+}
+
+x <- rep(seq(1,10, by = 0.1), 4)
+
+y <- notConstLinear(1, 200, 5, 123)
+
+ggplot() + geom_point(mapping = aes(x = x, y = y))
+
+```
+
+The plot starts of as linear, but as the predictor variable grows, the variability grows quickly. And so, this influences the data in the latter part of the graph to have high variance compared to the beginning part of the graph.
+
+## e.
+
+```{r}
+
+# linear model of fanning graph
+lin <- lm(y~x)
+
+# residual plot of fanning graph
+ggplot() + geom_point(mapping = aes(x = x, y = lin$residuals)) + labs(x = "Given x values", y = "Residual Amount")
+
+```
+
+The residual plot tells that the variance between the values is not majorly constant. This means there is a non-linear factor affecting the error amount in the data, implying that a linear model will not fit the data.
+
+# Problem 4
+
+```{r}
+
+atus <- read.csv(file = "C:/Users/lavil/Downloads/atus.csv")
+
+glimpse(atus)
+
+# subset to those who did homework
+atus1 <- subset(atus, homework > 0)
+
+```
+
+## a.
+
+```{r}
+
+# make scatter plot of sleep to homework time
+ggplot(atus1) + geom_point(mapping = aes(x = sleep, y = homework)) + labs(x = "Sleep Time (mins)", y = "Homework Time (mins)")
+
+# linear model the two variables
+lin <- lm(atus1$homework ~ atus1$sleep)
+
+# plot the linear model onto the scatter plot
+ggplot(atus1) + geom_point(mapping = aes(x = sleep, y = homework)) + labs(x = "Sleep Time (mins)", y = "Homework Time (mins)") + geom_abline(intercept = lin$coefficients[1], slope = lin$coefficients[2])
+
+```
+
+Even if the graph looks to have no linear pattern, there seems to be a general descending pattern.
+
+## b.
+
+```{r}
+
+ggplot(atus1) + geom_point(mapping = aes(x = sleep, y = lin$residuals)) + labs(x = "Sleep Time (mins)", y = "Residual Amount")
+
+```
+
+The residual plot is not randomly scattered because there is a closely clustered group towards the bottom of the graph. And so, this implies that possibly a linear model is not an appropriate model for the given data.
+
+# Problem 5
+
+## a.
+
+Null hypothesis: The female average chore time is less than or equal to the male average chore time.
+
+Alternative hypothesis: The female average chore time is greater than the male average chore time.
+
+```{r}
+
+t.test(x = subset(atus, gender == "Female")$household_chores, y = subset(atus, gender == "Male")$household_chores, alternative = "g", mu = 0)
+
+```
+
+Based on the results of the t test, the t statistic is 20.381, which means that the test places the difference between the means to be 20 standard deviations away from the usual output.
+Since the p-value is 0.0175 and the significance level needed is 0.05, we can reject the null hypothesis and say that the true mean of the amount of chore time females spend is greater than the amount of chore time males spend.
+
+## b.
+
+```{r}
+
+female <- table(subset(atus, gender == "Female")$household_chores)
+male <- table(subset(atus, gender == "Male")$household_chores)
+
+ggplot() + geom_bar(aes(female))
+ggplot() + geom_bar(aes(male))
+
+```
+
+For the p-value to provide meaningful conclusions, the data has to be somewhat normal shape. As we can see from the graphs of the frequency of female and male chore times, both sets of data are highly skewed. In addition, there are highly extreme outliers, so the t-test is not as accurate.
