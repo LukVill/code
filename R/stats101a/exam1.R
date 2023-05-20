@@ -29,3 +29,11 @@ MOE <- qt(0.95, df = length(batters$HR) - 1) * SE
 c(mean(batters$HR) - MOE, mean(batters$HR) + MOE)
 
 
+plot(Height~Volume, data = trees)
+ml <- lm(Height~Volume + Volume^2, data = trees)
+ml <- lm(Height~Volume + I(Volume^2), data = trees)
+ml <- lm(Height~(Volume + Volume^2), data = trees)
+summary(ml)
+
+help(nls)
+help(transform)
