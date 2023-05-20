@@ -1,0 +1,204 @@
+---
+title: "Stats101A, Spring 2023 - Homework 4"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output: 
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+```{r message=FALSE}
+# libraries used
+library(tidyverse)
+```
+
+# Problem 1a
+
+```{r}
+
+# load in playbill.csv
+playbill <- read.csv(file = "playbill.csv", header = TRUE)
+
+glimpse(playbill)
+
+# fit linear model
+lin <- lm(CurrentWeek ~ LastWeek, data = playbill)
+
+```
+
+## a. 
+
+```{r}
+confint(lin, level = 0.95)
+```
+The model could most definitely have a slope of 1 because the lower bound and upper bound for the slope for the linear model is about (0.95,1.01), which places 1 close to either bound.
+
+## b.
+
+```{r}
+
+# t stat for intercept = (intercept_estim - 10000) / (se(intercept_estim))
+tstat <- (lin$coefficients[1] - 10000) / summary(lin)$coefficients[1,2]
+names(tstat) <- NULL
+
+# tstat is left of mean, so lower tail test
+tstat
+
+# get p value from tstat
+pt(tstat, df = nrow(playbill) - 1)
+
+```
+
+Regardless of the alpha value (aka the significance level), a p-value of 0.37 says that there is about a 37% chance for 10000 to be the intercept of a sample taken from the list of shows. Therefore, based on usual significance levels, we do **not** have enough information to reject the null hypothesis. So, we fail to reject that $B_0 = 10000$.
+
+## c. 
+
+```{r}
+
+# estimate using model
+predict(lin, data.frame(LastWeek = 400000), interval = "c", level = 0.95)
+
+# prediction
+predict(lin, data.frame(LastWeek = 400000), interval = "p", level = 0.95)
+
+```
+
+Based on the estimate and the prediction interval, \$450,000 would not be a sensible value for the Current Week's gross office result for the production. This is because the direct estimate based on the model shows the value decreasing. In addition, the prediction interval's upper bound only goes up to \$439,442, which means that there is a 95% chance that the true future value would land below or equal to that upper bound. Having a 5% chance of landing above \$439k is not sensible.
+
+## d.
+
+```{r}
+# use r val to get validity of linearity
+cor(playbill$LastWeek, playbill$CurrentWeek)
+
+confint(lin, level = 0.95)
+```
+
+Because there is a strong linear relationship between last week and current week gross results and there is a high likelihood that the true slope of the gross results is close to 1, the prediction rule to assume that next week's gross results would be the same as last week's is decently sensible.
+
+# 1b
+
+```{r}
+
+# plot residuals against LastWeek 
+ggplot(playbill) + geom_point(mapping = aes(x = LastWeek, y = lin$residuals)) + labs(x = "LastWeek Gross", y = "Residuals")
+
+```
+
+The plot suggests that the variance is mostly random. However, there is a slight clumping towards the middle, but that might just be because the sample number is small.
+
+# Problem 2a
+
+```{r}
+
+# load dataset
+indicators <- read.delim(file = "indicators.txt", header = TRUE, sep = "\t")
+
+glimpse(indicators)
+
+# linear model
+lin <- lm(PriceChange ~ LoanPaymentsOverdue, indicators)
+
+# confidence interval
+confint(lin, level = 0.95)
+
+```
+
+Based on the 95% confidence interval on the slope, the bounds of the slope are both negative, so there is a very likely chance the true slope of the data is also negative.
+
+```{r}
+
+# using the model for direct estimate
+predict(lin, list(LoanPaymentsOverdue = 4))
+
+# using estimation
+predict(lin, list(LoanPaymentsOverdue = 4), interval = "c", level = 0.95)
+
+```
+
+No, 0% for the expected value of price change if overdue loan payment amount is 4% is not a sensible conclusion. This is because the interval bounds are only negative. And with the interval being a 95% confidence level, this implies that the price change being 0% when overdue loan amount is 4% is very unlikely.
+
+# 2b
+
+```{r}
+
+ggplot() + geom_point(aes(x = indicators$LoanPaymentsOverdue, y = lin$residuals)) + labs(x = "Percent Change in Loan", y = "Residuals")
+
+```
+
+The residual plot is random and scattered, which implies that the linear model is a decent fit for the data. However, there is a slight trending downward in the latter half of the plot, but that may disappear if there were more observations in the sample.
+
+# Problem 3
+
+## a.
+
+```{r}
+
+# load dataset
+invoices <- read.delim(file = "invoices.txt", header = TRUE, sep = "\t")
+
+glimpse(invoices)
+
+# linear model of time to invoices
+lin <- lm(Time ~ Invoices, data = invoices)
+
+lin
+
+# get summary of linear model
+summary(lin)
+
+# get confint of intercept
+confint(lin, level = 0.95)
+
+```
+
+The 95% interval of the intercept is (0.39,0.89).
+
+## b. 
+
+```{r}
+
+# tstat = (slope estimate - 0.01) / SE(slope estimate)
+tstat <- (lin$coefficients[2] - 0.01) / summary(lin)$coefficients[1,2]
+names(tstat) <- NULL
+
+tstat
+
+# tstat is positive, so test right tail
+pt(tstat, df = nrow(invoices) - 1, lower.tail = FALSE)
+
+```
+
+Since the p-value is almost 50%, this means that having a slope of 0.01 can occur by chance. Therefore, we fail to reject the null hypothesis.
+
+## c.
+
+```{r}
+
+# point estimate and prediction interval
+predict(lin, list(Invoices = 130), interval = "p", level = 0.95)
+
+```
+The point estimate is 2.1096 hours. The bounds of the 95% prediction interval are (1.4229, 2.7963).
+
+# Problem 4
+
+RSS1 < RSS2
+
+SSReg1 > SSReg2
+
+## a. 
+
+False, because visually, the variance in residuals is greater for model 2. 
+
+## b. 
+
+False, because visually, the variance in the regression for model 1 is expected to be higher than model 2's since the points are closer to the linear model. 
+
+## c. 
+
+False, because visually, the residuals are greater in variance in model 2. And, the data are closer to the model in model 1.
+
+## d.
+
+True, because visually, the residuals are smaller for model 1, so RSS for model 1 is less than RSS model 2. In addition, the data points are closer in model 1 than model 2, so the fit is better, implying SSreg for model 1 is higher than model 2.

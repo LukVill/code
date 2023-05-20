@@ -1,0 +1,222 @@
+---
+title: "Stats101A, Spring 2023 - Homework 7"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+```{r message=FALSE}
+
+library(tidyverse)
+df <- read.delim(paste0(getwd(),"/waistweightheight.txt"))
+glimpse(df)
+
+```
+
+# Problem A
+
+## a. 
+
+```{r}
+m1 <- lm(Weight ~ Waist + Height, data = df)
+```
+
+### i. 
+
+```{r}
+# SSReg
+ssreg <- sum(anova(m1)[-3,2])
+ssreg 
+
+# RSS
+rss <- anova(m1)[3,2]
+rss
+
+# SYY
+ssreg + rss
+```
+
+SSReg is 387916.6
+
+RSS is 50259.23
+
+SYY is 438175.8
+
+### ii.
+
+```{r}
+summary(m1)
+```
+R-squared is 0.8853
+
+Adjusted R-squared is 0.8848
+
+### iii.
+
+```{r}
+summary(m1)
+```
+The slope of the variable "Height" is estimated to be 2.4884. This means that provided that all observations have the same "Waist", the observations have an average change in Weight of 2.4884 units as Height increases by 1 unit.
+
+## b.
+
+```{r}
+set.seed(23)
+new.df <- transform(df, worthless = rnorm(dim(df)[1],0,5))
+glimpse(new.df)
+```
+
+### i. 
+
+```{r}
+
+m2 <- lm(Weight ~ Waist + Height + worthless, new.df)
+
+ssreg2 <- sum(anova(m2)[-4,2])
+ssreg2
+
+rss2 <- anova(m2)[4,2]
+rss2
+
+ssreg2 + rss2
+
+```
+SSReg is 387928.3
+
+RSS is 50247.49
+
+SYY is 438175.8
+
+# ii.
+
+SSReg and RSS have changed from part a. SSReg changed because it adds on the sum squares of the worthless variable. RSS changed because the model is altered due to the worthless variable, so the residuals' sum squares are altered.
+SYY stays the same because the actual data of Weight hasn't changed, so the variance of Weight stays the same.
+
+# iii.
+
+```{r}
+summary(m2)
+```
+R-squared has not changed while the adjusted R-squared dropped by 0.0002 when the worthless variable is added. This implies that the newly added variable "worthless" is most likely not useful to describe the behavior of Weight.
+
+## c.
+
+### i.
+
+```{r}
+m3 <- lm(Weight ~ worthless + Waist + Height, new.df)
+
+# ssreg
+ssreg3 <- sum(anova(m3)[-4,2])
+ssreg3
+
+# rss
+rss3 <- anova(m3)[4,2]
+rss3
+
+# syy
+ssreg3 + rss3
+```
+
+SSReg is 387928.3
+
+RSS is 50247.49
+
+SYY is 438175.8
+
+### ii.
+
+All variables have stayed the same. This is due to the fact the same variables were used in this model. The only difference with this model and the last is the order of partial F tests. SSReg and RSS do not depend on the order of the variables, and so, this implies that SYY does not change either because of the order of the variables.
+
+### iii.
+
+```{r}
+summary(m3)
+```
+R-squared and adjusted R-squared have not changed from part b's model. This is because the order does not matter to calculate R-squared.
+
+## d.
+
+Adjusted R-squared is a more reliable guide to see if the new variable is useful to add because it takes into account the degrees of freedom as well. This allows the adj. R-squared to change positively only if the RSS is heavily impacted by the new variable. In other words, RSS needs to go down drastically by the new variable for adj. R-squared to go up significantly.
+
+## e.
+
+We cannot look purely at the pattern of SSReg because the RSS could also be increasing dramatically due to the new variables. And so, this makes it so that even if SSReg is increasing, the increasing RSS implies that the new model does not necessarily explain more of the variation. 
+Partial tests are useful guidelines on whether add a new variable or not because they test for each added variable whether the parameters would be equal to 0 or not. In short, the tests look at if the parameters are statistically significant enough to have a value that's not 0, or are they insignificant so that if they were 0, they'd barely affect the model.
+
+# Problem B.
+
+```{r}
+
+cars <- read.csv(paste0(getwd(),"/cars04.csv"))
+glimpse(cars)
+
+# model
+cars.m <- lm(SuggestedRetailPrice ~ . -Vehicle.Name -Hybrid, cars)
+
+```
+
+## a.
+
+```{r eval=FALSE}
+testm <- lm(SuggestedRetailPrice ~ . -Hybrid, cars)
+testm
+```
+The resulting linear model is not comprehensible because it combines a categorical predictor alongside a numerical predictor. And so, the model tries to default the fitting to each unique Vehicle.Name and provide an intercept and slope for each one. And so, this model does not help describe a relationship between Sugg. Retail Price and the attributes of the car.
+
+## b.
+
+\begin{gather*}
+Y_{SuggestedRetailPrice} = B_0 X_{DealerCost} + B_1 x_{EngineSize} + B_2 X_{Cylinders} + B_3 X_{Horsepower} + B_4 X_{CityMPG} \\ + B_5 X_{HighwayMPG} + B_6 X_{Weight} + B_7 X_{WheelBase} + B_8 X_{Length} \\ + B_9 X_{Width} + Intercept
+\\ \implies \\
+Y_{SuggestedRetailPrice} = 1.0542X_{DealerCost} -32.2472 x_{EngineSize} + 228.3295 X_{Cylinders} + 2.3621 X_{Horsepower} - 16.7424 X_{CityMPG} \\ + 46.7575 X_{HighwayMPG} + 0.6992 X_{Weight} + 27.0534 X_{WheelBase} - 7.3202 X_{Length} \\ + -84.7085 X_{Width} + 349.9763
+\end{gather*}
+
+## c.
+
+```{r}
+summary(cars.m)
+```
+For Cylinders,
+
+slope: 228.32952
+
+t-stat: 3.171
+
+p-val: 0.001730
+
+From the t-stat and the p-val, we can conclude that Cylinders is a good predictor variable to describe the behavior of Sugg.Retail Price because it is unlikely to retrieve the estimated slope again through more samplings. Therefore, it is likely Cylinders has a correlation to Sugg.Retail Price.
+
+## d. 
+
+fval = tval^2
+
+```{r}
+sqrt(anova(cars.m)[3,4])
+```
+
+So, t-stat of Cylinders is 3.099639
+
+## e.
+
+```{r}
+summary(cars.m)
+```
+
+F-Stat is $2.073*10^{4}$. Since the F-stat is very big, this means at least one of the variables has a statistically significant slope that is not 0.
+
+## f.
+
+```{r}
+
+# model without fuel consumption
+cars.mNoFuel <- lm(SuggestedRetailPrice ~ . -Vehicle.Name -Hybrid -CityMPG -HighwayMPG, cars)
+
+# anova test 
+anova(cars.mNoFuel, cars.m)
+
+```
+
+Since the F-stat is 3.8994 with a p-val of 0.02165, this means that under a 5% significance level, the impact of CityMPG and HighwayMPG is statistically significant enough to alter Sugg. Retail Price. This implies that the model including those two variables would explain more of the data's variation rather than the model excluding them.
