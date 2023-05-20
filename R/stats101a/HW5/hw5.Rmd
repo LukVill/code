@@ -1,0 +1,184 @@
+---
+title: "Stats101A, Spring 2023 - Homework 3"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+# Problem 0
+
+## a. RSS
+$RSS = RSE^2 * df = 2.418^2 * 33 = 5.846724 * 33 = \\ 192.94$
+
+## b. SSReg
+$SSReg = F_{stat} * \frac{RSS}{dfRes}dfReg = 87.17 * \frac{192.94}{33} * 1= 87.17 * 5.8467 = \\ 509.6539$
+
+## c. Mean SSReg
+$MSSREG = \frac{SSReg}{dfReg} = \frac{509.6539}{1} = \\ 509.6539$
+
+## d. Total Reg
+$SYY = SSReg + RSS = 509.6539 + 192.94 = \\ 702.5939$
+
+## e. R
+$r = \sqrt{r^2} = \sqrt{0.7254} = \\ 0.8517$
+
+# Problem 1
+
+```{r}
+
+library(tidyverse)
+
+arms <- read.csv(file = paste0(getwd(),"/armspans2022_gender.csv"), header = TRUE)
+
+glimpse(arms)
+
+```
+
+## a. 
+
+```{r}
+# proportion of females
+mean(arms$is.female)
+```
+About 34.8% of the class reported to be female.
+
+## b.
+
+```{r}
+# make linear model
+m2 <- lm(armspan ~ is.female, data = arms)
+m2$coefficients
+```
+The intercept is 69.7586. This describes the expected value if is.female is null. In other words, 69.7586 is the mean value of non-females in the sample.
+
+## c. 
+The slope is -7.73. This describes the average difference between the armspans of female and non-female. In particular, this number says that on average, non-females have 7.73 less in armspan compared to females.
+
+## d. 
+The t-test is testing if the found slope from the sample can easily be obtained randomly through more samples. In other words,
+
+Null: The true slope of the data is 0.
+Alternative: The true slope of the data is not 0.
+
+Because the t-test is high, this means we can reject the null hypothesis and conclude that the true slope of the data is not 0, meaning there is some correlation between armspans and gender.
+
+# Problem 2
+
+```{r}
+# text wrapping
+library(stringi)
+
+
+# load in
+iowa <- read.delim(file = paste0(getwd(),"/iowatest.txt"), header = TRUE)
+
+glimpse(iowa)
+
+colnames(iowa)
+
+levels(factor(iowa$City))
+
+# change iowa city col into factor
+iowa$City <- relevel(factor(iowa$City), "Iowa City")
+
+# make linear model of test scores by cities in iowa
+# change cities to be factor with Iowa City first 
+model <- lm(Test ~ City, iowa)
+
+# get coefficients of model to calculate endpoints of segment
+model$coefficients
+
+# text wrapping function
+wrapper <- function(x, ...) {paste(stri_wrap(x, ...), collapse = "\n")}
+
+# plot
+ggplot(iowa) + geom_point(aes(City, Test)) + geom_segment(aes(x = 1, xend = 2, y = 64.058824, yend = 57.7619)) + geom_text(aes(1.5,75), label = wrapper("Difference in Means of Iowa City and Cedar Rapids", width = 9), size = 2.5) 
+
+# get stats of model
+summary(model)
+
+```
+
+
+Based on the statistics and graphics, we can see that generally, Iowa City outperforms all the other cities. 
+
+The summary dictates that the slope from Iowa City's mean to the other cities' is all negative, meaning that generally, all other cities' means are lower than Iowa City's.
+
+However, based on the p-values of the slopes and on a 5% significance level for a two-tailed test, the difference between the means of Iowa City and Cedar Rapid is not statistically significant enough, for the p-value is only 0.1616. 
+This implies that even if the means are different, the means could be different purely by chance, based on a 5% significance level.
+
+# Problem 3
+
+```{r}
+
+# make linear model for test score by poverty score 
+model <- lm(Test ~ Poverty, iowa)
+
+# stats of model
+summary(model)
+
+```
+Based on the summary of the linear model's statistics, the slope is negative as Poverty increases. This implies the higher the Poverty score, the lower the expected test score will be. 
+The p-values also support this claim, for the values are very close to 0. This implies the data's slope and intercepts are very unlikely to be obtained through random chance.
+
+These two conclusions imply that there is indeed a correlation between Poverty score and Test score.
+
+# Problem 4
+
+```{r}
+plot(model)
+```
+Residuals:
+Based on the residual plot, it seems the residuals are randomly scattered and there seems to be no obvious trend in the graph. This implies that the data has strong linearity and predominantly consistent variance along the range of the predictor variables.
+
+QQ:
+Based on the QQ plot, most of the values seem to be following a normal distribution. There are only a handful of values that seem to be outliers that do not follow the normal distribution. Thus, a general conclusion that normality can be assumed is a plausible deduction.
+
+Scale-Location:
+The residuals on the scale-location plot seem to be randomly scattered and portray no obvious trend as the predictor variables changes. This implies that it can be assumed variance is constant.
+
+# Problem 5
+
+```{r}
+
+# calculate hatvalues for every observation
+hval <- hatvalues(model)
+
+# get max hval index
+hvalMax <- which(hval == max(hval))
+# row of max hval
+hvalMax
+
+```
+The observation that has the highest leverage is on row 27. 
+
+
+Regarding bad leverage points, based on Problem 4's leverage plot, we can use the guideline that a bad leverage point is more than 2 standard deviations away and the leverage amount is more than about 0.03 (because of the guideline formula 4/n for a high leverage amount). 
+
+```{r}
+# get standard residuals
+rstan <- rstandard(model)
+# get rstan greater than 2 std away
+which(abs(rstan) > 2)
+
+# get hvals greater than 4/n
+which(hval > (4/nrow(iowa)))
+
+# check if any observations match up
+any(rstan %in% hval)
+any(hval %in% rstan)
+```
+Based on these criteria, even if there are high leverage points and influential points, there are no points that fall into both categories of high leverage and high standard deviation.
+This implies there are no bad leverage points.
+
+# Problem 6
+
+Null:
+The slope of all response variables (in this case, the Test score) is 0, with respect to the predictor variable, the Poverty score.
+
+Alternative:
+The slope of all response variables (in this case, the Test score) is not 0, with respect to the predictor variable, the Poverty score.
+
+Since the F-stat is 269.9 with a p-value close to 0, this implies that the slope obtained has a very unlikely chance of being obtained randomly. This means we can reject the null hypothesis. In conclusion, there is indeed a correlation between Poverty and Test scores, and the model fits well with the data.
