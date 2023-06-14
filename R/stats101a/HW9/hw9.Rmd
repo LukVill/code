@@ -1,0 +1,112 @@
+---
+title: "Stats101A, Spring 2023 - Homework 9"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+# Problem 1
+
+```{r message=FALSE}
+
+library(tidyverse)
+library(car)
+
+diet <- read.csv(paste0(getwd(),"/dietstudy.csv"))
+glimpse(diet)
+diet <- diet %>% dplyr::select(c("DIET", "AGE", "SEX", "WEIGHT_0", "DROPOUT2", "WEIGHT_2", "ADHER_2"))
+
+diet <- diet %>% dplyr::mutate(wtchange = WEIGHT_2 - WEIGHT_0)
+glimpse(diet)
+
+```
+
+## a. 
+
+```{r}
+
+wtchangegraph <- diet %>% group_by(DIET) %>% summarise(sum = abs(sum(wtchange)))
+
+ggplot(wtchangegraph) + geom_bar(aes(DIET,sum), stat = "identity") + labs(x = "Diet Type", y = "|Sum of Weight Change|")
+
+```
+
+Based on the bar graph, the diet with the most accumulated weight change would be the most effective diet. In this case, it would be Zone.
+
+## b.
+
+```{r}
+
+dropout <- diet %>% filter(wtchange == 0)
+any(dropout$DROPOUT2 == "no")
+
+```
+
+The reason why there are 0 weight changes for some of the observations is because all of those observations have dropped out of the diet. 
+
+```{r}
+diet <- diet %>% filter(wtchange != 0)
+```
+
+## c.
+
+```{r}
+
+m <- lm(wtchange ~ AGE + DIET + SEX + WEIGHT_0 + ADHER_2, diet)
+summary(m)
+
+```
+Based on this model and assuming it is valid in all of its conditions, the physician can say that based on a 10% significance, there is a correlation between gender and initial weight. This implies that males on average lose 0.96 more weight than females and the higher the initial weight, the more weight is lost on the Atkins diet.
+However, there is a lot more statistically significant evidence saying that for every higher level of adherence there is to any diet, an average of 0.87 more weight will be lost on the Atkins diet.
+
+## d.
+
+DIETOrnish describes that if every other variable in the model is controlled, then on average, those on the Ornish diet lose 0.15 weight **less** than those on Atkins.
+
+## e.
+
+```{r}
+
+summary(update(m, .~. + DIET:ADHER_2))
+
+```
+
+Ignoring statistical significance, the results say that the higher adherence to Ornish diet, the less weight loss there is compared to Atkins. However, if there is more adherence to Weight Watchers and Zone diet, then there is more weight loss compared to Atkins. 
+
+But, since the p-values of the results are close to 1, these results do not have enough statistical significance and are therefore biased. And so, adherence to a certain diet likely does not have a correlation to weight loss.
+
+# Problem 2
+
+## a.
+
+The multiple linear model is not a good model for the data because the residual vs fitted shows a trend, meaning linearity is not valid. The QQ plot shows many points straying from the normal line, showing normality is not valid. The scale-location plot shows that there is a trend in the standardized residuals, meaning that variance is inconsistent. And, by the Residuals vs Leverage plot, there is a bad leverage point that has a large value for Cook's Distance, meaning that data point contributes bad value to the model.
+
+## b.
+
+The residuals vs fitted values curving is showing that there is a big likelihood that the data does not uphold the linearity assumption to the model. If linearity is not upheld, then the linear model is not suited for this dataset.
+
+## c.
+
+The data point on row 223 is a bad leverage point because it's an outlier with high leverage.
+
+## d.
+
+The residuals vs fitted graph is much more scattered than the previous model, so this model suggests that it has better linearity than the previous one. 
+
+Normality is still iffy because the QQ plot showcases some stray points. However, normality is not so much of a problem because the sample size is large. This implies that the confidence intervals and t-tests for coefficients aren't biased, but prediction intervals should be avoided.
+
+The scale-location is much more scattered and shows little trend, so the model has better homeoscedasticity.
+
+Finally, the residuals vs leverage plot showcases 3 points that are bad leverage points.
+
+Overall, the model is much more valid than the previous model.
+
+## e.
+
+Using the marginal model plots, removing HighwayMPG and WheelBase would be decent choices to improve the model's validity. However, removing Cylinders and Horsepower would be better variables to remove since they stray off the Loess curve more so than HighwayMPG and Wheelbase.
+
+## f.
+
+After adding the manufacturer of the vehicle, the intercept will be the average price of the first brand in alphabetical order. The other slopes of other brands will be the average difference in prices compared to the baseline brand. The slopes of the other predictor variables will then be the baseline brand's statistics. If the other brands' statistics are desired, an interaction can be made between the brand and the specific predictor variable (i.e. `brand:Horsepower` can be added to the model if there is a desire to find a relationship with a certain brand's horsepower affecting price).

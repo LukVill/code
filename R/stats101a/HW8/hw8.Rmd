@@ -1,0 +1,140 @@
+---
+title: "Stats101A, Spring 2023 - Homework 8"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+# Problem 1
+
+```{r}
+
+library(tidyverse)
+library(MASS)
+library(car)
+
+realty <- read.delim(paste0(getwd(),"/realty.txt"), sep = "\t")
+glimpse(realty)
+
+table(realty$type)
+
+realty2 <- filter(realty,type=="Condo/Twh"|type=="SFR")%>%filter(sqft>0&bath>0)
+
+realty3 <-realty2%>%mutate(lprice=log(price))
+
+glimpse(realty3)
+
+```
+
+## a.
+
+```{r}
+
+m1 <- lm(lprice ~ city + bed + bath + sqft, realty3)
+
+summary(m1)
+
+unique(realty3$city)
+
+```
+If bed, bath, and sqft are 0, then the expected value of the log of the price of properties in Beverly Hills is about 13.27.
+
+## b.
+
+If bed, bath, and sqft were to remain the same for all observations, then the log price of properties in Westwood are on average 0.6161 less than the log price of properties in Beverly Hills.
+
+On average, Beverly Hills has the most expensive properties. On average, Westwood has the least expensive properties.
+
+## c.
+
+Yes, the more bedrooms there are, the higher the price is of the property. This can be seen via the interpretation of the bed variable. In other words, if city, bath, and sqft are constant, then about every 1 bedroom, the average log price of the properties increase by 0.1744. 
+
+## d.
+
+Bath's p-value being high implies that the estimated slope of the bed variable is not statistically significant. In other words, the obtained estimate can possibly be obtained through pure chance.
+
+## e.
+
+```{r}
+summary(update(m1,.~. - bed))
+```
+
+Because bed is now not a variable in the model, the bath variable does not have to consider controlling the value of bed. It then can be assumed that bath and bed have no correlation on one another.
+
+## f.
+
+```{r}
+
+library(lattice)
+xyplot(lprice ~ bath|bed, realty3)
+
+```
+Based off of the lattice plot, the more bedrooms there are, the higher the number of bathrooms and the higher the log price is of the property.
+
+This plot implies that there is some correlation that includes both bed and bath.
+
+## g.
+
+```{r}
+
+xyplot(lprice ~ sqft | city, realty3)
+
+```
+
+The assumption that log price and sqft are the same in each city is not a strong assumption because Beverly Hills has a different behavior compared to the rest of the cities.
+
+## h.
+
+```{r warning=FALSE}
+
+msmall <- lm(price~bed+bath+sqft,data=realty3)
+msmall.log <- lm(lprice~bed+bath+sqft, data=realty3)
+
+mmps(msmall)
+mmps(msmall.log)
+
+```
+
+Based off of msmall's marginal model plots, all the predictor variables follow the trend of the model's regression line. This implies that each predictor variable is positively contributing to the the model's linearity.
+
+On the other hand, for msmall.log's marginal model plots, only the bed variable follows the model's regression line closely. The other predictor variables are not as close to the regression line. This implies that in the log transformed model, not all the predictor variables are positively contributing to the linearity of the model.
+
+# Problem 2
+
+```{r}
+salary <- read.csv(paste0(getwd(),"/salary.csv"), stringsAsFactors = TRUE)
+glimpse(salary)
+```
+
+## a. 
+
+```{r}
+summary(lm(Salary ~ Expernc + Gender, salary))
+```
+The intercept implies that if expernc is the same for all observations, then the intercept is saying that the average female salary is about \$36,724.
+
+## b. 
+
+```{r}
+summary(lm(Salary ~ Expernc + Gender + Expernc:Gender, salary))
+```
+Male Slope: 492.34
+Male Intercept: 40294.53
+Female Slope: -49.42
+Female Intercept: 38342.43
+
+## c.
+
+```{r}
+summary(lm(Salary ~ Expernc + Expernc:Gender, salary))
+```
+The result implies that the female slope is -213.3 and the male slope is 603.8. This means that for every year in experience, the average female salary drops by \$213.30, but the average male salary increases by \$603.80.
+
+# Problem 3
+
+```{r}
+mmps(lm(Salary ~ Expernc + Expernc:Gender, salary))
+```
+The marginal model plot suggests that years in experience is a generally okay predictor variable that does a good job contributing to the linearity of the model.

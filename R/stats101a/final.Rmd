@@ -1,0 +1,311 @@
+---
+title: "Stats101A, Spring 2023 - Take Home Final"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+
+# Problem 1
+
+```{r include=FALSE}
+
+library(tidyverse)
+library(leaps)
+salary <- read.csv(paste0(getwd(),"/salary.csv"))
+glimpse(salary)
+
+m <- lm(Salary ~ ID + Gender + StartYr + DeptCode + Begin.Salary + Expernc + Rank, salary)
+
+```
+
+```{r eval=FALSE}
+# get Y transforms
+# boxcox
+car::boxCox(m)
+summary(car::powerTransform(m))
+# transform is not log, and possibly no transform needed
+# Inv Resp plot
+car::inverseResponsePlot(m)
+# data follows lambda = 0 well
+
+# conclusion: no transform on Y
+
+# get X transforms
+# check mmps, removing categorical vars
+car::mmps(update(m,.~. -Gender -Rank))
+# no polynomial transforms seem to be needed
+
+# check diagnostic plots
+plot(m)
+
+# try for interaction models
+m1 <- lm(Salary~. + Gender:Begin.Salary + Gender:StartYr + Gender:Expernc + Begin.Salary:Expernc, salary)
+summary(m1)
+car::vif(m1)
+
+# remove Gender:StartYr, Gender:Begin.Salary
+m1 <- update(m1,.~. -Gender:StartYr -Gender:Begin.Salary)
+
+car::vif(m1)
+
+# remove Begin.Salary:Expernc
+m1 <- update(m1,.~.-Begin.Salary:Expernc)
+
+car::vif(m1)
+
+# remove Gender:Expernc
+m1 <- update(m1, .~.-Gender:Expernc)
+
+car::vif(m1)
+
+# check Y transform
+car::boxCox(m1)
+summary(car::powerTransform(m1))
+```
+
+## a.
+
+\begin{gather*}
+Y_{Salary Of Female AssoProf} = 3394000 + 0.4709X_{ID} + 449.5X_{GenderMale} - 1710X_{StartYr} + 18.23X_{DeptCode} \\ + 1.386X{Begin.Salary} + 52.54X_{Expernc} - 1632X_{RankAsstProf} - 2011X_{RankInstruct} + 2955X_{RankProfessr} 
+\end{gather*}
+
+## b.
+
+For model validity, we have to check linearity, normality, homeoscedasticity, independence.
+
+```{r}
+plot(m)
+```
+
+Linearity: 
+The residuals vs fitted plot shows that the points are generally scattered. The only reason why the plot is squished-looking is because of the outliers. But generally, the scattered points are random. There is no obvious linear trend with the data as well. So, this implies that linearity can be assumed. Variance, on the other hand, can be questioned, so the scale-location plot is needed.
+
+Normality:
+The QQ plot shows a good number of points straying off of the line, meaning normality can be assumed to not be too strong. However, because there are 171 observations, the sample size is large enough to believe the t-stat tests, p-values, and predicted values. Though, prediction intervals are not to be believed.
+
+```{r}
+nrow(salary)
+```
+
+Homeoscedasticity:
+The scale-location plot showcases a good generally random spread of points, but there is a slight linear trend upwards. It seems to be negligible, but possible inconsistent variance should be kept in mind while going forward with analysis. 
+
+Sampling Independence: 
+The sampling is independent because each observation is a different person.
+
+Other Models' Validity:
+Models with transformed variables were considered as well. First, transformations on the Y and X variables were considered. Using BoxCox and Inverse Response Plot, possible lambdas were considered.
+
+```{r}
+car::boxCox(m)
+```
+
+Via BoxCox graph, we can see that the 95% confidence interval shows lambda being around 1, decently implying that the best transformation for the Y variable would be no transformation.
+
+```{r}
+summary(car::powerTransform(m))
+```
+Similarly, the hypothesis tests for response variable transformations conclude to reject the null hypothesis that the transformation uses log. In addition, it fails to reject that there even needs to be a transformation. 
+And so, we can conclude that there is little evidence that there needs to be a transformation on Y.
+
+Moreover, the X variables were checked as well. Since there are 0's in the Expernc column, marginal model plots are the only tests viable to use, for BoxCox cannot be used with 0 values.
+
+```{r}
+car::mmps(update(m,.~. -Gender -Rank))
+```
+From the marginal model plots, it's clear that each variable individually contributes to the linearity of the model. And so, there is little evidence that there needs to be any transformation on any variable.
+
+Finally, interaction variables were added and tested, but the variables provided too high of VIF, so collinearity was an obvious issue with interaction variables. 
+
+In conclusion, the normal multiple linear regression model was chosen.
+
+## c.
+
+```{r}
+# leverage
+# high leverage for salary
+highLev <- 2 * (length(names(m$coefficients))-1
+ + 1) / nrow(salary)
+```
+
+```{r eval=FALSE}
+# plot residual vs leverage, with leverage point marked
+ggplot() + geom_point(aes(hatvalues(m),rstandard(m))) + geom_vline(xintercept = highLev)
+
+# get points with high leverage
+which(hatvalues(m) > highLev)
+
+# these points are high leverage points
+
+```
+
+```{r}
+# determine which points are bad leverage points
+
+# any observation
+levSalary <- salary[hatvalues(m) > highLev,]
+# make new column of index of observation
+levSalary$Index <- which(hatvalues(m) > highLev)
+
+```
+
+```{r eval = FALSE}
+# which high lev points have high rstandard
+which(abs(rstandard(m)[levSalary$Index]) > 2)
+
+# Thus, observations 1, 50, 156 are bad high leverage points
+
+# influential points
+
+# big cooks distance 4/(n-2)
+bigCook <- 4/(nrow(salary)-2)
+
+cook <- cooks.distance(m)
+
+cook[cook > bigCook]
+
+```
+For the found model, there needs to be analysis on leverage and influential points.
+
+```{r}
+ggplot() + geom_point(aes(hatvalues(m),rstandard(m))) + geom_vline(xintercept = highLev, linetype = "dashed") + labs(x = "Leverage Amount", y = "Standardized Residuals")
+```
+
+Given the prior graph, there are multiple points that surpass the data's calculated high leverage amount, which is about 0.1169591.
+
+The following result is the list of observations' rows on `salary.csv` that have a high leverage:
+
+```{r}
+names(which(hatvalues(m) > highLev))
+```
+
+To discern if these are bad leverage points, we need to filter out which observation has a high standardized residual amount. The following result are the high leverage points with high standardized residuals:
+
+```{r}
+names(which(abs(rstandard(m)[levSalary$Index]) > 2))
+```
+
+And so, these are observations that must be considered because they negatively contribute to the linearity of the model.
+
+Next, influential points must be analyzed. Influence can be measured by finding Cook's Distance for each observation. The following result is the list of observations that have a large Cook's Distance:
+
+```{r}
+
+# influential points
+
+# big cooks distance 4/(n-2)
+bigCook <- 4/(nrow(salary)-2)
+
+cook <- cooks.distance(m)
+
+cook[cook > bigCook]
+
+```
+
+Observations that have high bad leverage and high influence are data points that severely negatively impact the linear model. These points are observations: 1, 50, and 156.
+
+
+Another aspect that must be analyzed is the collinearity of the model.
+
+```{r}
+car::vif(m)
+```
+
+Based on the results, Begin.Salary and StartYr are variables that have a high GVIF. These variables should be considered to be dropped from the model because they could negatively impact the significance of other variables.
+
+# Problem 2
+
+```{r}
+
+# using algebra manipulation, bic conversion is this function
+BICToAIC <- function(bic,n,p)
+{bic - (log(n) - 2)*p}
+
+# make function to use regsubsets obj and provide aic 
+# and bic analysis
+aicbicanalysis <- function(regsubObj, data)
+{
+  
+  # get summary 
+  sumModel <- summary(regsubObj)
+  
+  n <- nrow(data)
+  
+  # convert bic to aic
+  aic <- BICToAIC(sumModel$bic,n,seq_along(sumModel$bic))
+
+  # get bic
+  bic <- sumModel$bic
+  
+  aic
+  bic
+  
+  # get model with lowest aic and bic
+  print(paste0("Best AIC Model: ",which(aic == min(aic))))
+  print(paste0("Best BIC Model: ", which(bic == min(bic))))
+  print(sumModel)
+  
+}
+
+```
+
+```{r}
+# forward regression
+fModel <- leaps::regsubsets(Salary~.,salary,nvmax = 9 ,method="f")
+aicbicanalysis(fModel, salary)
+```
+
+```{r}
+# backward regression
+bModel <- leaps::regsubsets(Salary~.,salary,nvmax = 9,method = "b")
+aicbicanalysis(bModel,salary)
+```
+
+```{r}
+# exhaustive regression
+eModel <- leaps::regsubsets(Salary~.,salary,nvmax = 9,method = "e")
+aicbicanalysis(eModel,salary)
+```
+
+Based on the best subsetting algorithm and using forward, backward, and exhaustive regression, the model with the best AIC is the 6 variable model. This model uses: GenderMale, StartYr, Begin.Salary, RankAsstProf, RankInstruct, RankProfessr.
+
+# Problem 3
+
+```{r}
+bestModel <- lm(Salary ~ Gender + StartYr + Begin.Salary + Rank, salary)
+summary(bestModel)
+```
+
+Based on the given model from Problem 2, if a 10% significance were to be used, then the mean salary between each department is statistically significantly different. This implies that Professors have the highest mean salaries because the estimated value of RankProfessr is higher than the Intercept, and the Intercept represents the AssoProf rank. In addition, the AssoProf is higher than the rest of the ranks. This implies that Professors have the highest mean salaries.
+However, this statistical conclusion fails if a 5% significance were to be used.
+
+# Problem 4
+
+Based on the model from Problem 2, using a 10% significance, the most important variables determining salary would be department level, starting year, and beginning salary because their p-values fall within the 10% significance. This implies that their effects on salary are non-zero. 
+Gender is a considerable variable as well, but the p-value is slightly higher than the 10% significance. The effect that Gender has on salary is still debatable because the test fails to reject that Gender's slope is 0 using a 10% significance.
+
+# Problem 5
+
+```{r results='hide'}
+glimpse(salary)
+```
+
+The following are the confidence intervals of the average salaries of Professors and Assistant Professors given the the averages of being Male, starting 1972, and beginning salary of \$11,289:
+
+```{r}
+
+
+# Professr
+predict(bestModel,list(Gender = "Male", StartYr = 1972, Begin.Salary = 11289, Rank = "Professr"), interval = "c", level = 0.95)
+
+# AsstProf
+predict(bestModel,list(Gender = "Male", StartYr = 1972, Begin.Salary = 11289, Rank = "AsstProf"), interval = "c", level = 0.95)
+
+```
+
+The estimated average Professor salary is \$42,787.75, with an interval [\$42,419.82 , \$43,155.68]
+
+The estimated average Assistant Professor salary is \$38,186.59, with an interval [\$36,978.55 , \$39,394.63]

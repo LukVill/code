@@ -1,0 +1,206 @@
+---
+title: "Stats101A, Spring 2023 - Homework 10"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    extra_dependencies: ["amsmath"]
+---
+
+# Problem A
+
+```{r}
+library(tidyverse)
+library(car)
+pga <- read.csv(paste0(getwd(),"/pgatour2006-3.csv"))
+glimpse(pga)
+```
+
+## a.
+
+```{r}
+
+m <- lm(PrizeMoney ~ DrivingAccuracy + GIR + PuttingAverage + BirdieConversion + SandSaves + Scrambling + PuttsPerRound, pga)
+
+# boxcox
+car::boxCox(m)
+
+# powertransform
+summary(powerTransform(m))
+
+# inverse response
+car::inverseResponsePlot(m)
+
+```
+BoxCox plot: confidence interval is small and centered around 0
+
+Power Transform: fail to reject that transformation is log, reject that no transformation is needed -> there needs to be a transformation and it can be log transformation
+
+Inverse Response Plot: the points closely followed Lambda = 0.12 or 0
+
+In conclusion, the boxcox plot shows the optimal lambda being very close to 0. This implies that the recommended transformation by the boxcox plot is a value close to 0. In addition, the PowerTransform summary recommends that there indeed needs to be a transformation to the $Y$ variable, and the transformation can be log. Finally, the inverse response plot shows the points closely follow the curves for $\lambda = 0.12$ and $\lambda = 0$. 
+
+And so, all three of these tests showcase that a log transformation on the $Y$ variable is a decent recommendation.
+
+## b.
+
+```{r}
+
+# get power transformations on y and x
+# check all variables
+summary(powerTransform(cbind(pga$PrizeMoney, pga$DrivingAccuracy, pga$GIR, pga$PuttingAverage, pga$BirdieConversion, pga$SandSaves, pga$Scrambling, pga$PuttsPerRound)))
+
+# only PrizeMoney needs to be log transformed
+
+# update model to log the Y variable
+m <- update(m, log(PrizeMoney)~.)
+
+# plot
+plot(m)
+
+```
+
+The model that will be used will be the linear model, but the response variable (PrizeMoney) will be log-transformed. This decision was based off of the work done in part a. and via the `summary(powerTransform())` result.
+
+To check that the model is valid, linearity, normality, homeoscedasticity, and sampling independence must be valid. 
+
+From the plot of residuals to fitted values, there is little trend in the plot and the data is generally randomly scattered, which implies there is a solid linearity in the data.
+
+From the QQ plot, the points follow the line, which implies normality is strong.
+
+The scale-location plot shows a little trend in the data, but it generally shows that the variance mostly stays consistent.
+
+Sampling independence can be assumed because each observation is a different golfer.
+
+## c.
+
+```{r eval=FALSE}
+
+plot(m)
+
+# high leverage 
+2*(7 + 1)/nrow(pga)
+
+```
+
+Based on the leverage plot, observations on row 40 and 168 have high leverage and have around 2 standard deviations away on their standardized residuals. This means these are possible points for bad high leverage. In addition, observation 185 has is has a big standard deviation compared to the rest of the data and drifts from normality a bit, so this is a point to investigate further into.
+
+## d.
+
+```{r}
+
+summary(m)
+
+car::vif(m)
+
+```
+
+Based on the summary stats of the linear model, only two variables are statistically significant: GIR and BirdieConversion. This means that the rest of the predictors and the intercepts are not statistically significant enough to be different from 0. 
+
+Another weakness would be possible collinearity between variables. GIR, PuttingAverage, and PuttsPerRound have a VIF above 5. This could be the leading cause to why there are insignificant p-values for the rest of the predictor variables.
+
+## e.
+
+Removing all the insignificant variables all off the bat is not a good approach because those p-values could be skewed by possible collinearity. Collinearity causes the biased inflation of p-values for variables, and so, this would cause certain variables to seem insignificant but in reality, they would be important to the regression of the model.
+
+# Problem B
+
+```{r}
+
+# do regression algo
+bestmodel <- leaps::regsubsets(log(PrizeMoney) ~ DrivingAccuracy + GIR + PuttingAverage + BirdieConversion + SandSaves + Scrambling + PuttsPerRound, pga, method = "e")
+
+# using algebra manipulation, bic conversion is this function
+BICToAIC <- function(bic,n,p)
+{bic - (log(n) - 2)*p}
+
+# make function to use regsubsets obj and provide aic 
+# and bic analysis
+aicbicanalysis <- function(regsubObj, data)
+{
+  
+  # get summary 
+  sumModel <- summary(regsubObj)
+  
+  n <- nrow(pga)
+  
+  # convert bic to aic
+  aic <- BICToAIC(sumModel$bic,n,seq_along(sumModel$bic))
+
+  # get bic
+  bic <- sumModel$bic
+  
+  aic
+  bic
+  
+  # get model with lowest aic and bic
+  print(paste0("Best AIC Model: ",which(aic == min(aic))))
+  print(paste0("Best BIC Model: ", which(bic == min(bic))))
+  print(sumModel)
+  
+}
+
+aicbicanalysis(bestmodel, pga)
+
+
+```
+
+Based on AIC, the optimal model will be using 5 predictors: GIR, BirdieConversion, SandSaves, Scrambling, and PuttsPerRound.
+
+Based on BIC, the optimal model will be using 3 predictors: GIR, BirdieConversion, and Scrambling.
+
+## b.
+
+```{r}
+
+bestmodelback <- leaps::regsubsets(log(PrizeMoney) ~ DrivingAccuracy + GIR + PuttingAverage + BirdieConversion + SandSaves + Scrambling + PuttsPerRound, pga, method = "b")
+
+aicbicanalysis(bestmodelback,pga)
+
+```
+
+Based on AIC, the best model via backward step regression is with 5 predictors: GIR, BirdieConversion, SandSaves, Scrambling, and PuttsPerRound.
+
+Based on BIC, the best model via backward step regression is with 3 predictors: GIR, BirdieConversion, and Scrambling.
+
+## c.
+
+```{r}
+
+bestmodelforward <- leaps::regsubsets(log(PrizeMoney) ~ DrivingAccuracy + GIR + PuttingAverage + BirdieConversion + SandSaves + Scrambling + PuttsPerRound, pga, method = "f")
+
+aicbicanalysis(bestmodelforward,pga)
+
+```
+
+Based on AIC, the best model will be with 5 predictors: GIR, BirdieConversion, SandSaves, Scrambling, and PuttsPerRound.
+
+Based on BIC, the best model will be with 4 predictors: GIR, BirdieConversion, Scrambling, and PuttsPerRound.
+
+## d.
+
+The models differ from part c. as opposed to part a. and b. because the three parts utilize different algorithms. Part c's algorithm is forward stepping, which means that it takes the best performing model with each added variable. This can result in a different decision than the other algorithms because the BIC may let the algorithm choose a different model depending on whether starting with all the variables or starting with only 1.
+
+## e.
+
+The final model should be a utilizing the 5-variable model. This is because all three algorithms agree on the AIC conclusion and because BIC tends to be biased toward more simplified models. Therefore, having 3 variables as the predictor variables does not feel like it would contribute much to the regression as opposed to 5 variables.
+
+## f.
+
+```{r}
+finalModel <- lm(log(PrizeMoney)~GIR + BirdieConversion + SandSaves + Scrambling + PuttsPerRound, pga)
+
+summary(finalModel)
+
+plot(finalModel)
+
+car::vif(finalModel)
+
+```
+
+The intercept is the average log of PrizeMoney a player makes assuming all the rest of the other variables are the same. 
+
+The rest of the variables describe the rate of the log of PrizeMoney as the variables increase. (I.e. log of PrizeMoney increases by about 0.197 and GIR increases by 1 unit and the other variables are controlled.) 
+This interpretation can be applied and is similar for the rest of the variables.
+
+Yes, it is still necessary to take these statistical results with extreme caution because the estimated slopes of some of the variables aren't statistically significant enough to differ from 0. In addition, there are a few possibly bad high leverage points that could have negatively contributed to the regression model. However, it seems that collinearity does not seem to be a prominent problem anymore compared to the 7 variable model. So, we can rule out that these variables are not drastically negatively affecting each others' significance.
