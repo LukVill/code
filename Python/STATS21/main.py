@@ -1,102 +1,188 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-# import sklearn as sk
+import matplotlib.image as mpimg
+from PIL import Image
 import seaborn as sns
+from scipy import interpolate
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import MinMaxScaler
 import os
 from icecream import ic
-
-
-# make filepath for project folder
-# ALWAYS MAKE STATS21 BE THE LAST FOLDER
-currwd = os.path.abspath(os.getcwd())
-
-# make filepath for SPI dataset (social progress index)
-spiFilepath = os.path.abspath(currwd + "/SPI.csv")
-
-# make dataset for whi23
-whi15 = pd.read_csv(os.path.abspath(currwd + "/WHI15.csv"))
-whi16 = pd.read_csv(os.path.abspath(currwd + "/WHI16.csv"))
-whi17 = pd.read_csv(os.path.abspath(currwd + "/WHI17.csv"))
-whi18 = pd.read_csv(os.path.abspath(currwd + "/WHI18.csv"))
-whi19 = pd.read_csv(os.path.abspath(currwd + "/WHI19.csv"))
-whi20 = pd.read_excel(os.path.abspath(currwd + "/WHI20.xls"))
-whi21 = pd.read_excel(os.path.abspath(currwd + "/WHI21.xls"))
-whi22 = pd.read_excel(os.path.abspath(currwd + "/WHI22.xls"))
-whi23 = pd.read_excel(os.path.abspath(currwd + "/WHI23.xls"))
-
-# WHI15 useful cols: Country, Happiness Score
-whi15 = whi15[["Country","Happiness Score"]]
-# WHI16 useful cols: Country, Happiness Score
-whi16 = whi16[["Country","Happiness Score"]]
-# WHI17 useful cols: Country, Happiness.Score
-whi17 = whi17[["Country","Happiness.Score"]]
-# WHI18 useful cols: Country or region, Score
-whi18 = whi18[["Country or region", "Score"]]
-# WHI19 useful cols: Country or region, Score
-whi19 = whi19[["Country or region", "Score"]]
-# WHI20 useful cols: Country name, Ladder score
-whi20 = whi20[["Country name", "Ladder score"]]
-# WHI21 useful cols: Country name, Ladder score
-whi21 = whi21[["Country name", "Ladder score"]]
-# WHI22 useful cols: Country, Happiness score
-whi22 = whi22[["Country", "Happiness score"]]
-# WHI23 useful cols: Country name, Ladder score
-whi23 = whi23[["Country name","Ladder score"]]
-
-# make dictionary of the dataframes
-whi = dict(list(enumerate([whi15,whi16,whi17,whi18,whi19,whi20,whi21,whi22,whi23])))
-
-# get unique countries of 23 because it has the least
-# countries surveyed (for the sake of scope and accuracy)
-len(np.sort(pd.unique(whi23.iloc[:,0])))
-unique_countries = np.sort(pd.unique(whi23.iloc[:,0]))
-
-# but this is not enough, we must double check if each dataset has
-# every unique_countries entry
-
-# with indexing issues, naming issues came up
-
-# Special Case 1, Czech Republic vs Czechia
-for key in whi:
-    df = whi[key]
-    print("WHI ", key+15)       
-    for i in range(len(df)):
-        # check if contains Czech
-        if "Czech" in df.iloc[i,0]:
-            print("Row",i)
-            print("Name:",df.iloc[i,0], "\n")
-
-# STOPPED HERE: decide via SPI to choose czech republic or czechia
-
-# for each unique country, make array for scores
-# get unique country name, use it as key in dictionary,
-# dict[country] = array of scores (sorted by year)
-country_happiness = dict()
-i = 0
-for country in unique_countries:
-    country_happiness[country] = list()
-    # parse through each year for each country and add score 
-    # to dict
-    country_happiness[country].append(whi15[whi15.iloc[:,0] == country].iloc[0,1])
+import sys
+import statsmodels.formula.api as sm
+import lineardiag as ld
 
 
 
-# visualize scores of each country for each year
-#sns.lineplot(whi15, "Happiness Score", )
+def main():
+    res = StatsSummary()
+    res.start()
 
-# 
+# Class purpose:
+# 1. to ask the user which group to see
+# 2. 
+class StatsSummary():
+    # set attribute for rep countries
+    france_df = pd.read_csv("france_df.csv").iloc[:,1:]
+    mont_df = pd.read_csv("mont_df.csv").iloc[:,1:]
+    ethio_df = pd.read_csv("ethio_df.csv").iloc[:,1:]
+    medianData_df = pd.read_csv("medianData_df.csv").iloc[:,1:]
+    france_m = sm.ols("WHI ~ SPI + GDP + WGI",france_df).fit()
+    mont_m = sm.ols("WHI ~ SPI + GDP + WGI",mont_df).fit()
+    ethio_m = sm.ols("WHI ~ SPI + GDP + WGI",ethio_df).fit()
 
-# # make dataset for spi
-# spi = pd.read_csv(spiFilepath)
+    def diagModel(self,model):
+        model_diag = ld.LinearRegDiagnostic(model)
+        fig,axs = plt.subplots(ncols=2,nrows=2,figsize=(15,10))
+        sns.set_style("darkgrid")
+        model_diag.residual_plot(ax=axs[0,0])
+        model_diag.qq_plot(ax=axs[0,1])
+        model_diag.scale_location_plot(ax=axs[1,0])
+        model_diag.leverage_plot(ax=axs[1,1])
+        plt.subplots_adjust(hspace=0.35)
+        plt.show()
+        print(model_diag.vif_table())
 
-# # exclude countries with World
-# spi = spi.loc[spi["country"] != "World",:]
+    def start(self):
+        print("Hello! Welcome to the Statistics Summary applet on the behavior of World Happiness Index via Social Progress, Gross Domestic Product, and World Giving Index.")
+        c = input("Please select which Group you would like to analyze: 0, 1, or 2:")
+        while(c != "0" and c != "1" and c != "2"):
+            c = input("Whoops! Incorrect input. Please try again. Please pick 0, 1, or 2:")
+        if(c == "0"):
+            self.group0()
+        if(c == "1"):
+            self.group1()
+        if(c == "2"):
+            self.group2()
+            
+    def displayKMeans(self):
+        image = Image.open("kmeansplot.png")
+        image.show()
 
-# # after cleaning, reset index
-# spi.reset_index()
+    def displayStats(self,countryStr,model,datadf):
+        # display summary plots
+        fig, axs = plt.subplots(2,2, figsize = (12,8))
+        sns.set_style("darkgrid")
 
-# # first observation of SPI
-# spi.iloc[0,:]
+        sns.lineplot(x = "Year", y = "WHI", data = datadf, color = "red", ax = axs[0,0])
+        sns.lineplot(x = "Year", y = "SPI", data = datadf, color="blue", ax = axs[0,1])
+        sns.lineplot(x = "Year", y = "GDP", data = datadf, color = "green", ax = axs[1,0])
+        sns.lineplot(x = "Year", y = "WGI", data = datadf, color = "black", ax = axs[1,1])
+        title = "Time Series of Variables - " + countryStr
+        fig.suptitle(title)
+
+        plt.show()
+
+    def group0(self):
+        print("""
+              Group 0 is observed to be
+              the group with a high median happiness
+              score with a high SPI. The groups can be seen
+              via the following K-Means plot:
+              """)
+        self.displayKMeans()
+        input("Press Enter to continue...")
+        print("""
+              The representative of this group is France.
+              \n\n
+              The following are the basic graphs of 
+              the country's variables:
+              """)
+        self.displayStats("France",self.france_m,self.france_df)
+        input("Press Enter to continue...")
+        print("""
+              The following is the summary of the stats of 
+              the multiple linear regression model (where World 
+              Happiness Index is the response variable, and 
+              Social Progress Index, Gross Domestic Product,
+              and World Giving Index are the predictor
+              variables):
+              """)
+        print(self.france_m.summary())
+        input("Press Enter to continue...")
+        print("""
+              The following are the diagnostic plots and 
+              VIF table of the model:
+              """)
+        self.diagModel(self.france_m)
+        print("Program ending...")
 
 
+    def group1(self):
+        print("""
+              Group 1 is observed to be
+              the group with an average median happiness
+              score with an average SPI. The groups can be seen
+              via the following K-Means plot:
+              """)
+        self.displayKMeans()
+        input("Press Enter to continue...")
+        print("""
+              The representative of this group is Montenegro.
+              \n\n
+              The following are the basic graphs of 
+              the country's variables:
+              """)
+        self.displayStats("Montenegro",self.mont_m,self.mont_df)
+        input("Press Enter to continue...")
+        print("""
+              The following is the summary of the stats of 
+              the multiple linear regression model (where World 
+              Happiness Index is the response variable, and 
+              Social Progress Index, Gross Domestic Product,
+              and World Giving Index are the predictor
+              variables):
+              """)
+        print(self.mont_m.summary())
+        input("Press Enter to continue...")
+        print("""
+              The following are the diagnostic plots and 
+              VIF table of the model:
+              """)
+        self.diagModel(self.mont_m)
+        print("Program ending...")
+
+
+    def group2(self):
+        print("""
+              Group 2 is observed to be
+              the group with a low median happiness
+              score with a low SPI. The groups can be seen
+              via the following K-Means plot:
+              """)
+        self.displayKMeans()
+        input("Press Enter to continue...")
+        print("""
+              The representative of this group is Ethiopia.
+              \n\n
+              The following are the basic graphs of 
+              the country's variables:
+              """)
+        self.displayStats("Ethiopia",self.ethio_m,self.ethio_df)
+        input("Press Enter to continue...")
+        print("""
+              The following is the summary of the stats of 
+              the multiple linear regression model (where World 
+              Happiness Index is the response variable, and 
+              Social Progress Index, Gross Domestic Product,
+              and World Giving Index are the predictor
+              variables):
+              """)
+        print(self.ethio_m.summary())
+        input("Press Enter to continue...")
+        print("""
+              The following are the diagnostic plots and 
+              VIF table of the model:
+              """)
+        self.diagModel(self.ethio_m)
+        print("Program ending...")
+
+    # constructor
+    def __init__(self):
+        pass
+    
+
+
+if __name__ == "__main__":
+    main()

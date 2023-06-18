@@ -1,0 +1,307 @@
+---
+title: "Best Feature for a Country's Happiness"
+author: "Luke Villanueva"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    extra_dependencies: ["amsmath"]
+documentclass: report  
+---
+
+\begin{abstract}
+This data analysis focuses on finding which social factor has the most effect on the happiness level of specific countries. The predictive variables considered are Social Progress Index (SPI), gross domestic product (GDP), World Giving Index (WGI). Using K-Means clustering to find a representative country for each group, a cubic spline interpolation was used to fill in for reasonably missing data. A multiple linear regression model was fitted to each representative country. A program outputs the data's statistics and graphs.
+\end{abstract}
+
+\chapter{Introduction}
+
+Every year since around the year 2008, the World Happiness Report has been surveying and collecting data on samples of the population of each country. Based on a number of criteria and categories, the total number of each country's "happiness level" is reported annually. These categories can span from general kindness each citizen portrays (i.e. the World Giving Index), their GDP and economic success, to their progress towards a more humane government (i.e. the Social Progress index). 
+  
+For the purpose of a limited scope for this project, specific predictor variables have been chosen are Social Progress Index (SPI), gross domestic product (GDP), and World Giving Index (WGI). 
+
+\chapter{Data Preparation}
+
+\section{Data Collection}
+
+The data was collected from the World Happiness Report. There were reports available from 2013-2023. Some issues with this data was that 2014 was not available. In addition, 2023 had many countries excluded from the report. And so, to provide the best time scope for the project, the years from 2015-2022 was selected. 
+
+The reports consisted of many variables that were considered to create the happiness score such as economy score, family score, health score, and more. For this project, only the country name, each year, and each relevant score was extracted.
+
+![A small snippet of the World Happiness Report for 2015. This organization of information is similar for the following years.]("WHIsnapshot.png")
+
+The same applied to the GDP, SPI, and WGI reports. All reports provided many statistics that were considered to calculate each country's respective score for each category.
+
+![A small snapshot of the GDP data. The scope of the data continues, stopping before 2023.]("GDPsnapshot.png")
+
+![A small snapshot of the SPI data. There were many more variables used to calculate the SPI for each country for each year until 2023.]("SPIsnapshot.png")
+
+![A small snapshot of the WGI data. The data was delimited via semicolons, as opposed to the usual commas.]("WGIsnapshot.png")
+
+\subsection{Value Changes}
+
+For the WGI data, the WGI was given as a percentage. This implied that the value was stored as a string. This data was vectorized to be mutated into a simple integer for better data manipulation and analysis.
+
+\section{Data Cleaning}
+
+For the data cleaning, the objective was to create one dataframe with columns of Country, Year, WHI, SPI, GDP, and WGI, alongside with the rows being each individual report of the country on that specific year. 
+
+\section{Issues}
+
+The following are issues that came up during the creation of the one dataframe containing all of the necessary data for the data analysis. After these issues were resolved, a dataframe was created. There still was missing data, but that will be solved via interpolation/extrapolation.
+
+\subsection{Missing Countries}
+
+As cleaning progressed, an issue that came up was that there were missing countries with each year. And so, the most recent year (i.e. 2022) was chosen to represent the individual unique countries because it was predicted to have at least most of the countries in each of the previous years.
+
+\subsection{Nomenclature Errors}  
+
+Another issue among all the data was that each dataframe not only inconsistently names countries across each category of WHI, SPI, GDP, and WGI, but they also inconsistently named them through the years as well. Such examples would be Czech Republic being sometimes called Czechia, Taiwan being called Taiwan Province of China, and more.
+
+This issue was manually fixed by finding the countries that had only a nomenclature inconsistency. However, this did not take into consideration the countries that had multiple parts.
+  
+\subsection{Split Countries}
+
+Another issue would be that there were multiple countries that shared the same name but differed in politically. Such examples would be Congo (i.e. Republic of Congo vs the Democratic Republic of Congo), Macedonia (i.e. Macedonia vs North Macedonia), and more. 
+
+Some of these countries were considered still but a specific naming addition was added to distinguish between the different countries (i.e. Congo (Brazzaville) and Congo (Kinshana)), and some countries were discarded just because there weren't enough data for one or both of the country's split parts.
+
+\subsection{Missing Data}
+
+\subsubsection{Too Much Missing Data}
+
+As expected, there were many places where data was missing for all the categories. The criteria used to distinguish which countries were to be kept in would be that they did not have too many missing values. Setting threshold of the max missing values to 6 allowed enough countries to still be used while filtering countries that had too many missing data points.
+
+\subsubsection{Too Much Data Missing Sequentially}
+
+Another filtering process done in regards to missing data was that there needed to be enough points for the degrees of freedom to be viable for the cubic spline interpolation algorithm to work. And so, certain countries were also omitted because the algorithm was not able to interpolate the data.
+
+\section{Final Country List}
+
+The following is the final list of countries used in the data analysis:
+
+- 'Afghanistan', 'Albania', 'Argentina', 'Armenia', 'Australia',
+       'Austria', 'Azerbaijan', 'Bangladesh', 'Belarus', 'Belgium',
+       'Benin', 'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil',
+       'Bulgaria', 'Burkina Faso', 'Cambodia', 'Cameroon', 'Canada',
+       'Chad', 'Chile', 'China', 'Colombia', 'Costa Rica', 'Croatia',
+       'Czechia', 'Denmark', 'Dominican Republic', 'Ecuador', 'Egypt',
+       'El Salvador', 'Estonia', 'Ethiopia', 'Finland', 'France', 'Gabon',
+       'Georgia', 'Germany', 'Ghana', 'Greece', 'Guatemala', 'Guinea',
+       'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia',
+       'Iran', 'Iraq', 'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan',
+       'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait', 'Latvia', 'Lebanon',
+       'Liberia', 'Lithuania', 'Luxembourg', 'Madagascar', 'Malawi',
+       'Mali', 'Malta', 'Mauritania', 'Mauritius', 'Mexico', 'Moldova',
+       'Mongolia', 'Montenegro', 'Morocco', 'Myanmar', 'Namibia', 'Nepal',
+       'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria',
+       'Norway', 'Pakistan', 'Panama', 'Paraguay', 'Peru', 'Philippines',
+       'Poland', 'Portugal', 'Romania', 'Russia', 'Rwanda',
+       'Saudi Arabia', 'Senegal', 'Serbia', 'Sierra Leone', 'Singapore',
+       'Slovenia', 'South Africa', 'Spain', 'Sri Lanka', 'Sweden',
+       'Switzerland', 'Tajikistan', 'Tanzania', 'Thailand', 'Togo',
+       'Tunisia', 'Turkmenistan', 'Uganda', 'Ukraine',
+       'United Arab Emirates', 'United Kingdom', 'United States',
+       'Uruguay', 'Uzbekistan', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia',
+       'Zimbabwe'
+
+\section{Data Interpolation/Extrapolation via Cubic Spline Interpolation}
+
+To fill in the missing data for the remaining countries after filtering, cubic spline interpolation was used for both data interpolation and extrapolation. This algorithm was placed on the dataframe's variable columns (i.e. WHI, SPI, GDP, and WGI).
+
+\chapter{Data Analysis}
+
+\section{Model Selection}
+
+For the purpose of the most easy interpretation, a multiple linear regression model was chosen to model the behavior of the WHI with respect to SPI, GDP, and WGI.
+
+\section{Representative Country Selection}
+
+In order to find the countries to model and analyze deeper, a selective process must be made to categorize each country into groups. 
+
+This selective process was utilizing the medians of each variable for each country (i.e. creating a dataframe of each country's variables' medians). This would remove the element of time and let only each country have one instance. 
+
+This would let the iterative clustering process group the countries more efficiently.
+
+The clustering that provided that most defined groups will be used as the grouping.
+
+\subsection{K-Means Clustering}
+
+A K-Means clustering machine learning algorithm was applied to the datasets for WHI with respect to each predictor variable.
+
+![K-Means plot result]("kmeansplot.png")
+
+By this plot, WHI with respect to SPI seems to have the most defined clusters. And so, this grouping will be used to label the observations.
+
+The labels were attached to each of their respective observation (i.e. country), and this allows the countries to be grouped.
+
+![A snapshot of the final dataframe holding the median values of each country and their respective cluster group label from the K-Means algorithm]("medsnapshot.png")
+
+\subsubsection{K-Means Analysis}
+
+After grouping, the country with a median WHI value closest to the value of the K-Means algorithm's centroids will be used as the representative countries for each group.
+
+The median dataframe was vectorized by a distance formula to see which observation had the lowest distance to the centroid.
+
+France, Montenegro, and Ethiopia were the closest countries to their respective centroids. 
+
+![France's plots on WHI with respect to each predictor variable]("francestats.png")
+
+![Montenegro's plots on WHI with respect to each predictor variable]("montstats.png")
+
+![Ethiopia's plots on WHI with respect to each predictor variables]("ethiostats.png")
+
+This makes them the representative countries for their group. These countries will now be statistically analyzed.
+
+\section{Statistical Analysis and Research Conclusion}
+
+After finding the corresponding representatives of each group of countries, statistically analyzing them will provide a very general idea of how we can expect each group to behave.
+
+As a word of precaution, the following models have gone through power transformation algorithms to fix the diagnosis plots' results, but there was little change to any of the models.
+
+\subsection{France}
+
+\subsubsection{Linear Model Diagnosis}
+
+![France's Diagnostic plots]("francediag.png")
+
+The residual vs fitted plot is generally scattered, which implies a good sense of linearity. However, the trend is slightly downward, which may imply inconsistent variance.
+
+The normal plot has most of the points following the normal line, so normality can be generally assumed.
+
+The scale-location plot showcases the plots to be generally randomly scattered, but the trend is seeming to be somewhat positive. This implies slight inconsistent variance.
+
+There are 4 points that have high leverage and influence via Cook's distance, which negatively heavily affects the linear model.
+
+The VIF table shows SPI and WGI to be highly collinear.
+
+In conclusion, the model's faults include: highly collinear variables, a handful of bad leverage and influence points, and possible heteroscedasticity.
+
+\subsubsection{Statistical Interpretation}
+
+![France's linear model's summary stats]("francelmstats.png")
+
+The following analysis is assuming that the model is valid.
+
+Under a 10% significance level, the intercept and SPI are not statistically significant. The GDP and WGI are statistically significant.
+
+This can be interpreted that as GDP increases in France, the higher WHI gets. On the other hand, as WGI increases, WHI decreases.
+
+\subsection{Montenegro}
+
+\subsubsection{Linear Model Diagnosis}
+
+![Montenegro's Diagnostic plots]("montdiag.png")
+
+The residual vs fitted values plot shows a general scatter, which implies that linearity can be assumed.
+
+The QQ plot shows the plots generally following the line, which implies that normality can be assumed.
+
+The scale-location plot shows the plots generally scattered, but there is a slight downward trend, which implies there might be inconsistent variance.
+
+There are 2 points that have high bad leverage and high influence via Cook's distance. These points are negatively affecting the model.
+
+The VIF table shows that WGI and GDP are highly collinear.
+
+In conclusion, the model's faults include: highly collinear variables, a handful of bad leverage and influence points, and possible heteroscedasticity. 
+
+\subsubsection{Statistical Interpretation}
+
+![Montenegro's linear model's summary stats]("montlmstats.png")
+
+Under a 10% significance level, the intercept and SPI are not statistically significant. The GDP and WGI are statistically significant.
+
+GDP and WGI have negative coefficients.
+
+This implies as GDP increases, WHI decreases. Also, this implies as WGI increases, WHI decreases.
+
+\subsection{Ethiopia}
+
+\subsubsection{Linear Model Diagnosis}
+
+![Ethiopia's diagnostic plots]("ethiodiag.png")
+
+The residuals vs fitted values plot shows a general scatter, which implies that linearity can be assumed.
+
+The QQ plot shows that plots following the line well.
+
+The scale-location plot is generally scattered, which implies that there is homeoscedasticity.
+
+There is only 1 point that has high bad leverage and high influence, hurting the model.
+
+The VIF table shows that GDP and SPI are highly collinear.
+
+In conclusion, the model's faults is highly collinear variables.
+
+\subsubsection{Statistical Interpretation}
+
+![Ethiopia's linear model's summary stats]("ethiolmstats.png")
+
+Under a 10% significance level, the intercept is barely significant, but close enough to consider is somewhat significant. GDP and WGI are not significant. SPI is significant.
+
+SPI has a negative coefficient.
+
+This implies that as SPI increases, the WHI decreases.
+
+\subsection{Analysis Conclusion}
+
+In layman's terms and generally applying this analysis to the rest of the clusters, for countries in group 1, there is evidence that as the economic success of the country increases, happiness of the country also increases. However, the more kind and giving a group 1 country is, the less happy the country is.
+
+In regards to group 2, the higher the economic success and the more kind a group 2 country is, the less happy the country is.
+
+In regards to group 3, the more socially progressed the group 3 country is, the less happy the country is.
+
+\chapter{Limitations and Possible Further Research}
+
+As this project progressed, multiple tangents came up that can be resolved or further investigated in the future for this research.
+
+\section{Limitations}
+
+\subsection{K-Means Grouping Selection Method Has Little Mathematical Support}
+
+Using the medians of each country is not necessarily the best way to grab the best representative value for the country's statistics. Another method would have provided a more applicable grading scale for the clustering method to use.
+
+In addition, just because the clustering method grouped the country's together, there is no mathematical process that can support general assumption that a "representative" country can vaguely describe the behaviors of other countries in the same clustered group.
+
+\subsection{Interpolation/Extrapolation Strategies}
+
+Cubic spline interpolation is not the best interpolation method for a highly volatile index such as WHI. Another interpolation method that could have been used would be a seasonal adjusted interpolating algorithm, that takes into account the error in the previous history and applies it to the interpolating equation. In addition, a more robust extrapolation algorithm could be used besides extending an interpolating algorithm past its scope.
+
+\subsection{Too Few Years as Scope}
+
+For a more in-depth analysis on the statistics of the countries, there should have been more years provided for the WHI. However, the earliest year provided for WHI was 2013, and even then, 2013's data was not available to the public to access and manipulate. And so, too few years were available to provide a large enough sample to diagnose the model or be strongly confident in the statistical analysis.
+
+\subsection{Too Few Countries Post-Filter}
+
+The cross-referencing work done between the different datasets showed that not every organization survey the same countries nor do they make sure that the data is correctly inputted. This let too few countries make it past the filtering process.
+
+\section{Further Research}
+
+\subsection{Analyzing Each Country}
+
+A much larger scale project could be to statistically analyze each country rather than clustering them and obtaining a representative of the cluster. This would allow a general census on each country rather than arbitrarily applying a conclusion on one country based on another's analysis.
+
+\section{Further External Research}
+
+\subsection{Analyzing Why Certain Countries Had Missing Data}
+
+There could be a project that utilizes the fact there were many missing data across the multiple datasets used for this project. There must be a correlating factor between the capabilities for an organization to obtain information from that country and the actual status of that country.
+
+\chapter{Program Demonstration}
+
+When running `main.py`, the program greets the user with a welcome message. It then requests an input to see which group the user wants to see the statistical results of.
+
+![]("program1.png")
+![]("program2.png")
+
+With every line that it asks the user to press enter to continue, the previously mentioned plots are printed out (e.g. K-means plot, basic time series plots, linear model summary stats, and diagnostic plots)
+
+\chapter{References}
+
+World Happiness Report, https://worldhappiness.report
+
+GDP Report Per Country Per Year, https://datahub.io/core/gdp
+
+Social Progress Index, https://www.socialprogress.org
+
+World Giving Index, https://www.kaggle.com/datasets/vislupus/caf-world-giving-index
