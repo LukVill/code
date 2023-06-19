@@ -1,11 +1,9 @@
 ---
-title: "Best Feature for a Country's Happiness"
-author: "Luke Villanueva"
-date: "`r format(Sys.Date(), '%D')`"
+title: "Best Predictive Feature for a Country's Happiness"
+author: "Luke Villanueva, University of California - Los Angeles"
 output:
   pdf_document:
     toc: true
-    number_sections: true
     extra_dependencies: ["amsmath"]
 documentclass: report  
 ---
