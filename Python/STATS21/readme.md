@@ -1,6 +1,6 @@
 # Best Predictive Feature for a Country's Happiness
 
-![]("readmebanner.png")
+![](readmebanner.png)
 
 ## Abstract: 
 This data analysis focuses on finding which social factor has the most effect on the happiness level of specific countries. The predictive variables considered are Social Progress Index (SPI), gross domestic product (GDP), World Giving
