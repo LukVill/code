@@ -1,0 +1,165 @@
+---
+title: "Stats102A, Summer 2023 - Homework 1"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+  extra_dependencies: ["amsmath"]
+---
+  
+```{r}
+source("206039397_stats102a_hw1.R")
+```
+
+# Greatest Common Divisor Algorithm
+```
+INPUT val1, val2
+
+IF val1 has decimals OR val2 has decimals
+  STOP
+END IF
+
+IF val1 > val2
+  SET bigval = val1
+  SET smallval = val2
+END IF
+ELSE
+  SET bigval = val2
+  SET smallval = val1
+END ELSE
+  
+SET rval = bigval MODULUS smallval
+
+WHILE rval != 0
+  SET bigval = smallval
+  SET smallval = rval
+  SET rval = bigval MODULUS smallval
+END WHILE  
+
+RETURN rval
+
+```
+
+# Least Common Multiple Algorithm
+
+```
+
+INPUT vec
+
+IF length(vec) < 2 OR length(vec) > 100
+  STOP program
+END IF
+
+IF any of vec are decimals
+ STOP
+END IF
+
+SET total = vec[0]
+SET vec = vec[1:length(vec)]
+
+FOR i in 0:length(vec)
+  total = (total * vec[i])/gcd(total, vec[i])
+end for
+
+RETURN total
+
+```
+
+# Prime Factorization Algorithm
+
+```
+
+FUNCTION get_factors
+  INPUT n
+  
+  IF n has decimals
+    STOP
+  END IF
+  
+  DECLARE list[]
+
+  FOR i = 2 UNTIL i ==  n - 1
+    IF is_prime(i) AND n %% i == 0 AND i not in list[primes]
+      SET expCount = 0
+      SET temp_num = n
+      WHILE temp_num %% i == 0
+        SET expCount += 1
+        SET temp_num /= i
+      END WHILE
+      SET list[primes] += i
+      SET list[exponents] += expCount
+    END IF
+  END FOR 
+
+  IF list is empty
+    list = list[primes] + n
+    list = list[exponents] + 1
+  END IF
+  
+  list = 1 + list[primes]
+  list = 1 + list[exponents]
+
+  RETURN list
+
+END FUNCTION
+
+FUNCTION is_prime
+  INPUT num
+  
+  IF any are decimals
+    STOP
+  END IF
+  
+  SET primebool = TRUE
+  
+  FOR i = 2 UNTIL i == num - 1
+    IF num MODULUS i == 0 
+      SET primebool = FALSE
+    END IF
+  END FOR
+  
+  RETURN primebool
+  
+END FUNCTION
+
+```
+
+# GCD/LCM Showcase
+```{r, error=TRUE}
+
+gcd(72, 8)
+
+gcd(-1,531)
+
+gcd(47011,73618)
+
+gcd(1,NA)
+
+lcm(c(-12,21))
+
+lcm(c(-12,21))
+
+lcm(c(4789,6123,199))
+
+lcm(c(NA,2,-1))
+
+```
+
+# Prime Factorization Showcase
+
+```{r, error=TRUE}
+
+is_prime(c(9,7))
+
+get_factors(1920)
+
+get_factors(1.92)
+
+x <- sample(x = 1e4, size = 1)
+y <- get_factors(x)
+this_works <- prod(y$primes^y$exponents) == x & all(is_prime(y$primes))
+this_works
+
+get_factors(NA)
+
+```
