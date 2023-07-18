@@ -1,0 +1,350 @@
+---
+title: "Stats102A, Summer 2023 - Homework 1"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+  extra_dependencies: ["amsmath"]
+---
+
+```{r include=F}
+library(stringr)
+library(tidyverse)
+library(tidyr)
+
+source("206039397_stats102a_hw2.R")
+```
+
+# Algorithm Pseudocodes
+
+## Gradebook Simulation — gen_gradebook()
+
+```
+FUNCTION gen_gradebook()
+
+  SET seed to UID
+  
+  FUNCTION gen_score
+    RETURN random double from 0-1 * 100, change to integer
+  END FUNCTION
+  
+  FUNCTION gen_UID
+    SET rnum = random double from 0-3
+    SET num = character of rnum, substring from index 0-9
+    SET indx = index of "." in num
+    SET res = substring of num from 1 to indx + substring of num from indx + 1 to length of num
+    RETURN res
+  END FUNCTION
+
+  SET nStudents = 100
+  
+  SET gradebook = data frame, row = nStudents, col = 11
+  
+  SET column names of gradebook = "UID","Homework_1",
+                           "Homework_2","Homework_3",
+                           "Homework_4","Homework_5",
+                           "Quiz_1","Quiz_2","Quiz_3",
+                           "Quiz_4","Quiz_5"
+                           
+  SET uid = empty vector
+  
+  FOR i in vector 1:nStudents
+    SET uid = uid + gen_UID()
+  END FOR
+  SET gradebook[,"UID"] = uid
+  
+  FOR col in columns of gradebook WITHOUT UID
+    SET grades = empty vector
+    FOR i in 1:nStudents
+      SET grades = grades + gen_score()
+    END FOR
+    SET gradebook[,col] = grades
+  END FOR
+
+  RETURN gradebook
+
+END FUNCTION
+```
+
+## NA Replace — na.replace()
+```
+
+FUNCTION na.replace(vec, percent = 10)
+
+  FUNCTION get_random_index(vec)
+    RETURN random number from 1-length of vec INCLUSIVE
+  END FUNCTION
+  
+  SET res = vec
+  
+  IF percent is not number
+    STOP
+  END IF
+  IF any NA's in vec
+    WARNING
+  END IF
+  IF percent % 1 != 0
+    STOP
+  END IF
+  IF percent < 0
+    STOP
+  END IF
+  IF percent == 0
+    STOP
+  END IF
+  IF percent > 100
+    STOP
+  END IF
+  
+  SET percent = percent / 100
+  
+  SET needed_nas = roundup(percent * length(vec))
+  
+  SET n_na = length(vector of indices of na's in vec)
+  
+  SET na_left = needed_nas - n_na
+  
+  WHILE na_left > 0
+  
+    SET indx = NA
+    
+    WHILE indx is NA
+      SET indx = get_random_index(vec)
+    END WHILE 
+    
+    SET res[indx] = NA
+    SET na_left = na_left - 1
+    
+  END WHILE
+  
+  RETURN res
+
+END FUNCTION
+
+```
+
+
+
+# 1. Teacher's Gradebook
+
+## a.
+```{r}
+gradebook <- gen_gradebook()
+```
+
+## b.
+
+```{r na.replace implementation}
+
+# randomly replace data in vector with NA
+# percent is inputted as an integer
+# function will AT LEAST make the NA percent, but it can over do it
+na.replace <- function(vec,percent = 10)
+{
+  
+  # function to pick random index in vec
+  get_random_index <- function(vec)
+  {
+    floor(runif(1,min = 1, max = length(vec)+1))
+  }
+  
+  # result vector
+  res <- vec
+  
+  # default of percent is 10
+  
+  # input validation for percent
+  if(!is.numeric(percent))
+  {
+    stop("inputted percent is not numeric")
+  }
+  if(length(percent) != 1)
+  {
+    stop("inputted percent is a vector, and should be one value")
+  }
+  
+  # input validation for vec
+  # send warning if there are na's in vec already, telling user
+  # that those na's will count too
+  if(any(is.na(vec)))
+  {warning("there exists NA's in inputted vector. 
+           These NA's will count towards the percentage of NA's")}
+  
+  # check if percent is inputted as a decimal
+  if(percent %% 1 != 0)
+  {stop("inputted percent is decimal, but should be integer")}
+  
+  # check if percent is negative
+  if(percent < 0)
+  {stop("inputted percent should be nonnegative")}
+  
+  # check if percent is 0
+  if(percent == 0)
+  {warning("inputted percent is 0, should be positive; function will still run")}
+  
+  # check if percent is bigger than 100 percent
+  if(percent > 100)
+  {stop("inputted percent is greater than 100, should be from 1-100")}
+  
+  # get how many to change to reach at least 10 percent
+  percent <- percent / 100
+  # round up to get AT LEAST percent
+  needed_nas <- ceiling(percent * length(vec))
+
+  # count how many NAs, subtract current NA's from 
+  n_na <- length(which(is.na(vec)))
+  
+  
+  # get percentage of NA's left to do
+  na_left <- needed_nas - n_na
+  
+  # while there are na left to make
+  while(na_left > 0)
+  {
+    # get random indx
+    indx <- NA
+    # check if not already NA
+    while(is.na(indx))
+    {indx <- get_random_index(vec)}
+    
+    # once we get here, indx is not NA, so change to NA
+    res[indx] <- NA
+    
+    # update na_left counter
+    na_left <- na_left - 1
+  }
+  
+  # no more needed na's, so return vec
+  return(res)
+  
+}
+
+```
+
+
+```{r replace na's}
+
+gradebook$Homework_4 <- na.replace(gradebook$Homework_4,10)
+gradebook$Quiz_4 <- na.replace(gradebook$Quiz_4,10)
+
+# show there are 10 na's in specific columns
+sum(is.na(gradebook$Homework_4))
+sum(is.na(gradebook$Quiz_4))
+
+```
+
+## c. Messy Impute - messy_impute()
+
+```
+
+FUNCTION messy_impute()
+
+  INPUT df, center = "mean", margin, ...
+  
+  IF df is not the right class
+    STOP
+  END IF
+  
+  IF df cols != "UID","Homework_1",
+                       "Homework_2","Homework_3",
+                       "Homework_4","Homework_5",
+                       "Quiz_1","Quiz_2","Quiz_3",
+                       "Quiz_4","Quiz_5"
+    STOP
+  END IF
+  
+  IF df does not have valid dimensions
+    STOP
+  END IF
+  
+  IF center is not character OR chars in center > 1 OR center != "mean" or "median"
+    STOP
+  END IF
+  
+  IF margin is not numeric OR length margin > 1
+    STOP
+  END IF
+  
+  
+  FOR col in columns of df[1:length(df)]
+    SET df[,col] = numeric of df[,col]
+  END FOR
+  
+  SET fun = NULL
+  IF center == "mean"
+    SET fun = mean()
+  END IF
+  ELSE
+    SET fun == median()
+  END ELSE
+  
+  
+  IF margin == 1
+  
+    FOR row in rows of df
+      IF any of df[row,] is NA
+        SET impute_val = round(fun(double(df[row,-1]), remove NA's, ...), digitRound = 2)
+        
+        FOR i in indices of df[row,] == NA
+          SET df[row,i] == impute_val
+        END FOR
+        
+    END FOR
+  
+  END IF
+  
+  ELSE 
+  
+    FOR col in cols of df
+      IF any of df[,col] is NA
+        SET impute_val = round(fun(double(df[,col]), remove NA's, ...), digitRound = 2)
+        
+        FOR i in indices of df[,col] == NA
+          SET df[i,col] == impute_val
+        END FOR
+    END FOR
+  
+  END ELSE
+
+  FOR col in cols of df
+    SET df[i,col] = formatted to character rounded to 2 digits
+  END FOR
+
+  RETURN df   
+
+END FUNCTION
+
+```
+
+## d. 
+
+```{r}
+
+# selecting and printing two students with missing HW 4 and missing Q4
+
+print("Students missing Homework_4:")
+
+print(gradebook %>% filter(is.na(Homework_4)) %>% slice(1:2))
+
+print("Students missing Quiz_4:")
+
+print(gradebook %>% filter(is.na(Quiz_4)) %>% slice(1:2))
+
+
+# messy_impute cases
+messy_impute(gradebook,"mean", 1)
+messy_impute(gradebook, "median", 2)
+messy_impute(gradebook, "mean", 1, trim = 0.25)
+
+```
+
+## e. gradebook_tidy - tidify()
+
+```{r}
+
+tidy_impute <- function()
+{
+  
+}
+
+```
