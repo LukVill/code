@@ -1,5 +1,5 @@
 ---
-title: "Stats102A, Summer 2023 - Homework 1"
+title: "Stats102A, Summer 2023 - Homework 2"
 author: "Luke Villanueva - 206039397"
 date: "`r format(Sys.Date(), '%D')`"
 output:
@@ -15,9 +15,9 @@ library(tidyr)
 source("206039397_stats102a_hw2.R")
 ```
 
-# Algorithm Pseudocodes
+# 1. Teacher's Gradebook
 
-## Gradebook Simulation — gen_gradebook()
+## a.
 
 ```
 FUNCTION gen_gradebook()
@@ -66,7 +66,12 @@ FUNCTION gen_gradebook()
 END FUNCTION
 ```
 
-## NA Replace — na.replace()
+```{r}
+gradebook <- gen_gradebook()
+```
+
+## b.
+
 ```
 
 FUNCTION na.replace(vec, percent = 10)
@@ -122,17 +127,6 @@ FUNCTION na.replace(vec, percent = 10)
 END FUNCTION
 
 ```
-
-
-
-# 1. Teacher's Gradebook
-
-## a.
-```{r}
-gradebook <- gen_gradebook()
-```
-
-## b.
 
 ```{r na.replace implementation}
 
@@ -221,8 +215,7 @@ na.replace <- function(vec,percent = 10)
 
 ```
 
-
-```{r replace na's}
+```{r}
 
 gradebook$Homework_4 <- na.replace(gradebook$Homework_4,10)
 gradebook$Quiz_4 <- na.replace(gradebook$Quiz_4,10)
@@ -330,11 +323,30 @@ print("Students missing Quiz_4:")
 
 print(gradebook %>% filter(is.na(Quiz_4)) %>% slice(1:2))
 
+```
 
+```{r}
+# get UID of example students
+na_uids <- gradebook %>% mutate(index = rownames(gradebook)) %>% filter(is.na(Homework_4)) %>% slice(1:2)
+
+na_uids <- rbind(na_uids, gradebook %>% mutate(index = rownames(gradebook)) %>% filter(is.na(Quiz_4)) %>% slice(1:2))
+
+# get indices of example students
+indx <- as.numeric(na_uids %>% pull(index))
+
+# print example students
+gradebook %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+
+```
+
+```{r}
 # messy_impute cases
-messy_impute(gradebook,"mean", 1)
-messy_impute(gradebook, "median", 2)
-messy_impute(gradebook, "mean", 1, trim = 0.25)
+messy_impute(gradebook,"mean", 1) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+messy_impute(gradebook,"mean", 2) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+messy_impute(gradebook,"median", 1) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+messy_impute(gradebook,"median", 2) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+messy_impute(gradebook,"mean", 1, trim = 0.25) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
+messy_impute(gradebook,"mean", 2, trim= 0.25) %>% mutate(index = as.numeric(rownames(gradebook))) %>% slice(indx) %>% select(-index)
 
 ```
 
@@ -342,9 +354,205 @@ messy_impute(gradebook, "mean", 1, trim = 0.25)
 
 ```{r}
 
-tidy_impute <- function()
+# assumes there is gradebook name
+tidify_gradebook <- function()
 {
+  
+  # INPUT VALIDATION
+  if(!exists("gradebook"))
+  {stop("there should exists a \"gradebook\" object that holds UID, Homeworks, Quizzes")}
+  
+  # work with homework, mutate order of homework
+  hw <- gradebook %>% select(c("UID","Homework_1","Homework_2","Homework_3","Homework_4","Homework_5")) %>% pivot_longer(c("Homework_1","Homework_2","Homework_3","Homework_4","Homework_5"), names_to = "Homework_Num", values_to = "HW_Score") %>% mutate(order_num = as.numeric(substr(Homework_Num,10,length(Homework_Num))))
+  
+  # work with quizzes, mutate order
+  qz <- gradebook %>% select(c("UID","Quiz_1","Quiz_2","Quiz_3","Quiz_4","Quiz_5")) %>% pivot_longer(c("Quiz_1","Quiz_2","Quiz_3","Quiz_4","Quiz_5"), names_to = "Quiz_Num", values_to = "Q_Score") %>% mutate(order_num = as.numeric(substr(Quiz_Num,6,length(Quiz_Num))))
+  
+  res <- hw %>% left_join(qz, by = c("UID","order_num")) %>% select(c("UID", "order_num","HW_Score", "Q_Score")) %>% rename(Assgn_Num = order_num, Homework = HW_Score, Quiz = Q_Score)
+  
+  return(res)
   
 }
 
+gradebook_tidy <- tidify_gradebook()
+
+```
+
+## f. tidy_impute()
+
+```
+
+FUNCTION tidy_impute()
+
+  INPUT df, center = "mean", margin, ...
+  
+  IF df is not the right class
+    STOP
+  END IF
+  
+  IF df cols != "UID","Assgn_Number", "Homework", "Quiz"
+    STOP
+  END IF
+  
+  IF df does not have valid dimensions
+    STOP
+  END IF
+  
+  IF center is not character OR chars in center > 1 OR center != "mean" or "median"
+    STOP
+  END IF
+  
+  IF margin is not numeric OR length margin > 1
+    STOP
+  END IF
+  
+  
+  FOR col in columns of df[3:4]
+    SET df[,col] = numeric of df[,col]
+  END FOR
+  
+  SET fun = NULL
+  IF center == "mean"
+    SET fun = mean()
+  END IF
+  ELSE
+    SET fun == median()
+  END ELSE
+  
+  
+  IF margin == 1
+  
+    FOR row in rows of df
+      IF any of df[row,] is NA
+        SET impute_val = round(fun(double(df[row,3:4]), remove NA's, ...), digitRound = 2)
+        
+        FOR i in indices of df[row,] == NA
+          SET df[row,i] == impute_val
+        END FOR
+        
+    END FOR
+  
+  END IF
+  
+  ELSE 
+  
+    FOR col in cols of df[3:4]
+      IF any of df[,col] is NA
+        SET impute_val = round(fun(double(df[,col]), remove NA's, ...), digitRound = 2)
+        
+        FOR i in indices of df[,col] == NA
+          SET df[i,col] == impute_val
+        END FOR
+    END FOR
+  
+  END ELSE
+
+  FOR col in cols of df [3:4]
+    SET df[i,col] = formatted to character rounded to 2 digits
+  END FOR
+
+  RETURN df   
+
+END FUNCTION
+
+```
+
+## g. tidy_impute Demo
+
+```{r}
+
+# get UID of example students
+na_uids <- gradebook_tidy %>% mutate(index = rownames(gradebook_tidy)) %>% filter(is.na(Homework)) %>% slice(1:2)
+
+na_uids <- rbind(na_uids, gradebook_tidy %>% mutate(index = rownames(gradebook_tidy)) %>% filter(is.na(Quiz)) %>% slice(1:2))
+
+# get indices of example students
+indx <- as.numeric(na_uids %>% pull(index))
+
+# print example students
+gradebook_tidy %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+```
+
+```{r}
+
+
+tidy_impute(gradebook_tidy,"mean", 1) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+
+tidy_impute(gradebook_tidy,"mean", 2) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+tidy_impute(gradebook_tidy, "median", 1) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+tidy_impute(gradebook_tidy, "median", 2) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+tidy_impute(gradebook_tidy, "mean", 1, trim = 0.25) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+tidy_impute(gradebook_tidy, "mean", 2, trim = 0.25) %>% mutate(index = as.numeric(rownames(gradebook_tidy))) %>% slice(indx) %>% select(-index)
+
+
+```
+
+
+# 2. Short Answers
+
+## a.
+
+```{r}
+
+gdp <- read.csv("gdp-countries.csv")
+
+# display 10 observations
+sampGdp <- gdp[1:10,]
+# first 10 cols
+print(sampGdp[,1:10])
+
+web <- read.csv("Most Popular websites.csv")
+
+sampWeb <- web[1:10,]
+# first 10 cols
+print(sampWeb[,1:10])
+
+watch <- read.csv("swiss watch brands.csv")
+
+sampWatch <- watch[1:10,]
+# first 10 cols
+print(sampWatch[,1:10])
+
+```
+
+The dataset `gdp` displays each country's GDP over time. Only the country's name and GDP were explicitly collected. The row order is assumed to be the years increasing. The rows are GDP over time and the columns are country names.
+
+[LINK TO GDP](https://www.kaggle.com/datasets/iamtushara/gdp-timeseries-data-for-various-countries?select=gdp-countries.csv)
+
+The dataset `web` shows the popularity of each listed website. Website name, where the image of the company can be located, and the years with the respective website popularity were collected. The rows are different websites and the columns are the website names, image location, and years.
+
+[LINK TO WEB](https://www.kaggle.com/datasets/mathurinache/mostpopularwebsites)
+
+The dataset `watch` shows an undisclosed measured metric of different watch brands over time. The rows are different brands and the columns are the metric changing over time.
+
+[LINK TO WATCH](https://www.kaggle.com/datasets/mathurinache/swisswatchbrands)
+
+## b.
+
+### Tidy gdp
+
+```{r}
+# print first 10 rows
+print("sampGdp First 10 Rows:")
+print((sampGdp %>% mutate(time = as.numeric(rownames(sampGdp))) %>% pivot_longer(colnames(sampGdp), names_to = "Countries", values_to = "GDP"))[1:10,])
+```
+
+### Tidy web
+
+```{r}
+# print first 10 rows
+print((web %>% pivot_longer(colnames(web)[-c(1,2)], names_to = "Years", values_to = "Popularity") %>% mutate(Years = substr(Years,2,length(Years))))[1:10,]) 
+```
+
+### Tidy watch
+
+```{r}
+# print first 10 rows
+print((sampWatch %>% pivot_longer(colnames(sampWatch)[-c(1,2)], names_to = "Years", values_to = "Measure") %>% mutate(Years = substr(Years,2,length(Years))))[1:10,])
 ```

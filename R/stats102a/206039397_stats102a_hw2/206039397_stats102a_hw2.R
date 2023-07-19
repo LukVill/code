@@ -2,8 +2,6 @@ library(stringr)
 library(tidyverse)
 library(tidyr)
 
-# Prompt 1
-
 # ALL VALUES ARE CHARACTERS
 gen_gradebook <- function()
 {
@@ -183,7 +181,7 @@ messy_impute <- function(df, center = "mean", margin,...)
   }
   
   # format all values to character and two decimals
-  for(col in colnames(gradebook)[-1])
+  for(col in colnames(df)[-1])
   {
     df[,col] <- format(round(df[,col],2), nsmall = 2)
   }
@@ -193,6 +191,112 @@ messy_impute <- function(df, center = "mean", margin,...)
   
 }
 
-gradebook <- gen_gradebook()
+# tidy_impute()
 
-# Prompt 2
+tidy_impute <- function(df, center = "mean", margin,...)
+{
+  
+  # df
+  if(!("tbl" %in% attributes(df)$class) & 
+     !("data.frame" %in% attributes(df)$class))
+  {stop("input df should be tibble and/or data.frame object")}
+  # check col vals
+  if(!all(colnames(df) %in% c("UID","Assgn_Num",
+                              "Homework","Quiz")))
+  {stop("input df should be gradebook object with correct column names")}
+  # check num of cols
+  if(length(colnames(df)) != 4)
+  {stop("input df should have 4 columns")}
+  if(!all(is.character(df$UID)))
+  {stop("input df has invalid UID values")}
+  # make sure dimensions of df are valid
+  if(nrow(df) < 1 & ncol(df) < 1)
+  {stop("input df has invalid dimensions")}
+  
+  # center
+  if(!is.character(center) | length(center) > 1)
+  {stop("input center should be type character and length 1")}
+  if(center != "mean" & center != "median")
+  {stop("input center can only be \"mean\" or \"median\"")}
+  
+  # margin
+  if(!is.numeric(margin) | length(margin) > 1)
+  {stop("input margin should be numeric and length 1")}
+  if(margin != 1 & margin != 2)
+  {stop("input margin can only be 1 or 2")}
+  if(margin == 1)
+  {warning("input margin says to impute via row, i.e. missing value
+           will copy other value. The code will still run")}
+  
+  # ALGORITHM
+
+  # INITIAL CONVERSION
+  for(col in colnames(df)[-c(1,2)])
+  {
+    df[,col] <- as.numeric(unlist(df[,col]))
+  }
+  
+  # check if center is mean or median
+  fun <- NULL
+  if(center == "mean")
+  {
+    fun <- mean
+  }
+  else
+  {
+    fun <- median
+  }
+  
+  # row wise NA change
+  if(margin == 1)
+  {
+    for(row in seq_len(nrow(df)))
+    {
+      # if there is NA, impute algorithm
+      if(any(is.na(df[row,])))
+      {
+        impute_val <- round(fun(as.numeric(as.vector(df[row,c(3,4)])), 
+                                na.rm = T, ...), 
+                            digits = 2)
+        
+        # for all NA's in df, change values
+        for(i in which(is.na(df[row,])))
+        {
+          df[row,i] <- impute_val
+        }
+      }
+    }
+  }
+  
+
+  # col wise NA change
+  else
+  {
+    for(col in seq_len(ncol(df))[-c(1,2)])
+    {
+      # if there is NA, impute algorithm
+      if(any(is.na(df[,col])))
+      {
+        impute_val <- round(fun(as.numeric(unlist(df[,col])), 
+                                na.rm = T, ...), 
+                            digits = 2)
+        # for all NA's in df, change values
+        for(i in which(is.na(df[,col])))
+        {
+          df[i,col] <- impute_val
+        }
+      }
+    }
+  }
+    
+
+  # format all values to character and two decimals
+  for(col in colnames(df)[-c(1,2)])
+  {
+    df[,col] <- format(round(df[[col]],2), nsmall = 2)
+  }
+  
+  # done changing NAs
+  return(df)
+  
+}
