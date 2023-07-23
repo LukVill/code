@@ -1,0 +1,52 @@
+---
+title: "Stats102A, Summer 2023 - Homework 3"
+author: "Luke Villanueva - 206039397"
+date: "`r format(Sys.Date(), '%D')`"
+output:
+  pdf_document:
+  extra_dependencies: ["amsmath"]
+---
+
+```{r include=F}
+library(dplyr)
+library(stringr)
+library(tidyr)
+source("206039397_stats102a_hw3.R")
+```
+
+# 1. Cook's relational data
+
+```{r}
+food <- read.csv("food_item.csv")
+ingredient <- read.csv("ingredient.csv")
+recipe <- read.csv("recipe.csv")
+stock <- read.csv("stock.csv")
+```
+
+## a.
+
+```{r}
+ingredient %>% filter(recipe == "Beef Burger") %>% pull(food_item)
+```
+
+## b.
+
+```{r}
+ingredient %>% filter(grepl("TOMATO|BREAD",toupper(food_item)))
+```
+
+## c.
+
+```{r}
+food %>% filter(type == "Meat") %>% rename(food_item = item) %>% left_join(stock, by = "food_item") %>% filter(shop %in% c("MyMart","Coco Mart")) %>% select(-3)
+```
+
+## d.
+
+```{r}
+food %>% filter(type == "Wheat product") %>% rename(food_item = item) %>% left_join(ingredient, by = "food_item") %>% group_by(recipe) %>% summarise(sum_wheat_prod_cal = sum(weight..oz.))
+```
+
+
+# 2. Regular Expression Exercises
+
