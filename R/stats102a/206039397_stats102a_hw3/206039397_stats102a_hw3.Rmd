@@ -32,21 +32,94 @@ ingredient %>% filter(recipe == "Beef Burger") %>% pull(food_item)
 ## b.
 
 ```{r}
-ingredient %>% filter(grepl("TOMATO|BREAD",toupper(food_item)))
+ingredient %>% filter(str_detect(toupper(food_item),"TOMATO|BREAD"))
 ```
 
 ## c.
 
 ```{r}
-food %>% filter(type == "Meat") %>% rename(food_item = item) %>% left_join(stock, by = "food_item") %>% filter(shop %in% c("MyMart","Coco Mart")) %>% select(-3)
+food %>% filter(type == "Meat") %>% rename(food_item = item) %>% inner_join(stock, by = "food_item") %>% filter(shop %in% c("MyMart","Coco Mart")) %>% select(-3)
 ```
 
 ## d.
 
 ```{r}
-food %>% filter(type == "Wheat product") %>% rename(food_item = item) %>% left_join(ingredient, by = "food_item") %>% group_by(recipe) %>% summarise(sum_wheat_prod_cal = sum(weight..oz.))
+res <- food %>% filter(type == "Wheat product") %>% rename(food_item = item) %>% inner_join(ingredient, by = "food_item") %>% select(recipe) %>% left_join(ingredient, by = "recipe") %>% rename(item = food_item)
+
+# change tomato
+res$item[11] <- "Tomato"
+
+res %>% left_join(food, by = "item") %>% group_by(recipe) %>% summarise(Total_Calories = sum(calories))
 ```
 
 
 # 2. Regular Expression Exercises
+
+## 1.
+
+### a.
+
+```{r}
+pat_1_a(names$names)
+```
+
+### b.
+
+```{r}
+pat_1_b(names$names)
+```
+
+### c.
+
+```{r}
+pat_1_c(names$names)
+```
+
+## 2. 
+
+### a.
+
+```{r}
+pat_2_a(cards$cards)
+```
+
+### b.
+
+```{r}
+pat_2_b(cards$cards)
+```
+
+## 3.
+
+### a.
+
+```{r}
+pat_3_a(passwords$passwords)
+```
+
+### b.
+
+```{r}
+pat_3_b(passwords$passwords)
+```
+
+## 4.
+
+### a.
+
+```{r}
+pat_4_a(wordlists$Ranges$x, wordlists$Ranges$y)
+```
+
+### b.
+
+```{r}
+pat_4_b(wordlists$Backrefs$x, wordlists$Backrefs$y)
+```
+
+### c.
+
+```{r}
+pat_4_c(wordlists$Anchors$x, wordlists$Anchors$y)
+```
 
