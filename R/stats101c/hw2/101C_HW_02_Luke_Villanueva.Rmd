@@ -1,0 +1,206 @@
+---
+title: "Stats 101C - Homework 2"
+author: "Luke Villanueva"
+date: "Summer 2023"
+output:
+  pdf_document: default
+---
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+library(knitr)
+```
+
+Homework questions and instructions copyright Miles Chen, Do not post, share, or distribute without permission.
+
+# Homework 2 Requirements
+
+You will submit two files.
+
+The files you submit will be:
+
+1. `101C_HW_02_First_Last.Rmd` Take the provided R Markdown file and make the necessary edits so that it generates the requested output.
+
+2. `101C_HW_02_First_Last.pdf` Your output file. This must be a PDF. This is the primary file that will be graded. **Make sure all requested output is visible in the output file.**
+
+## Academic Integrity
+
+At the top of your R markdown file, be sure to include the following statement after modifying it with your name.
+
+"By including this statement, I, **Luke Villanueva**, declare that all of the work in this assignment is my own original work. At no time did I look at the code of other students nor did I search for code solutions online. I understand that plagiarism on any single part of this assignment will result in a 0 for the entire assignment and that I will be referred to the dean of students."
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Reading:
+
+- Read: Introduction to Statistical Learning with R: Chapter 3
+- Read: Tidy Modeling with R: Chapter 6 Fitting Models with parsnip
+- Read: Tidy Modeling with R: Chapter 7 A Model Workflow
+- Read: parsnip documentation: linear_regression() https://parsnip.tidymodels.org/reference/linear_reg.html
+- Read: parsnip documentation: fit() https://parsnip.tidymodels.org/reference/fit.html
+
+### DataCamp Homework Part 1 (25 pts)
+
++ Course: Data Manipulation with dplyr
++ https://app.datacamp.com/learn/courses/data-manipulation-with-dplyr
+
+Include certificate of completion here (30 pts):
+
+```{r, out.width="6.5in"}
+include_graphics("certificate.pdf")
+```
+
+
+## DataCamp Homework Part 2 (25 pts)
+
++ Course: Modeling with Data in the Tidyverse
++ https://app.datacamp.com/learn/courses/modeling-with-data-in-the-tidyverse
+
+```{r, out.width="6.5in"}
+include_graphics("certificate2.pdf")
+```
+
+### ISLR Chapter 3 Applied Exercises 
+
+The following questions are based on exercises from ISLR Chapter 3, but I have modified them. You can refer to the original questions in the chapter text if some of the questions are confusing because of missing context.
+
+### Exercise 8 (modified to use tidymodels)
+
+```{r, warning = F, message = F}
+library(ISLR)
+library(tidymodels)
+data(Auto)
+```
+
+step 0. Use `tidymodels` and `rsample` to split Auto into a training set (prop = 0.80) and test set. Use `set.seed(101)` before using `initial_split()`. Stratify on mpg. Report the dimensions of the training and test sets.
+
+a. Use `tidymodels` to fit a simple linear regression model to the training data with mpg as the response and horsepower as the predictor. Use the engine `lm`. Once you fit the model, print the model summary.
+
+If you call `summary()` on the parsnip `model_fit` object, it will print a list summary. To get the traditional `summary()` output associated with lm, use `extract_fit_engine()` along with `summary()`. 
+
+```{r}
+
+set.seed(101)
+
+split <- initial_split(Auto, prop = 0.8, strata = mpg)
+
+trainAuto <- training(split)
+testAuto <- testing(split)
+
+print(paste0("Training: ", nrow(trainAuto)))
+print(paste0("Testing: ", nrow(testAuto)))
+
+```
+
+```{r}
+
+lm_model <- linear_reg() %>% set_engine("lm")
+
+lm_fit <- lm_model %>% fit(mpg ~ horsepower, data = trainAuto)
+
+lm_fit %>% extract_fit_engine() %>% summary() %>% print()
+
+```
+Answer the following questions based on the fit model: 
+
+i. Is there a relationship between the predictor and the response?
+
+  - Answer: Yes, there is a relationship because the slope of horsepower has a p-value of close to 0. Meaning, it is unlikely that the slope is obtained through random sampling (i.e. the slope is statistically significant). Also, the R-squared value is generally high as well. In addition, the F-stat's p-value is close to 0, meaning the predictors generally have a statistically significant relationship.
+
+ii. How strong is the relationship between the predictor and the response?
+
+  - Answer: The relationship is generally strong because the R-squared value is about 0.62. Meaning, around 62% of the total variance is explained by the predictor's variance. This is a generally strong relationship.
+
+iii. Is the relationship between the predictor and the response positive or negative?
+
+  - Answer: The relationship is negative because there is an average of a 0.1595 decrease in mpg as horsepower increases. Meaning, this is a negative relationship.
+
+iv. Make predictions on the test set. Create a new data frame that contains the actual mpg, the prediction made by the model, as well as the lower and upper bounds of a 95% prediction interval. Add another column indicating if the actual mpg value is outside the bounds of the prediction interval. Identify which observations failed to make successful prediction intervals.
+
+```{r}
+
+pred <- lm_fit %>% predict(new_data = testAuto)
+pred_int <- lm_fit %>% predict(new_data = testAuto, type = "pred_int", level = 0.95)
+
+res <- testAuto %>% select(mpg) %>% 
+  mutate(pred = pred %>% pull(.pred), pred_lower = pred_int %>% pull(.pred_lower), pred_upper = pred_int %>% pull(.pred_upper)) %>%
+  mutate(outside_int = if_else(mpg < pred_lower | mpg > pred_upper, TRUE, FALSE))
+
+# identify the failed prediction intervals
+
+res %>% filter(outside_int == TRUE)
+
+```
+
+
+b. Use ggplot and create a plot for the test set with actual mpg on the x-axis and the predicted mpg on the y-axis. Add a geom_abline with a slope of 1 and intercept of 0 (also use lty = 2 to make it dotted) - this line represents where the predictions would be if they were 100% accurate. Add the option `coord_obs_pred()`. Color the observations that failed to make successful prediction intervals a different color from the other observations.
+
+
+```{r}
+
+ggplot(res, aes(x = mpg, y = pred, color = outside_int)) + geom_point() + geom_abline(slope = 1, intercept = 0, lty = 2) + coord_obs_pred()
+
+```
+
+
+### Exercise 9 (modified to use tidymodels)
+
+This exercise involves the use of multiple linear regression on the Auto data set.
+
+Skip part (a). You can make the plot for your own benefit, but don't include it in your HW solutions.
+
+(b) Compute the matrix of correlations between the variables using the function cor(). You will need to exclude the name variable from cor() which is qualitative.
+
+```{r}
+
+Auto %>% select(-name) %>% cor()
+
+```
+
+(c) Use tidymodels with the lm engine to create a multiple linear regression with mpg as the response and all other variables except name as the predictors. Print the summary and answer the following questions:
+
+```{r}
+
+mlm_fit <- linear_reg() %>% set_engine("lm") %>% fit(mpg ~ . - name, data = trainAuto)
+
+mlm_fit %>% extract_fit_engine() %>% summary()
+
+```
+
+i. Is there a relationship between the predictors and the response?
+
+  - Answer: There is a relationship between the predictors and the response because the summary provides that the p-values of the slopes of some variables are statistically significant. However, some are not significant, so not all the predictors have a relationship with the response variable. Also, the r-squared value is 0.83, which means there is a strong correlation between the predictors and the response. In addition, the F-stat's p-value is close to 0, meaning the predictors generally have a statistically significant relationship.
+
+ii. Which predictors appear to have a statistically significant relationship to the response?
+
+  - Answer: Based on a 5% significance level, the significant predictors are displacement, weight, year, and origin.
+
+iii. What does the coefficient for the year variable suggest? 
+
+  - Answer: The coefficient for year suggests that if all other variables were to be controlled, then on average, as year increases by 1, mpg increases by around 0.76.
+
+skip (d)
+
+(e) Use the * and : symbols to fit linear regression models with interaction effects. Do any interactions appear to be statistically significant?
+
+```{r}
+
+autoCols <- colnames(Auto)[-c(1,9)]
+
+recipeObj <- recipe(mpg ~ ., data = Auto) %>% step_rm(name) %>% step_interact(~all_of(autoCols):all_of(autoCols))
+
+wf <- workflow() %>% add_recipe(recipeObj) %>% add_model(lm_model)
+
+wf_fit <- fit(wf, data = Auto)
+
+summary(extract_fit_engine(wf_fit))
+
+```
+
+  - Answer: Based on a 5% significance level, the interactions that are statistically significant would be displacement:year, acceleration:year, and acceleration:origin.
+
+Skip part (f)

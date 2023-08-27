@@ -21,6 +21,12 @@ gen_gradebook <- function()
     
     # get number
     rnum <- runif(1,0,3)
+
+    # remove UID's starting with 0
+    if(as.integer(rnum) < 1)
+    {
+      rnum <- rnum + 1
+    }
     
     # substring from 1 - 11
     num <- substr(as.character(rnum),1,10)
@@ -30,6 +36,8 @@ gen_gradebook <- function()
     
     # take out dot
     res <- paste0(substr(num,1,indx),substr(num,indx+2,nchar(num)))
+    
+    res <- as.numeric(res)
     
     return(res)
     
@@ -101,7 +109,7 @@ messy_impute <- function(df, center = "mean", margin,...)
   # check num of cols
   if(length(colnames(df)) != 11)
   {stop("input df should have 11 columns")}
-  if(!all(is.character(df$UID)))
+  if(!all(is.numeric(df$UID)))
   {stop("input df has invalid UID values")}
   # make sure dimensions of df are valid
   if(nrow(df) < 1 & ncol(df) < 1)
@@ -147,7 +155,7 @@ messy_impute <- function(df, center = "mean", margin,...)
       # if there is NA, impute algorithm
       if(any(is.na(df[row,])))
       {
-        impute_val <- round(fun(as.numeric(as.vector(df[row,-1])), 
+        impute_val <- round(fun(as.numeric(unlist(df[row,-1])), 
                                 na.rm = T, ...), 
                             digits = 2)
         
@@ -168,7 +176,7 @@ messy_impute <- function(df, center = "mean", margin,...)
       # if there is NA, impute algorithm
       if(any(is.na(df[,col])))
       {
-        impute_val <- round(fun(as.numeric(as.vector(df[,col])), 
+        impute_val <- round(fun(as.numeric(unlist(df[,col])), 
                                 na.rm = T, ...), 
                             digits = 2)
         # for all NA's in df, change values
@@ -207,7 +215,7 @@ tidy_impute <- function(df, center = "mean", margin,...)
   # check num of cols
   if(length(colnames(df)) != 4)
   {stop("input df should have 4 columns")}
-  if(!all(is.character(df$UID)))
+  if(!all(is.numeric(df$UID)))
   {stop("input df has invalid UID values")}
   # make sure dimensions of df are valid
   if(nrow(df) < 1 & ncol(df) < 1)
@@ -255,7 +263,7 @@ tidy_impute <- function(df, center = "mean", margin,...)
       # if there is NA, impute algorithm
       if(any(is.na(df[row,])))
       {
-        impute_val <- round(fun(as.numeric(as.vector(df[row,c(3,4)])), 
+        impute_val <- round(fun(as.numeric(unlist(df[row,c(3,4)])), 
                                 na.rm = T, ...), 
                             digits = 2)
         

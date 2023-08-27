@@ -1,0 +1,198 @@
+---
+title: "Stats 101C - Homework 3"
+author: "Your Name"
+date: "Summer 2023"
+output:
+  pdf_document: default
+---
+
+
+```{r, echo = FALSE}
+library(knitr)
+```
+
+Homework questions and instructions copyright Miles Chen, Do not post, share, or distribute without permission.
+
+
+# Homework 2 Requirements
+
+You will submit two files.
+
+The files you submit will be:
+
+1. `101C_HW_02_First_Last.Rmd` Take the provided R Markdown file and make the necessary edits so that it generates the requested output.
+
+2. `101C_HW_02_First_Last.pdf` Your output file. This must be a PDF. This is the primary file that will be graded. **Make sure all requested output is visible in the output file.**
+
+## Academic Integrity
+
+At the top of your R markdown file, be sure to include the following statement after modifying it with your name.
+
+"By including this statement, I, Joe Bruin, declare that all of the work in this assignment is my own original work. At no time did I look at the code of other students nor did I search for code solutions online. I understand that plagiarism on any single part of this assignment will result in a 0 for the entire assignment and that I will be referred to the dean of students."
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading:
+
+- Read: Tidy Modeling with R: Chapters 8-13
+
+### Part 1: DataCamp Homework (25 pts)
+
++ Course: Modeling with tidymodels in R
++ https://app.datacamp.com/learn/courses/modeling-with-tidymodels-in-r
+
+Include certificate of completion here (30 pts):
+
+```{r, out.width="6.5in"}
+include_graphics("certificate.pdf")
+```
+
+
+### Part 2: Use tidymodels to fit a random forest model (50 pts)
+
++ Download the regression data from Kaggle
+
++ Load the tidyverse and tidymodels
+
+```{r}
+
+```
+
+
++ Use read_csv to read in the data. Remove the column `name`. It is present in the training data, but it is not in the testing data. It is there for your reference.
+
+```{r}
+train <- read_csv(...)
+```
+
++ Fold the training data into a 10-fold cross-validation set. Stratify on `percent_dem`. It is recommended to set a seed before your v-fold operation.
+
+```{r}
+set.seed(1)
+train_folds <- ...
+```
+
+
++ Create a parsnip rand_forest model object. Set the appropriate mode. Set the engine to "ranger".
+
+```{r}
+rf_model <- ...
+```
+
++ Create a workflow. Add a very simple formula to predict the outcome variable `percent_dem` based on all other variables except for the variable `id`.
+
+```{r}
+rf_workflow <- ...
+```
+
++ Try fitting the workflow to the set of resamples. Use `fit_resamples`. You will encounter an error because there are some missing values in some columns.
+
+```{r}
+rf_crossval_fit <- ...
+```
+
++ Create a recipe. Begin with a simple formula to predict the outcome variable `percent_dem` based on all other variables. Use `step_rm()` to remove the variable `id` from the recipe. Add a step to impute values for the missing values. For now, use `impute_mean()`. For the competition, you can consider other imputing methods.
+
+```{r}
+rf_recipe <- ...
+```
+
++ Re-Create the workflow. Add the recipe. Add the random forest model.
+
+```{r}
+rf_workflow <- ...
+```
+
+
++ Fit the workflow to the 10-fold cross validation resamples. Use `fit_resamples`. Save the results of fitting.
+
+```{r}
+rf_crossval_fit <- 
+```
+
+
++ Use `collect_metrics()` to get an estimate of the `rmse` for this random forest model. 
+
+```{r}
+# make sure the metrics are visible for the HW grader
+rf_crossval_fit %>% ...
+```
+
+
+For this homework, we have created only one model workflow. For the competition, you will attempt other models and workflows and use `fit_resamples()` in conjunction with `collect_metrics()` to get a sense of which model is the best performing model.
+
+For now, let's pretend that we have decided that `rf_workflow` is our best performing model and we want to use this model to make predictions on our test set for the competition.
+
++ Take `rf_workflow` and fit it to the full training data (not the 10-fold resampled data).
+
+```{r}
+set.seed(10)
+rf_workflow_fit <- ...
+```
+
+```{r}
+print(rf_workflow_fit) # print the resulting fit for the purpose of grading
+```
+
+
++ Read in the test data
+
+```{r}
+test <- read_csv("test.csv")
+```
+
++ Use `rf_workflow_fit` to make predictions for the test data. Be sure to bind the predicted values to the id column in the test data.
+
+```{r}
+
+```
+
+
++ For the purpose of this homework, print the first 15 rows of ids and predictions.
+
+```{r}
+
+```
+
+
++ Rename the columns if necessary so the column names are `id` and `percent_dem`. Use `write_csv()` to save the predictions to a csv file.
+
+```{r}
+
+```
+
+
+
+### Part 3: As a team, make a Kaggle Submission (25 pts)
+
++ Create your team on Kaggle with the teammates you have listed.
++ Upload a submission of predictions to Kaggle. Only one member of the team needs to make a submission for you to receive credit for this part of the homework.
++ Include a screenshot of your submission.
++ The scores on Kaggle are based on MSE not rmse. The scores on Kaggle should be approximately the square of your estimated rmse from the cross-validation.
++ I have uploaded a benchmark set of scores based on a model following the steps in this homework.
+
+```{r, out.width="6.5in"}
+include_graphics("screenshot.png")
+```
+
+Write your team members names here:
+
++ your name
++ team mate name
++ team mate name
++ team mate name
++ team mate name
+
+
+### Extra Credit [5 pts]
+
+Include a picture of your group meeting together.
+
+You may include a selfie photo of your group if you met in person. All team members must be present.
+
+You may use a screen shot of a Zoom meeting if you meet online. All team members must have their cameras on.
+
+
